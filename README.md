@@ -1,2 +1,0 @@
-# Toyo
-Registro de Visitas
