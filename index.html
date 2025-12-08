@@ -5,6 +5,13 @@
   <title>Registro de Visitas – Toyo Foods</title>
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
 
+  <link rel="manifest" href="manifest.json">
+
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js");
+  }
+</script>
   <!-- Librería para exportar a Excel -->
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 
@@ -1320,3 +1327,4 @@
   </script>
 </body>
 </html>
+
