@@ -1,83 +1,1183 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login | Seguimiento Vendedores</title>
-<style>
-body{
-  font-family:Arial, sans-serif;
-  background:#f2f4f8;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-}
-.card{
-  background:#fff;
-  padding:25px;
-  width:100%;
-  max-width:380px;
-  border-radius:14px;
-  box-shadow:0 4px 14px rgba(0,0,0,.12);
-}
-h2{text-align:center;color:#0046BE;}
-input,button{
-  width:100%;
-  padding:12px;
-  margin-top:12px;
-  font-size:16px;
-}
-button{
-  background:#0046BE;
-  color:#fff;
-  border:none;
-  border-radius:8px;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Toyo Foods – Seguimiento de Visitas</title>
+
+  <!-- Manifest inline (para “instalable” en móvil) -->
+  <link id="manifestLink" rel="manifest" href="" />
+
+  <!-- SheetJS (Excel .xlsx) via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <style>
+    :root{
+      --toyo-blue:#0046BE;
+      --toyo-navy:#002E80;
+      --bg:#F3F5F9;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#d8dee9;
+      --good:#16a34a;
+      --warn:#f59e0b;
+      --bad:#dc2626;
+      --shadow: 0 10px 25px rgba(2,6,23,.08);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background: linear-gradient(180deg, #eef2ff 0%, var(--bg) 40%, var(--bg) 100%);
+      padding: 14px;
+    }
+    header{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; margin-bottom:12px;
+    }
+    .brand{
+      display:flex; flex-direction:column; gap:2px;
+    }
+    .brand h1{
+      margin:0;
+      font-size:18px;
+      letter-spacing:.2px;
+      color:var(--toyo-navy);
+    }
+    .brand .sub{
+      font-size:12px; color:var(--muted);
+    }
+    .pill{
+      background:#fff;
+      border:1px solid var(--border);
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      display:flex; gap:8px; align-items:center;
+      box-shadow: 0 4px 12px rgba(2,6,23,.06);
+      white-space:nowrap;
+    }
+    .dot{
+      width:10px; height:10px; border-radius:50%;
+      background:var(--warn);
+      display:inline-block;
+    }
+    .dot.good{background:var(--good)}
+    .dot.bad{background:var(--bad)}
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+    @media (min-width: 980px){
+      .grid{ grid-template-columns: 1.15fr .85fr; align-items:start; }
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+    .card h2{
+      margin: 0 0 10px 0;
+      font-size: 15px;
+      color: var(--toyo-blue);
+      letter-spacing:.2px;
+    }
+    .row{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    @media (min-width: 620px){
+      .row.two{ grid-template-columns: 1fr 1fr; }
+      .row.three{ grid-template-columns: 1fr 1fr 1fr; }
+    }
+    label{
+      display:block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    input, select, textarea{
+      width:100%;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding: 12px 12px;
+      font-size: 15px;
+      outline:none;
+      background:#fff;
+    }
+    textarea{ min-height: 92px; resize: vertical; }
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(0,70,190,.45);
+      box-shadow: 0 0 0 4px rgba(0,70,190,.10);
+    }
+    .btns{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+    button{
+      border:none;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 14px;
+      cursor:pointer;
+      background: var(--toyo-blue);
+      color:#fff;
+      box-shadow: 0 10px 20px rgba(0,70,190,.18);
+    }
+    button.secondary{
+      background:#fff;
+      color:var(--toyo-blue);
+      border:1px solid rgba(0,70,190,.35);
+      box-shadow:none;
+    }
+    button.danger{
+      background: var(--bad);
+      box-shadow: 0 10px 20px rgba(220,38,38,.14);
+    }
+    button:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+    }
+    .hint{
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+      line-height:1.35;
+    }
+    .kpi{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
+    }
+    .kpi .box{
+      border:1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      background: linear-gradient(180deg,#fff 0%, #fbfcff 100%);
+    }
+    .kpi .top{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      margin-bottom: 8px;
+    }
+    .kpi .title{
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .kpi .value{
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .bar{
+      height: 12px;
+      background: #eef2ff;
+      border-radius: 999px;
+      overflow:hidden;
+      border:1px solid rgba(0,46,128,.08);
+    }
+    .bar > div{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, var(--toyo-blue), #2563eb);
+      border-radius: 999px;
+      transition: width .25s ease;
+    }
+    .status{
+      font-size: 12px;
+      margin-top: 8px;
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+    .status .tag{
+      padding: 4px 8px;
+      border-radius: 999px;
+      border:1px solid var(--border);
+      background:#fff;
+      font-weight:600;
+      font-size: 12px;
+    }
+    .tag.good{ color:var(--good); border-color: rgba(22,163,74,.25); }
+    .tag.warn{ color:var(--warn); border-color: rgba(245,158,11,.25); }
+    .tag.bad{ color:var(--bad); border-color: rgba(220,38,38,.25); }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size: 13px;
+      overflow:hidden;
+    }
+    th, td{
+      text-align:left;
+      padding: 10px 8px;
+      border-bottom:1px solid var(--border);
+      vertical-align:top;
+    }
+    th{
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .nowrap{ white-space:nowrap; }
+    .muted{ color:var(--muted); }
+    .small{ font-size: 12px; }
+    .maplink{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding: 7px 10px;
+      border-radius: 10px;
+      border:1px solid rgba(0,70,190,.25);
+      color: var(--toyo-blue);
+      text-decoration:none;
+      font-weight:700;
+      background:#fff;
+    }
+    .rightTools{
+      display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:flex-end;
+    }
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      background: rgba(15,23,42,.92);
+      color:#fff;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      max-width: 92vw;
+      display:none;
+      z-index: 50;
+    }
+    .hr{
+      height:1px;
+      background: var(--border);
+      margin: 12px 0;
+    }
+    .warnBox{
+      border:1px dashed rgba(245,158,11,.55);
+      background: #fff7ed;
+      color: #7c2d12;
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-size: 12px;
+      line-height:1.35;
+    }
+  </style>
 </head>
+
 <body>
+  <header>
+    <div class="brand">
+      <h1>Toyo Foods – Seguimiento de Visitas</h1>
+      <div class="sub">Un solo archivo · GPS automático · Excel descargable</div>
+    </div>
+    <div class="pill" title="Estado del GPS">
+      <span id="gpsDot" class="dot"></span>
+      <span id="gpsStatus">GPS: esperando…</span>
+    </div>
+  </header>
 
-<div class="card">
-<h2>Registro de Visitas</h2>
+  <div class="grid">
+    <!-- IZQUIERDA: Captura -->
+    <div class="card">
+      <h2>Registrar visita</h2>
 
-<input id="usuario" placeholder="Nombre completo">
-<input id="password" type="password" placeholder="Contraseña">
-<button onclick="login()">Entrar</button>
-</div>
+      <div class="row two">
+        <div>
+          <label>Vendedor (obligatorio)</label>
+          <select id="vendorSelect"></select>
+        </div>
+
+        <div>
+          <label>Cliente visitado (escribir)</label>
+          <input id="clientInput" type="text" placeholder="Ej. Sushi Factory Providencia" autocomplete="off" />
+        </div>
+      </div>
+
+      <div class="row two" style="margin-top:10px;">
+        <div>
+          <label>Motivo de visita (obligatorio)</label>
+          <select id="motiveSelect">
+            <option value="">Selecciona…</option>
+            <option>Cotización</option>
+            <option>Negociación</option>
+            <option>Degustación</option>
+            <option>Entrega de faltante</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Fecha y hora (automático)</label>
+          <input id="datetimeInput" type="text" readonly />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <div>
+          <label>Comentarios (obligatorio)</label>
+          <textarea id="commentsInput" placeholder="Ej. Se presentó cotización, solicita seguimiento, acordado para viernes…"></textarea>
+        </div>
+      </div>
+
+      <div class="row three" style="margin-top:10px;">
+        <div>
+          <label>Latitud (GPS)</label>
+          <input id="latInput" type="text" readonly />
+        </div>
+        <div>
+          <label>Longitud (GPS)</label>
+          <input id="lngInput" type="text" readonly />
+        </div>
+        <div>
+          <label>Precisión (m)</label>
+          <input id="accInput" type="text" readonly />
+        </div>
+      </div>
+
+      <div class="hint">
+        ✅ El GPS, fecha y hora se guardan automáticamente y <b>no se pueden editar</b>. Si no hay GPS, no se registra.
+        <br/>🔒 Además, cada registro se guarda con una <b>cadena de integridad</b> para detectar alteraciones.
+      </div>
+
+      <div class="btns">
+        <button id="saveBtn">Guardar visita</button>
+        <button id="clearFormBtn" class="secondary" type="button">Limpiar</button>
+      </div>
+
+      <div class="hr"></div>
+
+      <h2>Meta (seguimiento)</h2>
+      <div class="row two">
+        <div>
+          <label>Meta mensual (MXN)</label>
+          <input id="goalMonthly" type="number" inputmode="numeric" placeholder="Ej. 500000" />
+        </div>
+        <div>
+          <label>Días laborales del mes</label>
+          <input id="workDays" type="number" inputmode="numeric" placeholder="Ej. 22" />
+        </div>
+      </div>
+      <div class="row two" style="margin-top:10px;">
+        <div>
+          <label>Avance actual (MXN)</label>
+          <input id="goalProgress" type="number" inputmode="numeric" placeholder="Ej. 310000" />
+        </div>
+        <div>
+          <label>Meta diaria (automática)</label>
+          <input id="goalDaily" type="text" readonly />
+        </div>
+      </div>
+
+      <div class="btns">
+        <button id="saveGoalBtn" class="secondary" type="button">Guardar meta</button>
+      </div>
+      <div class="hint">La meta diaria se calcula: <b>Meta mensual / Días laborales</b>. El avance se muestra en la tarjeta de indicadores.</div>
+
+      <div class="hr"></div>
+
+      <h2>Exportación</h2>
+      <div class="warnBox" id="saturdayBox" style="display:none;"></div>
+
+      <div class="btns">
+        <button id="exportBtn">Descargar Excel (.xlsx)</button>
+        <button id="exportWeekBtn" class="secondary">Descargar semana actual</button>
+        <button id="backupBtn" class="secondary">Backup JSON</button>
+        <button id="clearAllBtn" class="danger">Borrar TODO (admin)</button>
+      </div>
+
+      <div class="hint">
+        📩 En un solo archivo sin servidor no se puede enviar el Excel automáticamente por correo.
+        Pero el archivo queda listo para que lo envíes a <b>hberistain@toyofoods.com.mx</b>.
+      </div>
+    </div>
+
+    <!-- DERECHA: Indicadores + Historial -->
+    <div class="card">
+      <h2>Indicadores</h2>
+
+      <div class="kpi">
+        <div class="box">
+          <div class="top">
+            <div class="title">Visitas HOY (meta 5)</div>
+            <div class="value"><span id="todayCount">0</span> / 5</div>
+          </div>
+          <div class="bar"><div id="todayBar"></div></div>
+          <div class="status">
+            <span class="tag" id="todayTag">En progreso</span>
+            <span class="muted small" id="todayNote"></span>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="top">
+            <div class="title">Visitas SEMANA (meta 25)</div>
+            <div class="value"><span id="weekCount">0</span> / 25</div>
+          </div>
+          <div class="bar"><div id="weekBar"></div></div>
+          <div class="status">
+            <span class="tag" id="weekTag">En progreso</span>
+            <span class="muted small" id="weekNote"></span>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="top">
+            <div class="title">Meta mensual (avance)</div>
+            <div class="value"><span id="goalPct">0</span>%</div>
+          </div>
+          <div class="bar"><div id="goalBar"></div></div>
+          <div class="status">
+            <span class="tag" id="goalTag">Sin meta</span>
+            <span class="muted small" id="goalNote"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+        <h2 style="margin:0;">Historial</h2>
+        <div class="rightTools">
+          <select id="filterVendor" title="Filtrar por vendedor" style="max-width:240px;"></select>
+          <button id="refreshBtn" class="secondary" type="button">Actualizar</button>
+        </div>
+      </div>
+
+      <div class="hint" style="margin-top:8px;">
+        El historial muestra: cliente, motivo, comentarios, y botón de mapa.  
+        También indica si algún registro fue alterado (integridad).
+      </div>
+
+      <div style="overflow:auto; margin-top:10px;">
+        <table id="historyTable">
+          <thead>
+            <tr>
+              <th class="nowrap">Fecha</th>
+              <th>Vendedor</th>
+              <th>Cliente</th>
+              <th class="nowrap">Motivo</th>
+              <th>Comentarios</th>
+              <th class="nowrap">Mapa</th>
+              <th class="nowrap">Integridad</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody">
+            <tr><td colspan="7" class="muted">Sin registros aún.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
 
 <script>
-const usuarios = {
-  "Aguilar Neri Daniel": {pass:"1234", rol:"vendedor"},
-  "De la Cruz Ponce Julio Cesar": {pass:"1234", rol:"vendedor"},
-  "Garibay Ortiz Sergio Joel": {pass:"1234", rol:"vendedor"},
-  "Perez Mar Alan Roberto": {pass:"1234", rol:"vendedor"},
-  "Reynoso Aguilar Maricela": {pass:"1234", rol:"vendedor"},
-  "Sandra Navarro Navarro": {pass:"1234", rol:"vendedor"},
-  "Arcenio Aguirre Ojeda": {pass:"1234", rol:"vendedor"},
-  "Velez Castellanos Antonio": {pass:"1234", rol:"vendedor"},
-  "Yepez Mora Oscar Alberto": {pass:"1234", rol:"vendedor"},
-  "Hernandez Gonzalez Miguel Angel": {pass:"1234", rol:"vendedor"},
-  "Sierra de Anda Aldo": {pass:"1234", rol:"vendedor"},
+/* =========================
+   CONFIG / CONSTANTES
+========================= */
+const APP_KEY_VISITS = "toyo_visits_v1";
+const APP_KEY_META   = "toyo_meta_v1";
+const APP_KEY_EXPORT = "toyo_export_v1";
 
-  "Beristain Bolaños Hector": {pass:"admin", rol:"gerencia"}
-};
+const VENDORS = [
+  "Aguilar Neri Daniel",
+  "De la Cruz Ponce Julio Cesar",
+  "Garibay Ortiz Sergio Joel",
+  "Perez Mar Alan Roberto",
+  "Reynoso Aguilar Maricela",
+  "Sandra Navarro Navarro",
+  "Arcenio Aguirre Ojeda",
+  "Velez Castellanos Antonio",
+  "Yepez Mora Oscar Alberto",
+  "Beristain Bolaños Hector",
+  "Sierra de Anda Aldo"
+];
 
-function login(){
-  const u = usuario.value.trim();
-  const p = password.value.trim();
+const DAILY_TARGET = 5;
+const WEEKLY_TARGET = 25;
 
-  if(!usuarios[u] || usuarios[u].pass !== p){
-    alert("Usuario o contraseña incorrectos");
+/* =========================
+   HELPERS
+========================= */
+function $(id){ return document.getElementById(id); }
+
+function toast(msg){
+  const el = $("toast");
+  el.textContent = msg;
+  el.style.display = "block";
+  clearTimeout(toast._t);
+  toast._t = setTimeout(()=> el.style.display="none", 2600);
+}
+
+function pad2(n){ return String(n).padStart(2,"0"); }
+
+function nowLocalParts(){
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = pad2(d.getMonth()+1);
+  const dd = pad2(d.getDate());
+  const hh = pad2(d.getHours());
+  const mi = pad2(d.getMinutes());
+  const ss = pad2(d.getSeconds());
+  return {d, yyyy, mm, dd, hh, mi, ss};
+}
+
+function dateKeyLocal(d=new Date()){
+  const y = d.getFullYear();
+  const m = pad2(d.getMonth()+1);
+  const day = pad2(d.getDate());
+  return `${y}-${m}-${day}`;
+}
+
+// ISO week helpers
+function isoWeekInfo(date = new Date()){
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  const year = d.getUTCFullYear();
+  return { isoYear: year, isoWeek: weekNo };
+}
+
+function weekKeyLocal(d=new Date()){
+  const {isoYear, isoWeek} = isoWeekInfo(d);
+  return `${isoYear}-W${String(isoWeek).padStart(2,"0")}`;
+}
+
+function weekdayName(d=new Date()){
+  return ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"][d.getDay()];
+}
+
+function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+
+function money(n){
+  if(!isFinite(n)) return "";
+  return new Intl.NumberFormat("es-MX",{style:"currency", currency:"MXN", maximumFractionDigits:0}).format(n);
+}
+
+function safeTrim(s){ return (s||"").toString().trim(); }
+
+function loadVisits(){
+  try{
+    return JSON.parse(localStorage.getItem(APP_KEY_VISITS) || "[]");
+  }catch(e){ return []; }
+}
+function saveVisits(visits){
+  localStorage.setItem(APP_KEY_VISITS, JSON.stringify(visits));
+}
+function loadMeta(){
+  try{
+    return JSON.parse(localStorage.getItem(APP_KEY_META) || "{}");
+  }catch(e){ return {}; }
+}
+function saveMeta(meta){
+  localStorage.setItem(APP_KEY_META, JSON.stringify(meta));
+}
+function loadExportInfo(){
+  try{
+    return JSON.parse(localStorage.getItem(APP_KEY_EXPORT) || "{}");
+  }catch(e){ return {}; }
+}
+function saveExportInfo(obj){
+  localStorage.setItem(APP_KEY_EXPORT, JSON.stringify(obj));
+}
+
+/* =========================
+   INTEGRIDAD (HASH CHAIN)
+========================= */
+async function sha256Hex(str){
+  const enc = new TextEncoder().encode(str);
+  const buf = await crypto.subtle.digest("SHA-256", enc);
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+
+async function computeRecordHash(recordCore, prevHash){
+  const payload = JSON.stringify(recordCore) + "|" + (prevHash || "");
+  return await sha256Hex(payload);
+}
+
+async function verifyIntegrity(visits){
+  // Verifica cadena y marca integrityOk true/false
+  let prev = "";
+  for(let i=0;i<visits.length;i++){
+    const v = visits[i];
+    const core = {
+      id: v.id, vendor: v.vendor, client: v.client, motive: v.motive, comments: v.comments,
+      lat: v.lat, lng: v.lng, accuracy: v.accuracy, geoTs: v.geoTs,
+      createdAt: v.createdAt, dayKey: v.dayKey, weekKey: v.weekKey
+    };
+    const expectedPrev = prev || "";
+    const expectedHash = await computeRecordHash(core, expectedPrev);
+    const ok = (v.prevHash || "") === expectedPrev && (v.hash || "") === expectedHash;
+    v.integrityOk = ok;
+    prev = v.hash || "";
+  }
+}
+
+/* =========================
+   GPS
+========================= */
+let lastGeo = null; // {lat,lng,accuracy,ts}
+let geoWatching = false;
+
+function setGpsStatus(state, msg){
+  const dot = $("gpsDot");
+  dot.classList.remove("good","bad");
+  if(state === "good") dot.classList.add("good");
+  if(state === "bad") dot.classList.add("bad");
+  $("gpsStatus").textContent = msg;
+}
+
+function updateGeoFields(){
+  if(!lastGeo){
+    $("latInput").value = "";
+    $("lngInput").value = "";
+    $("accInput").value = "";
+    return;
+  }
+  $("latInput").value = lastGeo.lat.toFixed(6);
+  $("lngInput").value = lastGeo.lng.toFixed(6);
+  $("accInput").value = Math.round(lastGeo.accuracy);
+}
+
+function startGeolocation(){
+  if(!navigator.geolocation){
+    setGpsStatus("bad","GPS: no disponible");
+    toast("Este dispositivo no soporta geolocalización.");
+    return;
+  }
+  if(geoWatching) return;
+  geoWatching = true;
+
+  setGpsStatus("", "GPS: buscando…");
+
+  navigator.geolocation.watchPosition(
+    (pos)=>{
+      const c = pos.coords;
+      lastGeo = {
+        lat: c.latitude,
+        lng: c.longitude,
+        accuracy: c.accuracy || 9999,
+        ts: pos.timestamp || Date.now()
+      };
+      updateGeoFields();
+      setGpsStatus("good", `GPS: OK (${Math.round(lastGeo.accuracy)} m)`);
+    },
+    (err)=>{
+      lastGeo = null;
+      updateGeoFields();
+      setGpsStatus("bad", "GPS: sin acceso");
+      // mensajes comunes: PERMISSION_DENIED / POSITION_UNAVAILABLE / TIMEOUT
+      toast("Activa ubicación (GPS) y permisos del navegador.");
+      console.warn(err);
+    },
+    { enableHighAccuracy:true, maximumAge: 5000, timeout: 15000 }
+  );
+}
+
+/* =========================
+   UI INIT
+========================= */
+function initVendors(){
+  // Select principal
+  const sel = $("vendorSelect");
+  sel.innerHTML = `<option value="">Selecciona…</option>` + VENDORS.map(v=>`<option>${v}</option>`).join("");
+  // Filtro
+  const f = $("filterVendor");
+  f.innerHTML = `<option value="__ALL__">Todos los vendedores</option>` + VENDORS.map(v=>`<option>${v}</option>`).join("");
+}
+
+function setDatetimeNow(){
+  const {yyyy,mm,dd,hh,mi} = nowLocalParts();
+  $("datetimeInput").value = `${dd}/${mm}/${yyyy} ${hh}:${mi}`;
+}
+
+function initManifest(){
+  // Manifest inline (data URL)
+  const manifest = {
+    name: "Toyo Foods – Seguimiento de Visitas",
+    short_name: "Toyo Visitas",
+    start_url: "./",
+    display: "standalone",
+    background_color: "#F3F5F9",
+    theme_color: "#0046BE",
+    icons: [
+      // Iconos sencillos en SVG data URL (compatibilidad variable, pero suficiente)
+      {
+        src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Crect width='100%25' height='100%25' rx='36' ry='36' fill='%230046BE'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='72' fill='white'%3ETF%3C/text%3E%3C/svg%3E",
+        sizes: "192x192",
+        type: "image/svg+xml"
+      },
+      {
+        src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512'%3E%3Crect width='100%25' height='100%25' rx='96' ry='96' fill='%23002E80'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='180' fill='white'%3ETF%3C/text%3E%3C/svg%3E",
+        sizes: "512x512",
+        type: "image/svg+xml"
+      }
+    ]
+  };
+  const json = encodeURIComponent(JSON.stringify(manifest));
+  $("manifestLink").href = `data:application/manifest+json;charset=utf-8,${json}`;
+}
+
+/* =========================
+   KPI LOGIC
+========================= */
+function computeKPIs(visits, vendorFilter){
+  const today = dateKeyLocal();
+  const week = weekKeyLocal();
+
+  const filterFn = (v)=> vendorFilter && vendorFilter !== "__ALL__" ? v.vendor === vendorFilter : true;
+
+  const vFiltered = visits.filter(filterFn);
+
+  const todayCount = vFiltered.filter(v=> v.dayKey === today).length;
+  const weekCount  = vFiltered.filter(v=> v.weekKey === week).length;
+
+  return { todayCount, weekCount, todayKey: today, weekKey: week };
+}
+
+function updateKPICards(visits){
+  const vendor = $("filterVendor").value || "__ALL__";
+  const {todayCount, weekCount} = computeKPIs(visits, vendor);
+
+  $("todayCount").textContent = todayCount;
+  $("weekCount").textContent  = weekCount;
+
+  const todayPct = clamp((todayCount/DAILY_TARGET)*100, 0, 100);
+  const weekPct  = clamp((weekCount/WEEKLY_TARGET)*100, 0, 100);
+
+  $("todayBar").style.width = `${todayPct}%`;
+  $("weekBar").style.width  = `${weekPct}%`;
+
+  // Etiquetas / notas
+  const hour = new Date().getHours();
+  const isLate = hour >= 18; // 6 pm
+  const todayTag = $("todayTag");
+  todayTag.className = "tag";
+  if(todayCount >= DAILY_TARGET){ todayTag.textContent = "Cumplido"; todayTag.classList.add("good"); }
+  else if(isLate && todayCount < DAILY_TARGET){ todayTag.textContent = "Faltan visitas"; todayTag.classList.add("bad"); }
+  else { todayTag.textContent = "En progreso"; todayTag.classList.add("warn"); }
+
+  $("todayNote").textContent = (vendor==="__ALL__")
+    ? (isLate && todayCount < DAILY_TARGET ? "Alerta por día (global).": "")
+    : (isLate && todayCount < DAILY_TARGET ? "Alerta por vendedor." : "");
+
+  const weekTag = $("weekTag");
+  weekTag.className = "tag";
+  if(weekCount >= WEEKLY_TARGET){ weekTag.textContent = "Meta semanal"; weekTag.classList.add("good"); }
+  else { weekTag.textContent = "En progreso"; weekTag.classList.add("warn"); }
+
+  $("weekNote").textContent = (vendor==="__ALL__") ? "Meta: 25 en total" : "Meta: 25 por vendedor";
+
+  // Meta ventas
+  const meta = loadMeta();
+  const monthly = Number(meta.monthly || 0);
+  const workDays = Number(meta.workDays || 0);
+  const progress = Number(meta.progress || 0);
+
+  const daily = (monthly>0 && workDays>0) ? (monthly/workDays) : 0;
+  $("goalDaily").value = daily ? money(daily) : "";
+
+  const pct = (monthly>0) ? clamp((progress/monthly)*100, 0, 999) : 0;
+  $("goalPct").textContent = monthly>0 ? Math.round(pct) : 0;
+  $("goalBar").style.width = monthly>0 ? `${clamp(pct,0,100)}%` : "0%";
+
+  const goalTag = $("goalTag");
+  goalTag.className = "tag";
+  if(monthly<=0){ goalTag.textContent = "Sin meta"; goalTag.classList.add("warn"); $("goalNote").textContent = "Captura meta mensual."; }
+  else{
+    if(pct>=100){ goalTag.textContent = "Cumplido"; goalTag.classList.add("good"); }
+    else if(pct>=60){ goalTag.textContent = "Buen ritmo"; goalTag.classList.add("good"); }
+    else if(pct>=35){ goalTag.textContent = "En progreso"; goalTag.classList.add("warn"); }
+    else { goalTag.textContent = "Riesgo"; goalTag.classList.add("bad"); }
+    $("goalNote").textContent = `${money(progress)} / ${money(monthly)} · diaria: ${money(daily)}`;
+  }
+}
+
+/* =========================
+   HISTORIAL
+========================= */
+function escapeHtml(s){
+  return (s||"").toString()
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function renderHistory(visits){
+  const tbody = $("historyBody");
+  const vendor = $("filterVendor").value || "__ALL__";
+  const qVendor = vendor !== "__ALL__";
+
+  const data = qVendor ? visits.filter(v=>v.vendor===vendor) : visits.slice();
+
+  // Most recent first
+  data.sort((a,b)=> (b.createdAt||"").localeCompare(a.createdAt||""));
+
+  if(data.length === 0){
+    tbody.innerHTML = `<tr><td colspan="7" class="muted">Sin registros aún.</td></tr>`;
     return;
   }
 
-  localStorage.setItem("usuario", u);
-  localStorage.setItem("rol", usuarios[u].rol);
+  tbody.innerHTML = data.map(v=>{
+    const dt = new Date(v.createdAt);
+    const fecha = `${pad2(dt.getDate())}/${pad2(dt.getMonth()+1)}/${dt.getFullYear()}`;
+    const hora  = `${pad2(dt.getHours())}:${pad2(dt.getMinutes())}`;
+    const mapUrl = `https://www.google.com/maps?q=${encodeURIComponent(v.lat + "," + v.lng)}`;
 
-  window.location.href =
-    usuarios[u].rol === "gerencia" ? "dashboard.html" : "app.html";
+    const integrityTxt = v.integrityOk ? "OK" : "ALTERADO";
+    const integrityBadge = v.integrityOk
+      ? `<span class="tag good">OK</span>`
+      : `<span class="tag bad">ALTERADO</span>`;
+
+    return `
+      <tr>
+        <td class="nowrap">${fecha}<div class="muted small">${hora}</div></td>
+        <td>${escapeHtml(v.vendor)}</td>
+        <td>${escapeHtml(v.client)}</td>
+        <td class="nowrap">${escapeHtml(v.motive)}</td>
+        <td>${escapeHtml(v.comments)}</td>
+        <td class="nowrap">
+          <a class="maplink" href="${mapUrl}" target="_blank" rel="noopener">📍 Mapa</a>
+          <div class="muted small">± ${Math.round(v.accuracy)} m</div>
+        </td>
+        <td class="nowrap">
+          ${integrityBadge}
+          <div class="muted small">${escapeHtml(v.hash||"").slice(0,10)}…</div>
+        </td>
+      </tr>
+    `;
+  }).join("");
 }
+
+/* =========================
+   GUARDAR VISITA
+========================= */
+async function saveVisit(){
+  const vendor = safeTrim($("vendorSelect").value);
+  const client = safeTrim($("clientInput").value);
+  const motive = safeTrim($("motiveSelect").value);
+  const comments = safeTrim($("commentsInput").value);
+
+  if(!vendor){ toast("Selecciona vendedor."); return; }
+  if(!client){ toast("Escribe el cliente."); return; }
+  if(!motive){ toast("Selecciona motivo."); return; }
+  if(!comments){ toast("Escribe comentarios."); return; }
+
+  if(!lastGeo){
+    toast("No hay GPS. Activa ubicación y permisos.");
+    return;
+  }
+  // Si precisión es muy mala, aún guardamos pero avisamos
+  const accuracy = Number(lastGeo.accuracy || 9999);
+
+  const createdAt = new Date().toISOString();
+  const dayKey = dateKeyLocal(new Date());
+  const weekKey = weekKeyLocal(new Date());
+
+  const visits = loadVisits();
+
+  const id = crypto.randomUUID ? crypto.randomUUID() : (Date.now()+"-"+Math.random().toString(16).slice(2));
+  const prevHash = (visits.length ? (visits[visits.length-1].hash || "") : "");
+
+  const core = {
+    id, vendor, client, motive, comments,
+    lat: Number(lastGeo.lat), lng: Number(lastGeo.lng),
+    accuracy: Number(accuracy), geoTs: Number(lastGeo.ts),
+    createdAt, dayKey, weekKey
+  };
+
+  const hash = await computeRecordHash(core, prevHash);
+
+  const record = { ...core, prevHash, hash, integrityOk:true };
+
+  visits.push(record);
+  saveVisits(visits);
+
+  // Verificar cadena completa (por si algo ya estaba alterado)
+  await verifyIntegrity(visits);
+  saveVisits(visits);
+
+  toast(accuracy > 80 ? "Visita guardada (GPS con baja precisión)." : "Visita guardada ✅");
+
+  // limpiar campos editables
+  $("clientInput").value = "";
+  $("motiveSelect").value = "";
+  $("commentsInput").value = "";
+
+  refreshAll();
+}
+
+/* =========================
+   META
+========================= */
+function loadMetaToUI(){
+  const meta = loadMeta();
+  $("goalMonthly").value = meta.monthly ?? "";
+  $("workDays").value = meta.workDays ?? "";
+  $("goalProgress").value = meta.progress ?? "";
+}
+
+function saveMetaFromUI(){
+  const monthly = Number($("goalMonthly").value || 0);
+  const workDays = Number($("workDays").value || 0);
+  const progress = Number($("goalProgress").value || 0);
+
+  saveMeta({ monthly, workDays, progress });
+  toast("Meta guardada ✅");
+  refreshAll();
+}
+
+/* =========================
+   EXPORTACIÓN EXCEL
+========================= */
+function visitsToRows(visits){
+  // Campos listos para tabla dinámica
+  return visits.map(v=>{
+    const dt = new Date(v.createdAt);
+    const fecha = `${dt.getFullYear()}-${pad2(dt.getMonth()+1)}-${pad2(dt.getDate())}`;
+    const hora  = `${pad2(dt.getHours())}:${pad2(dt.getMinutes())}:${pad2(dt.getSeconds())}`;
+    const {isoYear, isoWeek} = isoWeekInfo(new Date(dt));
+    const weekISO = `${isoYear}-W${String(isoWeek).padStart(2,"0")}`;
+
+    return {
+      Fecha: fecha,
+      Hora: hora,
+      Vendedor: v.vendor,
+      Cliente: v.client,
+      Motivo: v.motive,
+      Comentarios: v.comments,
+      Latitud: v.lat,
+      Longitud: v.lng,
+      Precision_m: Math.round(v.accuracy),
+      GPS_Timestamp: new Date(v.geoTs).toISOString ? new Date(v.geoTs).toISOString() : String(v.geoTs),
+      DiaSemana: weekdayName(new Date(dt)),
+      SemanaISO: weekISO,
+      DayKey: v.dayKey,
+      WeekKey: v.weekKey,
+      Integrity: v.integrityOk ? "OK" : "ALTERADO",
+      Hash: v.hash || "",
+      PrevHash: v.prevHash || ""
+    };
+  });
+}
+
+function downloadBlob(blob, filename){
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=> URL.revokeObjectURL(a.href), 5000);
+}
+
+async function exportExcel(scope="ALL"){
+  const visits = loadVisits();
+  await verifyIntegrity(visits);
+  saveVisits(visits);
+
+  let data = visits.slice();
+  const now = new Date();
+  const wk = weekKeyLocal(now);
+
+  if(scope === "WEEK"){
+    data = data.filter(v=> v.weekKey === wk);
+  }
+
+  if(data.length === 0){
+    toast(scope==="WEEK" ? "No hay visitas en la semana actual." : "No hay visitas para exportar.");
+    return;
+  }
+
+  const rows = visitsToRows(data);
+  const ws = XLSX.utils.json_to_sheet(rows);
+
+  // ancho de columnas (más cómodo)
+  ws["!cols"] = [
+    {wch: 12},{wch: 10},{wch: 28},{wch: 34},{wch: 16},{wch: 44},
+    {wch: 12},{wch: 12},{wch: 12},{wch: 24},{wch: 12},{wch: 10},
+    {wch: 12},{wch: 12},{wch: 12},{wch: 10},{wch: 66},{wch: 66}
+  ];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Visitas");
+
+  // Hoja resumen simple
+  const summary = buildSummarySheet(data);
+  const ws2 = XLSX.utils.aoa_to_sheet(summary);
+  ws2["!cols"] = [{wch: 22},{wch: 18},{wch: 18},{wch: 18}];
+  XLSX.utils.book_append_sheet(wb, ws2, "Resumen");
+
+  const {yyyy,mm,dd} = nowLocalParts();
+  const fname = scope==="WEEK"
+    ? `TOYOFOODS_VISITAS_${wk}_${yyyy}${mm}${dd}.xlsx`
+    : `TOYOFOODS_VISITAS_TODO_${yyyy}${mm}${dd}.xlsx`;
+
+  XLSX.writeFile(wb, fname);
+
+  // Guardar info de export (para recordatorio sábado)
+  const exp = loadExportInfo();
+  exp.lastExportAt = new Date().toISOString();
+  exp.lastExportWeek = wk;
+  saveExportInfo(exp);
+
+  toast("Excel descargado ✅");
+  refreshAll();
+}
+
+function buildSummarySheet(data){
+  // AOA: filas/columnas
+  const total = data.length;
+  const byVendor = {};
+  const byMotive = {};
+
+  data.forEach(v=>{
+    byVendor[v.vendor] = (byVendor[v.vendor]||0)+1;
+    byMotive[v.motive] = (byMotive[v.motive]||0)+1;
+  });
+
+  const rows = [];
+  rows.push(["RESUMEN", "", "", ""]);
+  rows.push(["Total visitas", total, "", ""]);
+  rows.push(["SemanaKey (si aplica)", weekKeyLocal(), "", ""]);
+  rows.push(["", "", "", ""]);
+  rows.push(["Por Vendedor", "Visitas", "", ""]);
+  Object.entries(byVendor).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{
+    rows.push([k, v, "", ""]);
+  });
+  rows.push(["", "", "", ""]);
+  rows.push(["Por Motivo", "Visitas", "", ""]);
+  Object.entries(byMotive).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{
+    rows.push([k, v, "", ""]);
+  });
+  return rows;
+}
+
+/* =========================
+   BACKUP JSON
+========================= */
+async function backupJSON(){
+  const visits = loadVisits();
+  await verifyIntegrity(visits);
+  saveVisits(visits);
+
+  const meta = loadMeta();
+  const payload = {
+    exportedAt: new Date().toISOString(),
+    visits,
+    meta
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
+  const {yyyy,mm,dd} = nowLocalParts();
+  downloadBlob(blob, `TOYOFOODS_BACKUP_${yyyy}${mm}${dd}.json`);
+  toast("Backup JSON descargado ✅");
+}
+
+/* =========================
+   BORRADO TOTAL (ADMIN)
+========================= */
+function clearAll(){
+  const pin = prompt("PIN admin (4 dígitos).");
+  // PIN simple (puedes cambiarlo aquí)
+  const ADMIN_PIN = "2025";
+  if(pin !== ADMIN_PIN){
+    toast("PIN incorrecto.");
+    return;
+  }
+  if(!confirm("¿Seguro? Esto borrará todo el historial y metas.")) return;
+
+  localStorage.removeItem(APP_KEY_VISITS);
+  localStorage.removeItem(APP_KEY_META);
+  localStorage.removeItem(APP_KEY_EXPORT);
+
+  toast("Datos borrados.");
+  refreshAll();
+}
+
+/* =========================
+   SÁBADO: recordatorio export
+========================= */
+function updateSaturdayReminder(){
+  const d = new Date();
+  const isSat = d.getDay() === 6;
+  const box = $("saturdayBox");
+  if(!isSat){
+    box.style.display = "none";
+    return;
+  }
+  const wk = weekKeyLocal(d);
+  const exp = loadExportInfo();
+  const done = exp.lastExportWeek === wk;
+  box.style.display = "block";
+  box.innerHTML = done
+    ? `✅ Hoy es <b>Sábado</b>. Ya descargaste la semana <b>${wk}</b>.`
+    : `⚠ Hoy es <b>Sábado</b>. Recuerda descargar el Excel de la semana <b>${wk}</b> y enviarlo a <b>hberistain@toyofoods.com.mx</b>.`;
+}
+
+/* =========================
+   REFRESH ALL
+========================= */
+async function refreshAll(){
+  setDatetimeNow();
+  loadMetaToUI();
+
+  const visits = loadVisits();
+  await verifyIntegrity(visits);
+  saveVisits(visits);
+
+  updateKPICards(visits);
+  renderHistory(visits);
+  updateSaturdayReminder();
+}
+
+/* =========================
+   EVENTOS
+========================= */
+document.addEventListener("DOMContentLoaded", async ()=>{
+  initManifest();
+  initVendors();
+  setDatetimeNow();
+  loadMetaToUI();
+  startGeolocation();
+
+  // Botones
+  $("saveBtn").addEventListener("click", saveVisit);
+  $("clearFormBtn").addEventListener("click", ()=>{
+    $("clientInput").value = "";
+    $("motiveSelect").value = "";
+    $("commentsInput").value = "";
+    toast("Formulario limpio.");
+  });
+
+  $("saveGoalBtn").addEventListener("click", saveMetaFromUI);
+
+  $("exportBtn").addEventListener("click", ()=> exportExcel("ALL"));
+  $("exportWeekBtn").addEventListener("click", ()=> exportExcel("WEEK"));
+  $("backupBtn").addEventListener("click", backupJSON);
+  $("clearAllBtn").addEventListener("click", clearAll);
+
+  $("refreshBtn").addEventListener("click", refreshAll);
+  $("filterVendor").addEventListener("change", refreshAll);
+
+  // Actualizar hora visible cada 10s (sin depender de edición)
+  setInterval(setDatetimeNow, 10000);
+  // Recordatorio sábado / KPI refresh ligero cada 60s
+  setInterval(()=>{ updateSaturdayReminder(); }, 60000);
+
+  await refreshAll();
+});
 </script>
 </body>
 </html>
