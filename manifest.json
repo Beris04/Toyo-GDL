@@ -1,12 +1,22 @@
 {
-  "name": "Toyo Visitas",
-  "short_name": "Toyo",
+  "name": "Toyo – Seguimiento de Visitas",
+  "short_name": "Toyo Visitas",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#0046BE",
   "theme_color": "#0046BE",
+  "description": "Sistema de seguimiento de visitas y ventas por vendedor",
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }
