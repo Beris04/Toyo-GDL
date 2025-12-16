@@ -1,67 +1,300 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Registro de Visita</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Toyo – Seguimiento de Visitas</title>
+<meta name="theme-color" content="#0046BE">
+<link rel="manifest" href="manifest.json">
+
 <style>
-body{font-family:Arial;background:#f2f4f8;padding:12px}
-.card{background:#fff;padding:18px;border-radius:14px}
-input,textarea,button{width:100%;padding:12px;margin-top:10px;font-size:16px}
-button{background:#25D366;color:#fff;border:none;border-radius:8px}
+:root{
+  --blue:#0046BE; --bg:#F0F2F5; --card:#fff;
+  --border:#d9dde6; --text:#0f172a; --muted:#64748b;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);padding:14px;color:var(--text)}
+.wrap{max-width:1100px;margin:auto}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+label{font-size:13px;color:var(--muted)}
+input,textarea,button{width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);font-size:16px}
+textarea{min-height:90px}
+.btn{background:var(--blue);color:#fff;font-weight:bold;border:none}
+.btn2{background:#fff;color:var(--blue);font-weight:bold;border:1px solid var(--blue)}
+.progress{height:14px;background:#e5e7eb;border-radius:999px;overflow:hidden}
+.progress div{height:100%;background:linear-gradient(90deg,var(--blue),#2d7dff)}
+.small{font-size:13px;color:var(--muted)}
+hr{border:none;border-top:1px solid var(--border);margin:10px 0}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-size:12px;border:1px solid rgba(29,78,216,.2)}
+a{color:var(--blue);font-weight:bold;text-decoration:none}
+a:hover{text-decoration:underline}
 </style>
 </head>
+
 <body>
+<script>
+/* ===== LOGIN CHECK ===== */
+const USER = localStorage.getItem("toyo_user");
+if(!USER || USER==="ADMIN"){ location.href="index.html"; }
+</script>
+
+<div class="wrap">
 
 <div class="card">
-<h3>Registro de Visita</h3>
-<p><b>Vendedor:</b> <span id="vendedor"></span></p>
-<p><b>Fecha:</b> <span id="fecha"></span></p>
+  <div class="topbar">
+    <div>
+      <h2 style="margin:0;color:var(--blue)">Registro de Visitas</h2>
+      <div class="small">Control diario con GPS</div>
+      <div class="small">Vendedor: <b id="userName"></b></div>
+    </div>
+    <button class="btn2" style="width:auto;padding:10px 14px" onclick="logout()">Salir</button>
+  </div>
+</div>
 
-<input id="cliente" placeholder="Cliente visitado">
-<textarea id="comentarios" placeholder="Comentarios"></textarea>
+<div class="grid">
 
-<button id="btn" onclick="guardar()">Guardar visita</button>
+  <!-- CAPTURA -->
+  <div class="card">
+    <h3 style="margin-top:0;color:var(--blue)">Captura</h3>
+
+    <label>Cliente</label>
+    <input id="cliente" placeholder="Nombre del cliente">
+
+    <label style="margin-top:10px">Comentarios</label>
+    <textarea id="comentarios" placeholder="Escribe comentarios de la visita"></textarea>
+
+    <div class="small" id="gpsBox" style="margin-top:10px">GPS: sin capturar</div>
+
+    <button class="btn2" style="margin-top:10px" onclick="capturarGPS()">📍 Capturar GPS</button>
+    <button class="btn" style="margin-top:10px" onclick="guardar()">✅ Guardar visita</button>
+  </div>
+
+  <!-- AVANCE -->
+  <div class="card">
+    <h3 style="margin-top:0;color:var(--blue)">Avance</h3>
+
+    <b id="pctDia">0%</b>
+    <div class="progress"><div id="barDia"></div></div>
+    <div class="small" id="subDia">0 de 5 visitas hoy</div>
+
+    <br>
+
+    <b id="pctSemana">0%</b>
+    <div class="progress"><div id="barSemana"></div></div>
+    <div class="small" id="subSemana">0 de 25 visitas semana</div>
+
+    <hr>
+
+    <label>Meta mensual ($)</label>
+    <input id="meta" inputmode="numeric" placeholder="Ej. 500000">
+
+    <label style="margin-top:10px">Venta del día ($)</label>
+    <input id="venta" inputmode="numeric" placeholder="Ej. 15000">
+
+    <button class="btn" style="margin-top:10px" onclick="guardarVenta()">💰 Guardar venta</button>
+
+    <b id="pctVenta">0%</b>
+    <div class="progress"><div id="barVenta"></div></div>
+    <div class="small" id="subVenta">$0 de $0</div>
+  </div>
+
+</div>
+
+<!-- HISTORIAL -->
+<div class="card">
+  <div class="topbar">
+    <h3 style="margin:0;color:var(--blue)">Historial</h3>
+    <button class="btn2" style="width:auto;padding:10px 14px" onclick="exportarExcel()">⬇️ Descargar historial (Excel)</button>
+  </div>
+
+  <div id="lista" style="margin-top:10px"></div>
+</div>
+
 </div>
 
 <script>
-if(!localStorage.getItem("usuario")){
-  location.href="index.html";
+/* ===== CONFIG ===== */
+const META_DIA = 5, META_SEM = 25;
+const LS = "toyo_visitas";
+
+// ventas por MES y por VENDEDOR (para que no se mezclen)
+const YM = new Date().getFullYear()+"_"+String(new Date().getMonth()+1).padStart(2,"0");
+const META_KEY = "meta_"+YM+"_"+USER;
+const VENTAS_KEY = "ventas_"+YM+"_"+USER;
+
+document.getElementById("userName").textContent = USER;
+
+let gps = null;
+
+/* ===== HELPERS ===== */
+const dayKey = ()=> new Date().toISOString().slice(0,10);
+
+const weekKey = ()=>{
+  const d = new Date(); d.setDate(d.getDate()+4-(d.getDay()||7));
+  const y = new Date(d.getFullYear(),0,1);
+  return d.getFullYear()+"-W"+Math.ceil((((d-y)/86400000)+1)/7);
+};
+
+/* ===== GPS ===== */
+function capturarGPS(){
+  navigator.geolocation.getCurrentPosition(p=>{
+    gps = p.coords;
+    gpsBox.textContent = `GPS: ${gps.latitude.toFixed(5)}, ${gps.longitude.toFixed(5)}`;
+  }, err=>{
+    alert("No se pudo obtener GPS: " + err.message);
+  }, { enableHighAccuracy:true, timeout:12000, maximumAge:0 });
 }
 
-const vendedor = localStorage.getItem("usuario");
-document.getElementById("vendedor").innerText = vendedor;
-
-const hoy = new Date();
-const fecha = hoy.toISOString().split("T")[0];
-document.getElementById("fecha").innerText = fecha;
-
+/* ===== GUARDAR VISITA ===== */
 function guardar(){
-  navigator.geolocation.getCurrentPosition(pos=>{
-    const visitas = JSON.parse(localStorage.getItem("visitas") || "[]");
+  if(!cliente.value.trim()) return alert("Ingresa cliente");
+  if(!gps) return alert("Captura GPS");
 
-    visitas.push({
-      vendedor,
-      cliente:cliente.value,
-      comentarios:comentarios.value,
-      fecha,
-      hora:new Date().toLocaleTimeString(),
-      lat:pos.coords.latitude,
-      lon:pos.coords.longitude
-    });
-
-    localStorage.setItem("visitas", JSON.stringify(visitas));
-
-    cliente.disabled = true;
-    comentarios.disabled = true;
-    btn.disabled = true;
-    btn.innerText = "Visita registrada ✔️";
-  }, ()=>{
-    alert("No se pudo obtener el GPS");
+  const data = JSON.parse(localStorage.getItem(LS) || "[]");
+  data.push({
+    vendedor: USER,
+    cliente: cliente.value.trim(),
+    comentarios: comentarios.value.trim(),
+    gps: { latitude:gps.latitude, longitude:gps.longitude, accuracy:gps.accuracy },
+    fecha: new Date().toISOString(),
+    day: dayKey(),
+    week: weekKey()
   });
+  localStorage.setItem(LS, JSON.stringify(data));
+
+  cliente.value = ""; comentarios.value = "";
+  gps = null; gpsBox.textContent = "GPS: sin capturar.";
+  render();
+}
+
+/* ===== RENDER ===== */
+function esc(s){ return String(s||"").replace(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m])); }
+
+function render(){
+  const all = JSON.parse(localStorage.getItem(LS) || "[]");
+  const data = all.filter(x=>x.vendedor===USER);
+
+  // historial
+  lista.innerHTML = "";
+  data.slice().reverse().forEach(d=>{
+    const map = d.gps
+      ? `<a target="_blank" href="https://maps.google.com/?q=${d.gps.latitude},${d.gps.longitude}">🗺️ Ver mapa</a>`
+      : "";
+    const comm = d.comentarios ? `<div class="small"><b>Comentarios:</b> ${esc(d.comentarios)}</div>` : "";
+    lista.innerHTML += `
+      <div class="small">
+        <span class="pill">${new Date(d.fecha).toLocaleString("es-MX")}</span><br>
+        <b>${esc(d.cliente)}</b><br>
+        ${map}
+        ${comm}
+      </div>
+      <hr>
+    `;
+  });
+
+  renderAvance();
+}
+
+/* ===== AVANCE VISITAS ===== */
+function renderAvance(){
+  const all = JSON.parse(localStorage.getItem(LS) || "[]");
+  const d = all.filter(x=>x.vendedor===USER);
+
+  const hoy = d.filter(x=>x.day===dayKey()).length;
+  const sem = d.filter(x=>x.week===weekKey()).length;
+
+  const pD = Math.min(100, Math.round(hoy/META_DIA*100));
+  const pS = Math.min(100, Math.round(sem/META_SEM*100));
+
+  pctDia.textContent = pD+"%"; barDia.style.width = pD+"%";
+  pctSemana.textContent = pS+"%"; barSemana.style.width = pS+"%";
+
+  subDia.textContent = `${hoy} de ${META_DIA} visitas hoy`;
+  subSemana.textContent = `${sem} de ${META_SEM} visitas semana`;
+}
+
+/* ===== VENTAS ===== */
+function guardarVenta(){
+  localStorage.setItem(META_KEY, meta.value);
+  let v = JSON.parse(localStorage.getItem(VENTAS_KEY) || "[]");
+  v.push(Number(venta.value || 0));
+  localStorage.setItem(VENTAS_KEY, JSON.stringify(v));
+  venta.value = "";
+  renderVentas();
+}
+
+function renderVentas(){
+  const m = Number(localStorage.getItem(META_KEY) || 0);
+  const v = JSON.parse(localStorage.getItem(VENTAS_KEY) || "[]");
+  const t = v.reduce((a,b)=>a+b, 0);
+  const p = m ? Math.min(100, Math.round(t/m*100)) : 0;
+
+  pctVenta.textContent = p+"%"; barVenta.style.width = p+"%";
+  subVenta.textContent = "$"+t.toLocaleString("es-MX")+" de $"+m.toLocaleString("es-MX");
+}
+
+/* ===== EXPORT EXCEL (CSV compatible con Excel) ===== */
+function exportarExcel(){
+  const all = JSON.parse(localStorage.getItem(LS) || "[]");
+  const d = all.filter(x=>x.vendedor===USER);
+
+  const metaV = Number(localStorage.getItem(META_KEY) || 0);
+  const ventasTotal = JSON.parse(localStorage.getItem(VENTAS_KEY) || "[]").reduce((a,b)=>a+b,0);
+  const pVenta = metaV ? Math.round((ventasTotal/metaV)*100) : 0;
+
+  const csv = [];
+  csv.push([
+    "Vendedor","Cliente","Comentarios","FechaHora",
+    "Latitud","Longitud","Precision_m",
+    "%VisitasDia","%VisitasSemana",
+    "MetaMensual","VentasAcumuladas","%AvanceVentas","Semana","Dia"
+  ].join(","));
+
+  d.forEach(x=>{
+    csv.push([
+      `"${USER.replace(/"/g,'""')}"`,
+      `"${String(x.cliente||"").replace(/"/g,'""')}"`,
+      `"${String(x.comentarios||"").replace(/"/g,'""')}"`,
+      `"${new Date(x.fecha).toLocaleString("es-MX")}"`,
+      x.gps ? x.gps.latitude : "",
+      x.gps ? x.gps.longitude : "",
+      x.gps ? Math.round(x.gps.accuracy||0) : "",
+      pctDia.textContent,
+      pctSemana.textContent,
+      metaV,
+      ventasTotal,
+      pVenta+"%",
+      `"${x.week}"`,
+      `"${x.day}"`
+    ].join(","));
+  });
+
+  const blob = new Blob([csv.join("\n")], {type:"text/csv;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `reporte_${USER.replace(/ /g,"_")}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ===== LOGOUT ===== */
+function logout(){
+  localStorage.removeItem("toyo_user");
+  location.href = "index.html";
+}
+
+/* init */
+render();
+renderVentas();
+
+/* ===== SW ===== */
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("sw.js");
 }
 </script>
 </body>
 </html>
-
 
