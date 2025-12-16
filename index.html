@@ -2,10 +2,9 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Toyo – Seguimiento de Visitas</title>
 <meta name="theme-color" content="#0046BE">
-
 <link rel="manifest" href="manifest.json">
 
 <style>
@@ -43,61 +42,52 @@ hr{border:none;border-top:1px solid var(--border);margin:10px 0}
 
 <!-- CAPTURA -->
 <div class="card">
-<h3 style="margin-top:0;color:var(--blue)">Captura</h3>
-
 <label>Vendedor</label>
 <select id="vendedor"></select>
 
 <label style="margin-top:10px">Cliente</label>
-<input id="cliente" placeholder="Nombre del cliente">
+<input id="cliente">
 
 <label style="margin-top:10px">Comentarios</label>
 <textarea id="comentarios"></textarea>
 
 <div class="small" id="gpsBox" style="margin-top:10px">GPS: sin capturar</div>
 
-<button class="btn2" style="margin-top:10px" onclick="capturarGPS()">📍 Capturar GPS</button>
-<button class="btn" style="margin-top:10px" onclick="guardar()">✅ Guardar visita</button>
+<button class="btn2" onclick="capturarGPS()">📍 Capturar GPS</button>
+<button class="btn" onclick="guardar()">✅ Guardar visita</button>
 </div>
 
 <!-- AVANCE -->
 <div class="card">
-<h3 style="margin-top:0;color:var(--blue)">Avance</h3>
-
 <b id="pctDia">0%</b>
 <div class="progress"><div id="barDia"></div></div>
-<div class="small" id="subDia">0 de 5 visitas hoy</div>
-
-<br>
+<div class="small" id="subDia"></div>
 
 <b id="pctSemana">0%</b>
 <div class="progress"><div id="barSemana"></div></div>
-<div class="small" id="subSemana">0 de 25 visitas semana</div>
+<div class="small" id="subSemana"></div>
 
 <hr>
 
 <label>Meta mensual ($)</label>
 <input id="meta">
 
-<label style="margin-top:10px">Venta del día ($)</label>
+<label>Venta del día ($)</label>
 <input id="venta">
 
-<button class="btn" style="margin-top:10px" onclick="guardarVenta()">💰 Guardar venta</button>
+<button class="btn" onclick="guardarVenta()">💰 Guardar venta</button>
 
 <b id="pctVenta">0%</b>
 <div class="progress"><div id="barVenta"></div></div>
-<div class="small" id="subVenta">$0 de $0</div>
-
+<div class="small" id="subVenta"></div>
 </div>
 </div>
 
 <!-- HISTORIAL -->
 <div class="card">
-<h3 style="margin-top:0;color:var(--blue)">Historial</h3>
-
-<button class="btn2" onclick="exportarExcel()">⬇️ Descargar historial (Excel)</button>
-
-<div id="lista" style="margin-top:10px"></div>
+<h3>Historial</h3>
+<button class="btn2" onclick="exportarPorVendedor()">📊 Descargar Excel por vendedor</button>
+<div id="lista"></div>
 </div>
 
 </div>
@@ -105,7 +95,7 @@ hr{border:none;border-top:1px solid var(--border);margin:10px 0}
 <script>
 /* ===== CONFIG ===== */
 const META_DIA=5, META_SEM=25;
-const LS="toyo_visitas";
+const LS="toyo_visitas", BACKUP="toyo_backup";
 const YM=new Date().getFullYear()+"_"+(new Date().getMonth()+1);
 const META_KEY="meta_"+YM, VENTAS_KEY="ventas_"+YM;
 
@@ -114,13 +104,13 @@ const VENDEDORES=[
 "Aguilar Neri Daniel","De la Cruz Ponce Julio Cesar","Garibay Ortiz Sergio Joel",
 "Perez Mar Alan Roberto","Reynoso Aguilar Maricela","Sandra Navarro Navarro",
 "Arcenio Aguirre Ojeda","Velez Castellanos Antonio","Yepez Mora Oscar Alberto",
-"Hernandez Gonzalez Miguel Angel","Sierra de Anda Aldo","Beristain Bolaños Hector"
+"Hernandez Gonzalez Miguel Angel","Sierra de Anda Aldo"
 ];
 VENDEDORES.forEach(v=>vendedor.add(new Option(v,v)));
 
 let gps=null;
 
-/* ===== HELPERS ===== */
+/* ===== FECHAS ===== */
 const dayKey=()=>new Date().toISOString().slice(0,10);
 const weekKey=()=>{
  const d=new Date(); d.setDate(d.getDate()+4-(d.getDay()||7));
@@ -138,11 +128,10 @@ function capturarGPS(){
 
 /* ===== GUARDAR VISITA ===== */
 function guardar(){
- if(!cliente.value.trim()) return alert("Ingresa cliente");
- if(!gps) return alert("Captura GPS");
+ if(!cliente.value||!gps) return alert("Cliente y GPS obligatorios");
 
  const data=JSON.parse(localStorage.getItem(LS)||"[]");
- data.push({
+ const rec={
   vendedor:vendedor.value,
   cliente:cliente.value,
   comentarios:comentarios.value,
@@ -150,8 +139,11 @@ function guardar(){
   fecha:new Date().toISOString(),
   day:dayKey(),
   week:weekKey()
- });
+ };
+ data.push(rec);
+
  localStorage.setItem(LS,JSON.stringify(data));
+ localStorage.setItem(BACKUP,JSON.stringify(data)); // ☁️ respaldo
 
  cliente.value=""; comentarios.value="";
  gps=null; gpsBox.textContent="GPS: sin capturar";
@@ -160,36 +152,32 @@ function guardar(){
 
 /* ===== RENDER ===== */
 function render(){
- const data=JSON.parse(localStorage.getItem(LS)||"[]");
+ const d=JSON.parse(localStorage.getItem(LS)||"[]");
  lista.innerHTML="";
- data.slice().reverse().forEach(d=>{
-  const map=d.gps
-   ? `<a target="_blank" href="https://maps.google.com/?q=${d.gps.latitude},${d.gps.longitude}">🗺️ Ver mapa</a>`
-   : "";
+ d.slice().reverse().forEach(x=>{
   lista.innerHTML+=`
   <div class="small">
-   <b>${d.vendedor}</b> – ${d.cliente}<br>
-   ${new Date(d.fecha).toLocaleString("es-MX")}<br>
-   ${map}
+   <b>${x.vendedor}</b> – ${x.cliente}<br>
+   ${new Date(x.fecha).toLocaleString("es-MX")}<br>
+   <a target="_blank" href="https://maps.google.com/?q=${x.gps.latitude},${x.gps.longitude}">🗺️ Ver mapa</a>
   </div><hr>`;
  });
  renderAvance();
 }
 
-/* ===== AVANCE VISITAS ===== */
+/* ===== AVANCE ===== */
 function renderAvance(){
  const d=JSON.parse(localStorage.getItem(LS)||"[]");
- const hoy=d.filter(x=>x.day===dayKey()).length;
- const sem=d.filter(x=>x.week===weekKey()).length;
+ const h=d.filter(x=>x.day===dayKey()).length;
+ const s=d.filter(x=>x.week===weekKey()).length;
 
- const pD=Math.min(100,Math.round(hoy/META_DIA*100));
- const pS=Math.min(100,Math.round(sem/META_SEM*100));
+ pctDia.textContent=Math.round(h/META_DIA*100)+"%";
+ barDia.style.width=pctDia.textContent;
+ subDia.textContent=`${h} de ${META_DIA} visitas hoy`;
 
- pctDia.textContent=pD+"%"; barDia.style.width=pD+"%";
- pctSemana.textContent=pS+"%"; barSemana.style.width=pS+"%";
-
- subDia.textContent=`${hoy} de ${META_DIA} visitas hoy`;
- subSemana.textContent=`${sem} de ${META_SEM} visitas semana`;
+ pctSemana.textContent=Math.round(s/META_SEM*100)+"%";
+ barSemana.style.width=pctSemana.textContent;
+ subSemana.textContent=`${s} de ${META_SEM} visitas semana`;
 }
 
 /* ===== VENTAS ===== */
@@ -205,33 +193,41 @@ function renderVentas(){
  const m=Number(localStorage.getItem(META_KEY)||0);
  const v=JSON.parse(localStorage.getItem(VENTAS_KEY)||"[]");
  const t=v.reduce((a,b)=>a+b,0);
- const p=m?Math.min(100,Math.round(t/m*100)):0;
- pctVenta.textContent=p+"%"; barVenta.style.width=p+"%";
+ const p=m?Math.round(t/m*100):0;
+ pctVenta.textContent=p+"%";
+ barVenta.style.width=p+"%";
  subVenta.textContent="$"+t+" de $"+m;
 }
 
-/* ===== EXPORT EXCEL ===== */
-function exportarExcel(){
+/* ===== EXCEL POR VENDEDOR ===== */
+function exportarPorVendedor(){
  const d=JSON.parse(localStorage.getItem(LS)||"[]");
- const meta=Number(localStorage.getItem(META_KEY)||0);
+ const meta=localStorage.getItem(META_KEY)||0;
  const ventas=JSON.parse(localStorage.getItem(VENTAS_KEY)||"[]").reduce((a,b)=>a+b,0);
- const pVenta=meta?Math.round(ventas/meta*100):0;
+ const pctV=meta?Math.round(ventas/meta*100):0;
 
- let csv=["Vendedor,Cliente,Fecha,Lat,Lng,%VisitasDia,%VisitasSemana,MetaMensual,Ventas,%AvanceVentas"];
- d.forEach(x=>{
-  csv.push([
-   x.vendedor,x.cliente,
-   new Date(x.fecha).toLocaleString("es-MX"),
-   x.gps.latitude,x.gps.longitude,
-   pctDia.textContent,pctSemana.textContent,
-   meta,ventas,pVenta+"%"
-  ].join(","));
+ VENDEDORES.forEach(v=>{
+  const rows=d.filter(x=>x.vendedor===v);
+  if(!rows.length) return;
+
+  let csv=["Vendedor,Cliente,Comentarios,Fecha,Lat,Lng,Semana,%VisitasDia,%VisitasSemana,Meta,Ventas,%Ventas"];
+  rows.forEach(x=>{
+   csv.push([
+    x.vendedor,x.cliente,
+    `"${x.comentarios.replace(/"/g,'""')}"`,
+    new Date(x.fecha).toLocaleString("es-MX"),
+    x.gps.latitude,x.gps.longitude,
+    x.week,pctDia.textContent,pctSemana.textContent,
+    meta,ventas,pctV+"%"
+   ].join(","));
+  });
+
+  const blob=new Blob([csv.join("\n")],{type:"text/csv"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`reporte_${v.replace(/ /g,"_")}.csv`;
+  a.click();
  });
- const blob=new Blob([csv.join("\n")],{type:"text/csv"});
- const a=document.createElement("a");
- a.href=URL.createObjectURL(blob);
- a.download="reporte_visitas.csv";
- a.click();
 }
 
 render(); renderVentas();
