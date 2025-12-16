@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Toyo – Dashboard</title>
+<meta name="theme-color" content="#0046BE">
+<style>
+body{font-family:Arial;background:#F0F2F5;padding:14px}
+.card{background:#fff;padding:14px;border-radius:16px;margin-bottom:14px}
+table{width:100%;border-collapse:collapse}
+th,td{padding:8px;border-bottom:1px solid #ddd}
+th{background:#0046BE;color:#fff}
+</style>
+</head>
+
+<body>
+<script>
+if(localStorage.getItem("toyo_user")!=="ADMIN") location.href="index.html";
+</script>
+
+<div class="card">
+<h2>Dashboard Gerencia</h2>
+<button onclick="logout()">Salir</button>
+</div>
+
+<div class="card">
+<table id="t">
+<tr>
+<th>Vendedor</th>
+<th>Visitas Hoy</th>
+<th>Visitas Semana</th>
+</tr>
+</table>
+</div>
+
+<script>
+const d=JSON.parse(localStorage.getItem("toyo_visitas")||"[]");
+
+function dayKey(){return new Date().toISOString().slice(0,10)}
+function weekKey(){
+ const x=new Date(); x.setDate(x.getDate()+4-(x.getDay()||7));
+ const y=new Date(x.getFullYear(),0,1);
+ return x.getFullYear()+"-W"+Math.ceil((((x-y)/86400000)+1)/7);
+}
+
+const hoy=dayKey(), sem=weekKey();
+const vendedores=[...new Set(d.map(x=>x.vendedor))];
+
+vendedores.forEach(v=>{
+ const h=d.filter(x=>x.vendedor===v&&x.day===hoy).length;
+ const s=d.filter(x=>x.vendedor===v&&x.week===sem).length;
+ t.innerHTML+=`<tr><td>${v}</td><td>${h}</td><td>${s}</td></tr>`;
+});
+
+function logout(){
+ localStorage.removeItem("toyo_user");
+ location.href="index.html";
+}
+</script>
+</body>
+</html>
