@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Toyo – App Vendedor</title>
+<meta name="theme-color" content="#0046BE">
+<style>
+body{font-family:Arial;background:#F0F2F5;padding:14px}
+.card{background:#fff;padding:14px;border-radius:16px;margin-bottom:14px}
+label{font-size:13px}
+input,textarea,button{width:100%;padding:12px;font-size:16px;margin-top:6px}
+button{background:#0046BE;color:#fff;border:none;border-radius:12px}
+.progress{height:14px;background:#eee;border-radius:999px;overflow:hidden}
+.progress div{height:100%;background:#0046BE}
+.small{font-size:13px;color:#666}
+</style>
+</head>
+
+<body>
+<script>
+const USER=localStorage.getItem("toyo_user");
+if(!USER || USER==="ADMIN") location.href="index.html";
+</script>
+
+<div class="card">
+<h2>Vendedor: <span id="u"></span></h2>
+<button onclick="logout()">Salir</button>
+</div>
+
+<div class="card">
+<label>Cliente</label>
+<input id="cliente">
+
+<label>Comentarios</label>
+<textarea id="comentarios"></textarea>
+
+<div class="small" id="gpsBox">GPS: sin capturar</div>
+
+<button onclick="gps()">📍 Capturar GPS</button>
+<button onclick="guardar()">Guardar visita</button>
+</div>
+
+<div class="card">
+<b id="pctDia">0%</b>
+<div class="progress"><div id="barDia"></div></div>
+<div class="small" id="subDia"></div>
+
+<b id="pctSemana">0%</b>
+<div class="progress"><div id="barSemana"></div></div>
+<div class="small" id="subSemana"></div>
+</div>
+
+<div class="card">
+<h3>Historial</h3>
+<button onclick="exportar()">Descargar Excel</button>
+<div id="lista"></div>
+</div>
+
+<script>
+document.getElementById("u").textContent=USER;
+const LS="toyo_visitas";
+let gpsData=null;
+
+function dayKey(){return new Date().toISOString().slice(0,10)}
+function weekKey(){
+ const d=new Date(); d.setDate(d.getDate()+4-(d.getDay()||7));
+ const y=new Date(d.getFullYear(),0,1);
+ return d.getFullYear()+"-W"+Math.ceil((((d-y)/86400000)+1)/7);
+}
+
+function gps(){
+ navigator.geolocation.getCurrentPosition(p=>{
+  gpsData=p.coords;
+  gpsBox.textContent=`GPS: ${p.coords.latitude.toFixed(5)}, ${p.coords.longitude.toFixed(5)}`;
+ });
+}
+
+function guardar(){
+ if(!cliente.value||!gpsData) return alert("Cliente y GPS obligatorios");
+ const d=JSON.parse(localStorage.getItem(LS)||"[]");
+ d.push({
+  vendedor:USER,
+  cliente:cliente.value,
+  comentarios:comentarios.value,
+  gps:gpsData,
+  fecha:new Date().toISOString(),
+  day:dayKey(),
+  week:weekKey()
+ });
+ localStorage.setItem(LS,JSON.stringify(d));
+ cliente.value=""; comentarios.value="";
+ gpsData=null; gpsBox.textContent="GPS: sin capturar";
+ render();
+}
+
+function render(){
+ const d=JSON.parse(localStorage.getItem(LS)||"[]").filter(x=>x.vendedor===USER);
+ lista.innerHTML="";
+ const h=d.filter(x=>x.day===dayKey()).length;
+ const s=d.filter(x=>x.week===weekKey()).length;
+ pctDia.textContent=Math.round(h/5*100)+"%"; barDia.style.width=pctDia.textContent;
+ pctSemana.textContent=Math.round(s/25*100)+"%"; barSemana.style.width=pctSemana.textContent;
+ subDia.textContent=`${h} de 5 hoy`; subSemana.textContent=`${s} de 25 semana`;
+
+ d.slice().reverse().forEach(x=>{
+  lista.innerHTML+=`${x.cliente} – ${new Date(x.fecha).toLocaleString()}<br>`;
+ });
+}
+
+function exportar(){
+ const d=JSON.parse(localStorage.getItem(LS)||"[]").filter(x=>x.vendedor===USER);
+ let csv=["Vendedor,Cliente,Comentarios,Fecha"];
+ d.forEach(x=>{
+  csv.push([USER,x.cliente,`"${x.comentarios||""}"`,new Date(x.fecha).toLocaleString()].join(","));
+ });
+ const b=new Blob([csv.join("\n")],{type:"text/csv"});
+ const a=document.createElement("a");
+ a.href=URL.createObjectURL(b);
+ a.download="historial_"+USER+".csv";
+ a.click();
+}
+
+function logout(){
+ localStorage.removeItem("toyo_user");
+ location.href="index.html";
+}
+
+render();
+</script>
+</body>
+</html>
