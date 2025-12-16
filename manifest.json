@@ -1,8 +1,0 @@
-{
-  "name": "Seguimiento de Vendedores – Toyo GDL",
-  "short_name": "Toyo GDL",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#f2f4f8",
-  "theme_color": "#0046BE"
-}
