@@ -1,63 +1,154 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Gerencia</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Toyo – Dashboard Gerencia</title>
+<meta name="theme-color" content="#0046BE">
+
 <style>
-body{font-family:Arial;background:#f2f4f8;padding:12px}
-.card{background:#fff;padding:16px;border-radius:14px;margin-bottom:14px}
+:root{
+  --blue:#0046BE; --bg:#F0F2F5; --card:#fff;
+  --border:#d9dde6; --text:#0f172a; --muted:#64748b;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);padding:14px;color:var(--text)}
+.wrap{max-width:1200px;margin:auto}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:1000px){.grid{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.grid{grid-template-columns:1fr}}
+.kpi .label{font-size:13px;color:var(--muted)}
+.kpi .value{font-size:26px;font-weight:bold;color:var(--blue)}
+.progress{height:14px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin-top:6px}
+.progress div{height:100%;background:linear-gradient(90deg,var(--blue),#2d7dff)}
 table{width:100%;border-collapse:collapse}
-th,td{border:1px solid #ccc;padding:8px;font-size:14px}
-th{background:#0046BE;color:#fff}
+th,td{padding:10px;border-bottom:1px solid var(--border);text-align:left;font-size:14px}
+th{background:#eff6ff;color:#1d4ed8}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.btn2{background:#fff;color:var(--blue);font-weight:bold;border:1px solid var(--blue);border-radius:12px;padding:10px 14px}
+.small{font-size:13px;color:var(--muted)}
 </style>
 </head>
+
 <body>
-
-<h2>Dashboard – Gerencia</h2>
-
-<div class="card" id="resumen"></div>
-<div class="card" id="tabla"></div>
-
 <script>
-if(localStorage.getItem("rol")!=="gerencia"){
+/* ===== LOGIN CHECK ===== */
+if(localStorage.getItem("toyo_user")!=="ADMIN"){
   location.href="index.html";
 }
+</script>
 
-const visitas = JSON.parse(localStorage.getItem("visitas") || "[]");
-const hoy = new Date().toISOString().split("T")[0];
+<div class="wrap">
 
-const hoyCount = visitas.filter(v=>v.fecha===hoy).length;
-const semanaCount = visitas.length;
+<div class="card">
+  <div class="topbar">
+    <div>
+      <h2 style="margin:0;color:var(--blue)">Dashboard Gerencia</h2>
+      <div class="small">Visión general de visitas y desempeño</div>
+    </div>
+    <button class="btn2" onclick="logout()">Salir</button>
+  </div>
+</div>
 
-resumen.innerHTML = `
-<b>Visitas hoy:</b> ${hoyCount} / 5 (${Math.round(hoyCount/5*100)}%)<br>
-<b>Visitas semana:</b> ${semanaCount} / 25 (${Math.round(semanaCount/25*100)}%)
-`;
+<!-- KPIs -->
+<div class="grid">
+  <div class="card kpi">
+    <div class="label">Visitas hoy</div>
+    <div class="value" id="kpiHoy">0</div>
+  </div>
+  <div class="card kpi">
+    <div class="label">Visitas semana</div>
+    <div class="value" id="kpiSemana">0</div>
+  </div>
+  <div class="card kpi">
+    <div class="label">% avance semanal</div>
+    <div class="value" id="kpiPct">0%</div>
+    <div class="progress"><div id="barPct"></div></div>
+  </div>
+  <div class="card kpi">
+    <div class="label">Vendedores activos</div>
+    <div class="value" id="kpiVendedores">0</div>
+  </div>
+</div>
 
-let html = `
-<table>
-<tr>
-  <th>Vendedor</th>
-  <th>Cliente</th>
-  <th>Fecha</th>
-  <th>Hora</th>
-</tr>
-`;
+<!-- TABLA -->
+<div class="card">
+  <h3 style="margin-top:0;color:var(--blue)">Detalle por vendedor</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Vendedor</th>
+        <th>Visitas hoy</th>
+        <th>Visitas semana</th>
+        <th>% semana</th>
+      </tr>
+    </thead>
+    <tbody id="tabla"></tbody>
+  </table>
+</div>
 
-visitas.forEach(v=>{
-  html+=`
-  <tr>
-    <td>${v.vendedor}</td>
-    <td>${v.cliente}</td>
-    <td>${v.fecha}</td>
-    <td>${v.hora}</td>
-  </tr>
+</div>
+
+<script>
+/* ===== DATA ===== */
+const META_SEM = 25;
+const LS = "toyo_visitas";
+
+function dayKey(){ return new Date().toISOString().slice(0,10); }
+function weekKey(){
+  const d=new Date(); d.setDate(d.getDate()+4-(d.getDay()||7));
+  const y=new Date(d.getFullYear(),0,1);
+  return d.getFullYear()+"-W"+Math.ceil((((d-y)/86400000)+1)/7);
+}
+
+const hoy = dayKey();
+const sem = weekKey();
+const data = JSON.parse(localStorage.getItem(LS) || "[]");
+
+const vendedores = [...new Set(data.map(x=>x.vendedor))];
+
+let totalHoy = 0;
+let totalSemana = 0;
+
+const tbody = document.getElementById("tabla");
+
+vendedores.forEach(v=>{
+  const vh = data.filter(x=>x.vendedor===v && x.day===hoy).length;
+  const vs = data.filter(x=>x.vendedor===v && x.week===sem).length;
+
+  totalHoy += vh;
+  totalSemana += vs;
+
+  const pct = Math.min(100, Math.round(vs / META_SEM * 100));
+
+  tbody.innerHTML += `
+    <tr>
+      <td>${v}</td>
+      <td>${vh}</td>
+      <td>${vs}</td>
+      <td>${pct}%</td>
+    </tr>
   `;
 });
 
-html+="</table>";
-tabla.innerHTML = html;
+document.getElementById("kpiHoy").textContent = totalHoy;
+document.getElementById("kpiSemana").textContent = totalSemana;
+
+const pctGlobal = vendedores.length
+  ? Math.round((totalSemana / (META_SEM * vendedores.length)) * 100)
+  : 0;
+
+document.getElementById("kpiPct").textContent = pctGlobal + "%";
+document.getElementById("barPct").style.width = pctGlobal + "%";
+document.getElementById("kpiVendedores").textContent = vendedores.length;
+
+function logout(){
+  localStorage.removeItem("toyo_user");
+  location.href="index.html";
+}
 </script>
+
 </body>
 </html>
+
