@@ -2,32 +2,24 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Toyo Foods – Seguimiento de Visitas</title>
-
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <style>
 :root{
-  --toyo-blue:#0046BE;
-  --toyo-navy:#002E80;
+  --blue:#0046BE;
+  --navy:#002E80;
   --bg:#F3F5F9;
-  --card:#ffffff;
-  --text:#0f172a;
-  --muted:#64748b;
+  --card:#fff;
   --border:#d8dee9;
   --good:#16a34a;
   --warn:#f59e0b;
-  --bad:#dc2626;
-  --radius:16px;
-  --shadow:0 10px 25px rgba(0,0,0,.08);
 }
 *{box-sizing:border-box}
 body{
   margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  font-family:system-ui,Arial;
   background:var(--bg);
-  color:var(--text);
   padding:14px;
 }
 header{
@@ -41,120 +33,56 @@ header{
   align-items:center;
   gap:12px;
 }
-.header-left img{
-  height:44px;
-}
-.brand h1{
-  margin:0;
-  font-size:18px;
-  color:var(--toyo-navy);
-}
-.brand .sub{
-  font-size:12px;
-  color:var(--muted);
-}
-.pill{
-  background:#fff;
-  border:1px solid var(--border);
-  padding:6px 10px;
-  border-radius:999px;
-  font-size:12px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-.dot{width:10px;height:10px;border-radius:50%;background:#f59e0b}
-.dot.good{background:var(--good)}
-.dot.bad{background:var(--bad)}
-
-.grid{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:12px;
-  max-width:1100px;
-  margin:auto;
-}
-@media(min-width:900px){
-  .grid{grid-template-columns:1.2fr .8fr}
-}
+.header-left img{height:42px}
+.brand h1{margin:0;font-size:18px;color:var(--navy)}
+.brand .sub{font-size:12px;color:#555}
 .card{
-  background:#fff;
+  background:var(--card);
   border:1px solid var(--border);
-  border-radius:var(--radius);
+  border-radius:14px;
   padding:14px;
-  box-shadow:var(--shadow);
+  margin-bottom:12px;
 }
-h2{
-  font-size:15px;
-  color:var(--toyo-blue);
-  margin:0 0 10px 0;
-}
-label{
-  font-size:12px;
-  color:var(--muted);
-}
+h2{margin:0 0 10px;color:var(--blue);font-size:15px}
+label{font-size:12px;color:#555}
 input,select,textarea{
   width:100%;
   padding:10px;
-  border-radius:12px;
+  border-radius:10px;
   border:1px solid var(--border);
-  font-size:14px;
+  margin-bottom:8px;
 }
-textarea{min-height:80px}
-.row{display:grid;gap:10px}
-.row.two{grid-template-columns:1fr 1fr}
-.row.three{grid-template-columns:1fr 1fr 1fr}
-
+textarea{min-height:70px}
 button{
-  padding:10px 14px;
-  border:none;
-  border-radius:12px;
-  background:var(--toyo-blue);
+  background:var(--blue);
   color:#fff;
+  border:none;
+  border-radius:10px;
+  padding:10px;
   cursor:pointer;
 }
-button.secondary{
-  background:#fff;
-  color:var(--toyo-blue);
-  border:1px solid var(--toyo-blue);
-}
-button.danger{background:var(--bad)}
-
-.kpi{
-  display:grid;
-  gap:10px;
-}
-.kpi .box{
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:12px;
-}
+.kpi{margin-bottom:10px}
 .bar{
   height:10px;
-  background:#eef2ff;
+  background:#e5e7eb;
   border-radius:999px;
   overflow:hidden;
 }
 .bar div{
   height:100%;
-  background:linear-gradient(90deg,var(--toyo-blue),#2563eb);
+  background:linear-gradient(90deg,var(--blue),#2563eb);
   width:0%;
 }
-
 table{
   width:100%;
-  border-collapse:collapse;
   font-size:12px;
+  border-collapse:collapse;
 }
 th,td{
-  padding:8px;
+  padding:6px;
   border-bottom:1px solid var(--border);
 }
-.maplink{
-  color:var(--toyo-blue);
-  text-decoration:none;
-  font-weight:600;
-}
+a{color:var(--blue);text-decoration:none}
 </style>
 </head>
 
@@ -162,130 +90,103 @@ th,td{
 
 <header>
   <div class="header-left">
-    <img src="logo.png" alt="Toyo Foods">
+    <img src="logo.png">
     <div class="brand">
       <h1>Toyo Foods</h1>
       <div class="sub">Seguimiento de Visitas</div>
     </div>
   </div>
-  <div class="pill">
-    <span id="gpsDot" class="dot"></span>
-    <span id="gpsStatus">GPS…</span>
-  </div>
+  <div id="gpsStatus">📍 GPS…</div>
 </header>
 
-<div class="grid">
-
-<!-- REGISTRO -->
 <div class="card">
 <h2>Registrar visita</h2>
 
-<div class="row two">
-  <div>
-    <label>Vendedor</label>
-    <select id="vendor">
-      <option value="">Selecciona</option>
-      <option>Aguilar Neri Daniel</option>
-      <option>De la Cruz Ponce Julio Cesar</option>
-      <option>Garibay Ortiz Sergio Joel</option>
-      <option>Perez Mar Alan Roberto</option>
-      <option>Reynoso Aguilar Maricela</option>
-      <option>Sandra Navarro Navarro</option>
-      <option>Arcenio Aguirre Ojeda</option>
-      <option>Velez Castellanos Antonio</option>
-      <option>Yepez Mora Oscar Alberto</option>
-      <option>Beristain Bolaños Hector</option>
-      <option>Sierra de Anda Aldo</option>
-    </select>
-  </div>
-  <div>
-    <label>Cliente</label>
-    <input id="client">
-  </div>
-</div>
+<label>Vendedor</label>
+<select id="vendor">
+  <option value="">Selecciona</option>
+  <option>Aguilar Neri Daniel</option>
+  <option>De la Cruz Ponce Julio Cesar</option>
+  <option>Garibay Ortiz Sergio Joel</option>
+  <option>Perez Mar Alan Roberto</option>
+  <option>Reynoso Aguilar Maricela</option>
+  <option>Sandra Navarro Navarro</option>
+  <option>Arcenio Aguirre Ojeda</option>
+  <option>Velez Castellanos Antonio</option>
+  <option>Yepez Mora Oscar Alberto</option>
+  <option>Beristain Bolaños Hector</option>
+  <option>Sierra de Anda Aldo</option>
+</select>
 
-<div class="row two">
-  <div>
-    <label>Motivo</label>
-    <select id="motive">
-      <option value="">Selecciona</option>
-      <option>Cotización</option>
-      <option>Negociación</option>
-      <option>Degustación</option>
-      <option>Entrega de faltante</option>
-    </select>
-  </div>
-  <div>
-    <label>Fecha / Hora</label>
-    <input id="datetime" readonly>
-  </div>
-</div>
+<label>Cliente</label>
+<input id="client">
+
+<label>Motivo</label>
+<select id="motive">
+  <option value="">Selecciona</option>
+  <option>Cotización</option>
+  <option>Negociación</option>
+  <option>Degustación</option>
+  <option>Entrega de faltante</option>
+</select>
 
 <label>Comentarios</label>
 <textarea id="comments"></textarea>
 
 <button onclick="saveVisit()">Guardar visita</button>
-
-<hr>
-
-<h2>Meta mensual</h2>
-<label>Meta mensual ($)</label>
-<input id="meta">
-
-<label>Avance actual ($)</label>
-<input id="avance">
-
-<button class="secondary" onclick="saveMeta()">Guardar meta</button>
-
 </div>
 
-<!-- INDICADORES -->
+<div class="card">
+<h2>Meta mensual</h2>
+
+<label>Meta ($)</label>
+<input id="meta">
+
+<label>Avance ($)</label>
+<input id="avance">
+
+<button onclick="saveMeta()">Guardar meta</button>
+</div>
+
 <div class="card">
 <h2>Indicadores</h2>
 
-<div class="kpi">
-  <div class="box">
-    <div>Visitas HOY (5)</div>
-    <strong id="todayCount">0</strong>
-    <div class="bar"><div id="todayBar"></div></div>
-  </div>
+<div class="kpi">Visitas hoy: <b id="todayCount">0</b></div>
+<div class="bar"><div id="todayBar"></div></div>
 
-  <div class="box">
-    <div>Visitas SEMANA (25)</div>
-    <strong id="weekCount">0</strong>
-    <div class="bar"><div id="weekBar"></div></div>
-  </div>
+<div class="kpi">Visitas semana: <b id="weekCount">0</b></div>
+<div class="bar"><div id="weekBar"></div></div>
 
-  <div class="box">
-    <div>Avance meta mensual</div>
-    <strong id="metaPct">0%</strong>
-    <div class="bar"><div id="metaBar"></div></div>
-  </div>
+<div class="kpi">Meta mensual: <b id="metaPct">0%</b></div>
+<div class="bar"><div id="metaBar"></div></div>
 </div>
 
-<hr>
-
+<div class="card">
 <h2>Historial</h2>
 <table>
 <thead>
-<tr>
-<th>Fecha</th><th>Vendedor</th><th>Cliente</th><th>Motivo</th><th>Mapa</th>
-</tr>
+<tr><th>Fecha</th><th>Vendedor</th><th>Cliente</th><th>Mapa</th></tr>
 </thead>
 <tbody id="history"></tbody>
 </table>
-
-</div>
 </div>
 
 <script>
-const visits = JSON.parse(localStorage.getItem("visits")||"[]");
-const metaData = JSON.parse(localStorage.getItem("meta")||"{}");
+const visits = JSON.parse(localStorage.getItem("toyo_visits")||"[]");
+const metaData = JSON.parse(localStorage.getItem("toyo_meta")||"{}");
 
 function saveVisit(){
-  if(!navigator.geolocation){alert("Sin GPS");return;}
+  if(!vendor.value || !client.value || !motive.value){
+    alert("Completa todos los campos");
+    return;
+  }
+  if(!navigator.geolocation){
+    alert("GPS no disponible");
+    return;
+  }
+
   navigator.geolocation.getCurrentPosition(pos=>{
-    const v={
+    visits.push({
       vendor:vendor.value,
       client:client.value,
       motive:motive.value,
@@ -293,18 +194,19 @@ function saveVisit(){
       lat:pos.coords.latitude,
       lng:pos.coords.longitude,
       date:new Date().toISOString()
-    };
-    visits.push(v);
-    localStorage.setItem("visits",JSON.stringify(visits));
+    });
+    localStorage.setItem("toyo_visits",JSON.stringify(visits));
     render();
     alert("Visita guardada");
+  },()=>{
+    alert("Activa GPS");
   });
 }
 
 function saveMeta(){
   metaData.meta=Number(meta.value||0);
   metaData.avance=Number(avance.value||0);
-  localStorage.setItem("meta",JSON.stringify(metaData));
+  localStorage.setItem("toyo_meta",JSON.stringify(metaData));
   render();
 }
 
@@ -312,32 +214,29 @@ function render(){
   history.innerHTML="";
   visits.forEach(v=>{
     history.innerHTML+=`
-      <tr>
-        <td>${v.date.slice(0,10)}</td>
-        <td>${v.vendor}</td>
-        <td>${v.client}</td>
-        <td>${v.motive}</td>
-        <td><a class="maplink" target="_blank"
-        href="https://maps.google.com?q=${v.lat},${v.lng}">Mapa</a></td>
-      </tr>`;
+    <tr>
+      <td>${v.date.slice(0,10)}</td>
+      <td>${v.vendor}</td>
+      <td>${v.client}</td>
+      <td><a target="_blank" href="https://maps.google.com?q=${v.lat},${v.lng}">Mapa</a></td>
+    </tr>`;
   });
 
   const today=new Date().toISOString().slice(0,10);
   const todayCount=visits.filter(v=>v.date.startsWith(today)).length;
-  todayCountEl.textContent=todayCount;
-  todayBar.style.width=Math.min(todayCount/5*100,100)+"%";
+  document.getElementById("todayCount").textContent=todayCount;
+  document.getElementById("todayBar").style.width=Math.min(todayCount/5*100,100)+"%";
 
-  weekCount.textContent=visits.length;
-  weekBar.style.width=Math.min(visits.length/25*100,100)+"%";
+  document.getElementById("weekCount").textContent=visits.length;
+  document.getElementById("weekBar").style.width=Math.min(visits.length/25*100,100)+"%";
 
   if(metaData.meta){
     const pct=Math.round(metaData.avance/metaData.meta*100);
-    metaPct.textContent=pct+"%";
-    metaBar.style.width=Math.min(pct,100)+"%";
+    document.getElementById("metaPct").textContent=pct+"%";
+    document.getElementById("metaBar").style.width=Math.min(pct,100)+"%";
   }
 }
 
-datetime.value=new Date().toLocaleString();
 render();
 </script>
 
