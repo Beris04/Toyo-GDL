@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>App Visitas · Cloud + Mapa (1 archivo)</title>
+  <title>App Visitas · Cloud + Mapa Pro (1 archivo)</title>
 
   <!-- Leaflet (CDN). Si el CDN falla, la app sigue funcionando sin mapa -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -190,6 +190,65 @@
       display:none;
     }
     @media (max-width:920px){ .fab{display:block;} }
+  
+    .heroStats{
+      display:grid;
+      grid-template-columns: 1.3fr .7fr;
+      gap:10px;
+      margin-bottom:12px;
+    }
+    @media (max-width: 720px){ .heroStats{grid-template-columns:1fr} }
+    .heroCard{
+      border:1px solid var(--line);
+      background:linear-gradient(135deg, rgba(15,23,42,.98), rgba(30,41,59,.96));
+      color:#fff;
+      border-radius:18px;
+      padding:14px;
+      box-shadow:0 20px 38px rgba(15,23,42,.18);
+    }
+    .heroCard .heroTitle{font-size:12px;opacity:.82}
+    .heroCard .heroValue{font-size:28px;font-weight:950;line-height:1;margin-top:8px}
+    .heroCard .heroMeta{font-size:12px;opacity:.88;margin-top:8px}
+    .goalWrap{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.78);
+      border-radius:16px;
+      padding:12px;
+    }
+    .goalTop{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      font-size:12px;font-weight:900;margin-bottom:10px;
+    }
+    .progress{
+      width:100%;height:12px;border-radius:999px;background:rgba(15,23,42,.08);overflow:hidden;
+    }
+    .progress > span{
+      display:block;height:100%;width:0%;
+      background:linear-gradient(90deg,#22c55e,#3b82f6);
+      border-radius:999px;
+      transition:width .25s ease;
+    }
+    .pillRow{display:flex;gap:8px;flex-wrap:wrap}
+    .pillBtn{
+      border:1px solid rgba(15,23,42,.10);
+      background:#fff;
+      border-radius:999px;
+      padding:8px 10px;
+      font-size:12px;
+      font-weight:900;
+      cursor:pointer;
+    }
+    .pillBtn:hover{transform:translateY(-1px)}
+    .quickCard{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.82);
+      border-radius:16px;
+      padding:12px;
+      margin-top:12px;
+    }
+    .sectionLabel{font-size:12px;color:var(--muted);margin:0 0 8px}
+    datalist{display:none}
+
   </style>
 </head>
 <body>
@@ -198,8 +257,8 @@
       <div class="brand">
         <div class="logo" aria-hidden="true"></div>
         <div>
-          <h1>App Visitas · Cloud + Mapa</h1>
-          <div class="sub">1 solo archivo (index.html) · GitHub Pages · Cloud (Supabase)</div>
+          <h1>App Visitas · Cloud + Mapa Pro</h1>
+          <div class="sub">1 solo archivo (index.html) · GitHub Pages · Cloud (Supabase) · Mejoras UX</div>
         </div>
       </div>
       <nav class="tabs" role="tablist" aria-label="Navegación">
@@ -231,6 +290,22 @@
             </div>
           </div>
 
+          <div class="heroStats">
+            <div class="heroCard">
+              <div class="heroTitle">Resumen del día</div>
+              <div class="heroValue" id="heroVisits">0 / 5</div>
+              <div class="heroMeta" id="heroMessage">Empieza tu ruta y registra cada visita con ubicación.</div>
+            </div>
+            <div class="goalWrap">
+              <div class="goalTop">
+                <span>Meta diaria</span>
+                <span id="goalPct">0%</span>
+              </div>
+              <div class="progress"><span id="goalBar"></span></div>
+              <div class="hint" style="margin-top:10px">Objetivo sugerido: 5 visitas por día.</div>
+            </div>
+          </div>
+
           <div class="row">
             <div class="field">
               <label>Ciudad</label>
@@ -239,6 +314,22 @@
             <div class="field">
               <label>Vendedor</label>
               <select id="vendorSelect"></select>
+            </div>
+          </div>
+
+          <div class="quickCard">
+            <div class="sectionLabel">Captura rápida</div>
+            <div class="row">
+              <div class="field">
+                <label>Clientes recientes</label>
+                <select id="recentClientSelect">
+                  <option value="">Selecciona un cliente reciente</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Cliente frecuente</label>
+                <div class="hint" style="padding-top:12px">Selecciona un cliente reciente para capturar más rápido.</div>
+              </div>
             </div>
           </div>
 
@@ -259,7 +350,7 @@
           <div class="row" style="margin-top:10px">
             <div class="field">
               <label>Comentarios</label>
-              <textarea id="notesInput" placeholder="Notas rápidas, faltantes, acuerdos, etc."></textarea>
+              <textarea id="notesInput" placeholder="Comentarios, faltantes, acuerdos, etc."></textarea>
             </div>
           </div>
 
@@ -283,6 +374,10 @@
             <div class="kpi">
               <div class="lbl"><span>Clientes únicos</span><span class="muted">hoy</span></div>
               <div class="val" id="kpiClients">0</div>
+            </div>
+            <div class="kpi">
+              <div class="lbl"><span>Cumplimiento meta</span><span class="muted">5 visitas</span></div>
+              <div class="val" id="kpiGoal">0%</div>
             </div>
           </div>
 
@@ -425,6 +520,10 @@
               <div class="lbl"><span>CDMX</span><span class="muted">registros</span></div>
               <div class="val" id="adminKpiCDMX">0</div>
             </div>
+            <div class="kpi">
+              <div class="lbl"><span>AGS</span><span class="muted">registros</span></div>
+              <div class="val" id="adminKpiAGS">0</div>
+            </div>
           </div>
 
           <div style="margin-top:12px">
@@ -453,7 +552,7 @@
           </div>
         </div>
         <div class="bd">
-          <div class="hint">Incluye desglose por tipo y comentarios completos (según filtros).</div>
+          <div class="hint">Incluye visitas del filtro, avance semanal y avance mensual por vendedor. Meta semanal: 25 visitas · Meta mensual: 100 visitas.</div>
           <div class="hr"></div>
           <div class="list" id="adminVendorsSummary"></div>
         </div>
@@ -492,7 +591,8 @@
           <div class="row" style="margin-top:10px">
             <div class="field">
               <label>Título</label>
-              <input id="msgTitle" placeholder="Ej. Objetivo de la semana" />
+              <input id="msgTitle" placeholder="Se genera según ciudad y vendedor" />
+              <div class="hint" style="margin-top:8px">El título puede llenarse automáticamente según la ciudad o el vendedor seleccionado.</div>
             </div>
           </div>
           <div class="row" style="margin-top:10px">
@@ -561,14 +661,16 @@
       "Aguilar Neri Daniel","De la Cruz Ponce Julio Cesar","Garibay Ortiz Sergio Joel","Sierra de Anda Aldo",
       "Perez Mar Alan Roberto","Reynoso Aguilar Maricela","Sandra Navarro Navarro","Aguirre Ojeda Arcenio",
       "Velez Castellanos Antonio","Yepez Mora Oscar Alberto","Sanchez Esmeralda","Reynaga Valeria",
-      "González Guzmán Cristian Eduardo","Hernandez Gonzalez Angel Miguel"
-    ]
+      "González Guzmán Cristian Eduardo"
+    ],
+    AGS: ["Hernandez Gonzalez Angel Miguel"]
   };
 
   const CITY_META = [
     {code:"GDL", label:"Guadalajara"},
     {code:"MTY", label:"Monterrey"},
-    {code:"CDMX", label:"México"}
+    {code:"CDMX", label:"México"},
+    {code:"AGS", label:"Aguascalientes"}
   ];
 
   const VISIT_TYPES = [
@@ -600,6 +702,12 @@
   const kpiCount = $("#kpiCount");
   const kpiHours = $("#kpiHours");
   const kpiClients = $("#kpiClients");
+  const kpiGoal = $("#kpiGoal");
+  const heroVisits = $("#heroVisits");
+  const heroMessage = $("#heroMessage");
+  const goalPct = $("#goalPct");
+  const goalBar = $("#goalBar");
+  const recentClientSelect = $("#recentClientSelect");
 
   const listCity = $("#listCity");
   const visitState = $("#visitState");
@@ -626,6 +734,7 @@
   const adminKpiGDL = $("#adminKpiGDL");
   const adminKpiMTY = $("#adminKpiMTY");
   const adminKpiCDMX = $("#adminKpiCDMX");
+  const adminKpiAGS = $("#adminKpiAGS");
 
   const listAdmin = $("#listAdmin");
   const adminVendorsSummary = $("#adminVendorsSummary");
@@ -675,6 +784,13 @@
     return d.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
   }
   function secToH(sec){ return (sec/3600).toFixed(1); }
+  function pct(n, total){
+    if(!total) return 0;
+    return Math.max(0, Math.min(100, Math.round((n/total)*100)));
+  }
+  function safeJsonParse(raw, fallback){
+    try{return JSON.parse(raw);}catch(e){return fallback;}
+  }
 
   function toast(msg){
     const el = document.createElement("div");
@@ -699,6 +815,7 @@
   // ===== Storage =====
   const LS_KEY = "app_visitas_local_v1";
   const SS_ACTIVE = "app_visitas_active_v1";
+  const LS_DRAFT = "app_visitas_draft_v2";
 
   function uuid(){
     return (crypto?.randomUUID?.() || ("id-" + Date.now() + "-" + Math.random().toString(16).slice(2)));
@@ -721,6 +838,43 @@
   }
   function activeSet(obj){ sessionStorage.setItem(SS_ACTIVE, JSON.stringify(obj)); }
   function activeClear(){ sessionStorage.removeItem(SS_ACTIVE); }
+
+  function loadDraft(){
+    return safeJsonParse(localStorage.getItem(LS_DRAFT) || "{}", {});
+  }
+  function saveDraft(patch){
+    const next = {...loadDraft(), ...patch};
+    localStorage.setItem(LS_DRAFT, JSON.stringify(next));
+  }
+  function getRecentClients(city, vendor, limit=12){
+    const all = loadAll();
+    const items = [];
+    Object.values(all).forEach(dayArr=>{
+      (Array.isArray(dayArr) ? dayArr : []).forEach(r=>{
+        if((r.city||"")===city && (r.vendor||"")===vendor && (r.client||"").trim()){
+          items.push({client:(r.client||"").trim(), ts:r.end_ts || r.start_ts || ""});
+        }
+      });
+    });
+    const unique = new Map();
+    items.sort((a,b)=> String(b.ts).localeCompare(String(a.ts)));
+    items.forEach(x=>{
+      const key = x.client.toUpperCase();
+      if(!unique.has(key)) unique.set(key, x.client);
+    });
+    return [...unique.values()].slice(0, limit);
+  }
+  function fillRecentClients(city, vendor){
+    if(!recentClientSelect) return;
+    const recents = getRecentClients(city, vendor);
+    recentClientSelect.innerHTML = `<option value="">Selecciona un cliente reciente</option>`;
+    recents.forEach(name=>{
+      const opt = document.createElement("option");
+      opt.value = name;
+      opt.textContent = name;
+      recentClientSelect.appendChild(opt);
+    });
+  }
 
   // ===== Cloud (Supabase REST) =====
   function cloudConfigured(){
@@ -884,6 +1038,32 @@
       typeSelect.appendChild(opt);
     });
   }
+  function cityLabel(code){
+    const key = normalizeCity(code || "ALL");
+    const found = CITY_META.find(c=>c.code===key);
+    if(found) return found.label;
+    if(key === "ALL") return "Todas";
+    return key;
+  }
+
+  function defaultAnnouncementTitle(city, vendor){
+    const cityTxt = cityLabel(city || "ALL");
+    if(vendor && vendor !== "ALL") return `Comunicado · ${cityTxt} · ${vendor}`;
+    if(city && city !== "ALL") return `Comunicado · ${cityTxt}`;
+    return "Comunicado general";
+  }
+
+  function syncAnnouncementTitle(force=false){
+    if(!msgTitle) return;
+    const nextAuto = defaultAnnouncementTitle(msgCity?.value || "ALL", msgVendor?.value || "ALL");
+    const current = (msgTitle.value || "").trim();
+    const lastAuto = msgTitle.dataset.autoTitle || "";
+    msgTitle.placeholder = nextAuto;
+    if(force || !current || current === lastAuto){
+      msgTitle.value = nextAuto;
+    }
+    msgTitle.dataset.autoTitle = nextAuto;
+  }
 
   // Admin options
   function refreshAdminCityOptions(){
@@ -921,15 +1101,17 @@
     [...adminVendor.options].some(o=>o.value===prev) && (adminVendor.value=prev);
 
     // msg vendor
+    const msgCitySelected = (msgCity && msgCity.value) ? msgCity.value : city;
     const prev2 = msgVendor.value || "ALL";
     msgVendor.innerHTML = `<option value="ALL">Todos</option>`;
-    const mv = (city==="ALL") ? [...new Set(Object.values(SELLERS).flat())].sort() : (SELLERS[city]||[]).slice().sort();
+    const mv = (msgCitySelected==="ALL") ? [...new Set(Object.values(SELLERS).flat())].sort() : (SELLERS[msgCitySelected]||[]).slice().sort();
     mv.forEach(v=>{
       const opt=document.createElement("option");
       opt.value=v; opt.textContent=v;
       msgVendor.appendChild(opt);
     });
     [...msgVendor.options].some(o=>o.value===prev2) && (msgVendor.value=prev2);
+    syncAnnouncementTitle();
   }
 
   // ===== Render City =====
@@ -937,20 +1119,35 @@
     const day = todayISO();
     kpiDate.textContent = day;
     const recs = loadDay(day);
+    const selectedCity = citySelect.value || "GDL";
+    const selectedVendor = vendorSelect.value || "";
 
-    const total = recs.length;
-    const totalSec = recs.reduce((a,r)=> a + (r.duration_sec || 0), 0);
-    const clients = new Set(recs.map(r=>(r.client||"").trim()).filter(Boolean)).size;
+    const total = recs.filter(r => (r.city||"")===selectedCity && (selectedVendor ? (r.vendor||"")===selectedVendor : true)).length;
+    const sellerRecs = recs.filter(r => (r.city||"")===selectedCity && (selectedVendor ? (r.vendor||"")===selectedVendor : true));
+    const totalSec = sellerRecs.reduce((a,r)=> a + (r.duration_sec || 0), 0);
+    const clients = new Set(sellerRecs.map(r=>(r.client||"").trim()).filter(Boolean)).size;
+    const goal = pct(total, 5);
 
     kpiCount.textContent = total;
     kpiHours.textContent = secToH(totalSec);
     kpiClients.textContent = clients;
+    if(kpiGoal) kpiGoal.textContent = `${goal}%`;
+    if(heroVisits) heroVisits.textContent = `${total} / 5`;
+    if(goalPct) goalPct.textContent = `${goal}%`;
+    if(goalBar) goalBar.style.width = `${goal}%`;
+    if(heroMessage){
+      heroMessage.textContent = total >= 5
+        ? "Meta diaria cumplida. Puedes seguir registrando para superar el objetivo."
+        : `Te faltan ${Math.max(0, 5-total)} visita(s) para llegar a tu meta de hoy.`;
+    }
+
+    fillRecentClients(selectedCity, selectedVendor);
 
     listCity.innerHTML="";
     if(total===0){
-      listCity.innerHTML = `<div class="item"><div class="meta">Aún no hay visitas registradas hoy.</div></div>`;
+      listCity.innerHTML = `<div class="item"><div class="meta">Aún no hay visitas registradas hoy para este vendedor.</div></div>`;
     }else{
-      recs.slice().sort((a,b)=> (a.start_ts||0)-(b.start_ts||0)).forEach(r=>{
+      sellerRecs.slice().sort((a,b)=> (a.start_ts||0)-(b.start_ts||0)).forEach(r=>{
         const el=document.createElement("div");
         el.className="item";
         const dur = r.duration_sec ? Math.round(r.duration_sec/60) + " min" : "—";
@@ -969,7 +1166,7 @@
 
     ensureCityMap();
     if(hasLeaflet()){
-      const pts = plotRoute(layerCity, recs.slice().sort((a,b)=> (a.start_ts||0)-(b.start_ts||0)));
+      const pts = plotRoute(layerCity, sellerRecs.slice().sort((a,b)=> (a.start_ts||0)-(b.start_ts||0)));
       fitToPoints(mapCity, pts);
     }
 
@@ -989,7 +1186,8 @@
     if(x.includes("GUADALAJARA")) return "GDL";
     if(x.includes("MONTERREY")) return "MTY";
     if(x.includes("MEXICO") || x.includes("MÉXICO")) return "CDMX";
-    if(["GDL","MTY","CDMX"].includes(x)) return x;
+    if(x.includes("AGUASCALIENTES")) return "AGS";
+    if(["GDL","MTY","CDMX","AGS"].includes(x)) return x;
     return x;
   }
 
@@ -1003,6 +1201,32 @@
       out.push(d.toISOString().slice(0,10));
     }
     return out;
+  }
+
+  function monthBoundsFrom(dayStr){
+    const src = (dayStr || todayISO()) + "T00:00:00";
+    const d = new Date(src);
+    if(isNaN(d)) return {from: todayISO(), to: todayISO()};
+    const y = d.getFullYear();
+    const m = d.getMonth();
+    const start = new Date(y, m, 1);
+    const end = new Date(y, m + 1, 0);
+    const fmt = (x)=> `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}-${String(x.getDate()).padStart(2,"0")}`;
+    return { from: fmt(start), to: fmt(end) };
+  }
+
+  function weekBoundsFrom(dayStr){
+    const src = (dayStr || todayISO()) + "T00:00:00";
+    const d = new Date(src);
+    if(isNaN(d)) return {from: todayISO(), to: todayISO()};
+    const day = d.getDay(); // 0=domingo, 1=lunes
+    const diffToMonday = day === 0 ? -6 : 1 - day;
+    const start = new Date(d);
+    start.setDate(d.getDate() + diffToMonday);
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
+    const fmt = (x)=> `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}-${String(x.getDate()).padStart(2,"0")}`;
+    return { from: fmt(start), to: fmt(end) };
   }
 
   async function fetchCloudRange(from, to){
@@ -1041,25 +1265,41 @@
     const source = adminSource.value || "LOCAL";
 
     let base=[];
+    let weekBase=[];
+    let monthBase=[];
+    const refDay = to || from || todayISO();
+    const weekRange = weekBoundsFrom(refDay);
+    const monthRange = monthBoundsFrom(refDay);
+
     if(source==="CLOUD"){
       if(!cloudConfigured()){
         toast("Cloud no configurado. Cambiando a Local.");
         adminSource.value="LOCAL";
         base = loadLocalRange(from, to);
+        weekBase = loadLocalRange(weekRange.from, weekRange.to);
+        monthBase = loadLocalRange(monthRange.from, monthRange.to);
       }else{
         try{
           base = await fetchCloudRange(from, to);
+          weekBase = await fetchCloudRange(weekRange.from, weekRange.to);
+          monthBase = await fetchCloudRange(monthRange.from, monthRange.to);
         }catch(e){
           toast("Cloud falló. Mostrando Local.");
           adminSource.value="LOCAL";
           base = loadLocalRange(from, to);
+          weekBase = loadLocalRange(weekRange.from, weekRange.to);
+          monthBase = loadLocalRange(monthRange.from, monthRange.to);
         }
       }
     }else{
       base = loadLocalRange(from, to);
+      weekBase = loadLocalRange(weekRange.from, weekRange.to);
+      monthBase = loadLocalRange(monthRange.from, monthRange.to);
     }
 
     base = base.map(r=>({...r, city: normalizeCity(r.city)}));
+    weekBase = weekBase.map(r=>({...r, city: normalizeCity(r.city)}));
+    monthBase = monthBase.map(r=>({...r, city: normalizeCity(r.city)}));
     let recs = base.slice();
 
     if(city!=="ALL") recs = recs.filter(r=>normalizeCity(r.city)===city);
@@ -1070,11 +1310,12 @@
     adminKpiHours.textContent = secToH(recs.reduce((a,r)=>a+(r.duration_sec||0),0));
     adminKpiClients.textContent = new Set(recs.map(r=>(r.client||"").trim()).filter(Boolean)).size;
 
-    const byCity={GDL:0, MTY:0, CDMX:0};
+    const byCity={GDL:0, MTY:0, CDMX:0, AGS:0};
     base.forEach(r=>{ const c=normalizeCity(r.city); if(byCity[c]!==undefined) byCity[c]++; });
     adminKpiGDL.textContent = byCity.GDL;
     adminKpiMTY.textContent = byCity.MTY;
     adminKpiCDMX.textContent = byCity.CDMX;
+    if(adminKpiAGS) adminKpiAGS.textContent = byCity.AGS;
 
     // Badge
     if(adminSourceLbl && adminDot){
@@ -1114,48 +1355,105 @@
       setTimeout(()=>mapAdmin && mapAdmin.invalidateSize(), 50);
     }
 
-    // Ranking with type breakdown + full comments
-    const byVendor = {};
-    recs.forEach(r=>{
-      const v = (r.vendor||"—");
-      if(!byVendor[v]) byVendor[v] = {count:0, types:{}, notes:[]};
-      byVendor[v].count++;
-      const t=(r.type||"—");
-      byVendor[v].types[t]=(byVendor[v].types[t]||0)+1;
-      if(r.notes) byVendor[v].notes.push(`• ${r.client||"—"} (${r.day||""}) · ${r.type||"—"} — ${r.notes}`);
-    });
+// Ranking with type breakdown + weekly/monthly goals
+const weekScoped = weekBase.filter(r=>{
+  if(city!=="ALL" && normalizeCity(r.city)!==city) return false;
+  if(vendor!=="ALL" && (r.vendor||"")!==vendor) return false;
+  return true;
+});
 
-    const list = Object.entries(byVendor).sort((a,b)=>b[1].count-a[1].count);
-    if(!adminVendorsSummary) return; adminVendorsSummary.innerHTML="";
-    if(!list.length){
-      adminVendorsSummary.innerHTML = `<div class="item"><div class="meta">Sin datos.</div></div>`;
-    }else{
-      list.forEach(([v,data])=>{
-        const typesChips = Object.entries(data.types)
-          .sort((a,b)=>b[1]-a[1])
-          .map(([t,c])=> `<span class="chip chipWide" title="${escapeHtml(t)}" style="margin-right:6px;margin-top:6px">${escapeHtml(t)} · ${c}</span>`)
-          .join("");
-        const notesBlock = data.notes.length
-          ? `<div class="meta wrapText" style="margin-top:10px">${escapeHtml(data.notes.join("\n"))}</div>`
-          : `<div class="meta" style="margin-top:10px">Sin comentarios.</div>`;
-        const el=document.createElement("div");
-        el.className="item";
-        el.innerHTML = `
-          <div class="top">
-            <div>
-              <div class="name">${escapeHtml(v)}</div>
-              <div class="meta">${data.count} visita(s)</div>
-              <div style="display:flex;flex-wrap:wrap;margin-top:6px">${typesChips || ""}</div>
-              ${notesBlock}
-            </div>
-            <span class="chip">${data.count}</span>
-          </div>
-        `;
-        adminVendorsSummary.appendChild(el);
-      });
-    }
+const monthScoped = monthBase.filter(r=>{
+  if(city!=="ALL" && normalizeCity(r.city)!==city) return false;
+  if(vendor!=="ALL" && (r.vendor||"")!==vendor) return false;
+  return true;
+});
 
-    // Keep last applied recs for export
+const weekCounts = {};
+weekScoped.forEach(r=>{
+  const v = (r.vendor||"—");
+  weekCounts[v] = (weekCounts[v]||0) + 1;
+});
+
+const monthCounts = {};
+monthScoped.forEach(r=>{
+  const v = (r.vendor||"—");
+  monthCounts[v] = (monthCounts[v]||0) + 1;
+});
+
+const byVendor = {};
+recs.forEach(r=>{
+  const v = (r.vendor||"—");
+  if(!byVendor[v]) byVendor[v] = {count:0, types:{}, notes:[]};
+  byVendor[v].count++;
+  const t=(r.type||"—");
+  byVendor[v].types[t]=(byVendor[v].types[t]||0)+1;
+  if(r.notes) byVendor[v].notes.push(`• ${r.client||"—"} (${r.day||""}) · ${r.type||"—"} — ${r.notes}`);
+});
+
+[...new Set([...Object.keys(weekCounts), ...Object.keys(monthCounts)])].forEach(v=>{
+  if(!byVendor[v]) byVendor[v] = {count:0, types:{}, notes:[]};
+});
+
+const list = Object.entries(byVendor).sort((a,b)=>{
+  const monthDiff = (monthCounts[b[0]]||0) - (monthCounts[a[0]]||0);
+  if(monthDiff!==0) return monthDiff;
+  const weekDiff = (weekCounts[b[0]]||0) - (weekCounts[a[0]]||0);
+  if(weekDiff!==0) return weekDiff;
+  return (b[1].count||0) - (a[1].count||0);
+});
+
+if(!adminVendorsSummary) return; adminVendorsSummary.innerHTML="";
+if(!list.length){
+  adminVendorsSummary.innerHTML = `<div class="item"><div class="meta">Sin datos.</div></div>`;
+}else{
+  list.forEach(([v,data])=>{
+    const weeklyCount = weekCounts[v] || 0;
+    const monthlyCount = monthCounts[v] || 0;
+    const weekGoal = 25;
+    const monthGoal = 100;
+    const weekPct = Math.round((weeklyCount / weekGoal) * 100);
+    const monthPct = Math.round((monthlyCount / monthGoal) * 100);
+    const weekPctSafe = Math.max(0, Math.min(100, weekPct));
+    const monthPctSafe = Math.max(0, Math.min(100, monthPct));
+    const typesChips = Object.entries(data.types)
+      .sort((a,b)=>b[1]-a[1])
+      .map(([t,c])=> `<span class="chip chipWide" title="${escapeHtml(t)}" style="margin-right:6px;margin-top:6px">${escapeHtml(t)} · ${c}</span>`)
+      .join("");
+    const notesBlock = data.notes.length
+      ? `<div class="meta wrapText" style="margin-top:10px">${escapeHtml(data.notes.join("\n"))}</div>`
+      : `<div class="meta" style="margin-top:10px">Sin comentarios en el filtro actual.</div>`;
+    const progressHtml = `
+      <div style="margin-top:10px">
+        <div class="meta">Semana ${escapeHtml(weekRange.from)} a ${escapeHtml(weekRange.to)}: <b>${weeklyCount}</b> / ${weekGoal} visitas · <b>${weekPct}%</b></div>
+        <div style="margin-top:6px;height:10px;border-radius:999px;background:rgba(15,23,42,.08);overflow:hidden">
+          <div style="height:100%;width:${weekPctSafe}%;background:${weekPct >= 100 ? 'var(--good)' : 'linear-gradient(90deg,#a855f7,#3b82f6)'}"></div>
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <div class="meta">Mes ${escapeHtml(monthRange.from.slice(0,7))}: <b>${monthlyCount}</b> / ${monthGoal} visitas · <b>${monthPct}%</b></div>
+        <div style="margin-top:6px;height:10px;border-radius:999px;background:rgba(15,23,42,.08);overflow:hidden">
+          <div style="height:100%;width:${monthPctSafe}%;background:${monthPct >= 100 ? 'var(--good)' : 'linear-gradient(90deg,#3b82f6,#22c55e)'}"></div>
+        </div>
+      </div>`;
+    const el=document.createElement("div");
+    el.className="item";
+    el.innerHTML = `
+      <div class="top">
+        <div style="width:100%">
+          <div class="name">${escapeHtml(v)}</div>
+          <div class="meta">Filtro actual: ${data.count} visita(s)</div>
+          ${progressHtml}
+          <div style="display:flex;flex-wrap:wrap;margin-top:8px">${typesChips || `<span class="meta">Sin tipos registrados en el filtro actual.</span>`}</div>
+          ${notesBlock}
+        </div>
+        <span class="chip">S ${weeklyCount}/25 · M ${monthlyCount}/100</span>
+      </div>
+    `;
+    adminVendorsSummary.appendChild(el);
+  });
+}
+
+// Keep last applied recs for export
     window.__ADMIN_LAST_RECS__ = recs;
     window.__ADMIN_LAST_BASE__ = base;
     window.__ADMIN_RANGE__ = {from,to};
@@ -1295,6 +1593,16 @@
       }
 
       activeClear();
+      saveDraft({
+        city: citySelect.value,
+        vendor: vendorSelect.value,
+        client: "",
+        type: typeSelect.value,
+        notes: ""
+      });
+      clientInput.value = "";
+      notesInput.value = "";
+      if(recentClientSelect) recentClientSelect.value = "";
       toast("Visita guardada");
       renderCity();
     }catch(e){
@@ -1381,7 +1689,7 @@
       const msgId = pick.id || "";
       announceBox.dataset.msgId = msgId;
 
-      announceTitle.textContent = (pick.title || "Comunicado").trim();
+      announceTitle.textContent = (pick.title || defaultAnnouncementTitle(pick.city || "ALL", pick.vendor || "ALL")).trim();
       const bodyTxt = (pick.body || "").trim();
       announceMsg.textContent = bodyTxt;
 
@@ -1459,6 +1767,20 @@
     });
   }
 
+  async function deleteAnnouncementById(id){
+    const path = `/rest/v1/${encodeURIComponent(ANNOUNCE_TABLE)}?id=eq.${encodeURIComponent(id)}`;
+    try{
+      await sbFetch(path, {
+        method:"DELETE",
+        headers:{ "Prefer":"return=minimal" }
+      });
+      return true;
+    }catch(e){
+      await setAnnouncementActive(id, false);
+      return false;
+    }
+  }
+
   function renderAdminAnnouncements(rows){
     if(!msgList) return;
     msgList.innerHTML = "";
@@ -1471,11 +1793,11 @@
     list.forEach(r=>{
       const active = (r.active === undefined) ? true : !!r.active;
       const when = r.day || (r.created_at ? (new Date(r.created_at)).toISOString().slice(0,10) : "");
-      const meta = [when, (r.city||"ALL"), (r.vendor||"ALL")].filter(Boolean).join(" · ");
+      const meta = [when, cityLabel(r.city||"ALL"), (r.vendor||"ALL")].filter(Boolean).join(" · ");
       const id = (r.id || "");
       const expanded = isAnnExpanded(id);
       const body = (r.body || "").toString().trim();
-      const title = (r.title || "Comunicado").toString().trim();
+      const title = (r.title || defaultAnnouncementTitle(r.city || "ALL", r.vendor || "ALL")).toString().trim();
 
       const el = document.createElement("div");
       el.className = "item";
@@ -1517,12 +1839,12 @@
         const id = btn.getAttribute("data-ann-del");
         if(!id) return;
         try{
-          await setAnnouncementActive(id, false);
-          toast("Mensaje eliminado");
+          const hardDeleted = await deleteAnnouncementById(id);
+          toast(hardDeleted ? "Mensaje eliminado" : "Mensaje desactivado");
           await loadAnnouncementsList();
           await refreshAnnouncement();
         }catch(e){
-          toast("No se pudo eliminar (habilita UPDATE en announcements)");
+          toast("No se pudo eliminar el mensaje");
         }
       });
     });
@@ -1575,19 +1897,42 @@
     }
 
     let ok = 0;
+    let soft = 0;
     for(const r of rows){
       try{
-        await setAnnouncementActive(r.id, false);
+        const hardDeleted = await deleteAnnouncementById(r.id);
         ok++;
+        if(!hardDeleted) soft++;
       }catch(e){}
     }
-    toast(`Mensajes eliminados: ${ok}`);
+    toast(soft ? `Mensajes retirados: ${ok} (algunos quedaron inactivos)` : `Mensajes eliminados: ${ok}`);
     await loadAnnouncementsList();
     await refreshAnnouncement();
   }
 
 
   // ===== Routing / Tabs =====
+  function safeOpenAdmin(){
+    try{
+      ensureAdminMap();
+      setTimeout(()=>{ if(hasLeaflet() && mapAdmin) mapAdmin.invalidateSize(); }, 80);
+      Promise.resolve(applyAdmin()).catch((e)=>{
+        console.error("Admin apply failed", e);
+        if(listAdmin){
+          listAdmin.innerHTML = `<div class="item"><div class="meta">Admin abierto, pero hubo un problema al cargar datos. Revisa Cloud o vuelve a intentar.</div></div>`;
+        }
+        toast("Admin abierto con error de carga");
+      });
+      Promise.resolve(loadAnnouncementsList()).catch(()=>{});
+    }catch(e){
+      console.error("Admin open failed", e);
+      if(listAdmin){
+        listAdmin.innerHTML = `<div class="item"><div class="meta">No se pudo cargar Admin completamente.</div></div>`;
+      }
+      toast("No se pudo cargar Admin");
+    }
+  }
+
   function setActiveTab(which){
     const isAdmin = (which==="admin");
     tabCity.classList.toggle("active", !isAdmin);
@@ -1596,9 +1941,7 @@
     pageAdmin.style.display = isAdmin ? "" : "none";
 
     if(isAdmin){
-      ensureAdminMap();
-      setTimeout(()=>{ if(hasLeaflet() && mapAdmin) mapAdmin.invalidateSize(); }, 80);
-      applyAdmin();
+      safeOpenAdmin();
     }else{
       ensureCityMap();
       setTimeout(()=>{ if(hasLeaflet() && mapCity) mapCity.invalidateSize(); }, 80);
@@ -1617,11 +1960,12 @@
       setActiveTab("admin");
       return;
     }
-    // shortcuts: /gdl /mty /cdmx
+    // shortcuts: /gdl /mty /cdmx /ags
     const p = h.replace("/","").toUpperCase();
-    if(["GDL","MTY","CDMX"].includes(p)){
+    if(["GDL","MTY","CDMX","AGS"].includes(p)){
       citySelect.value = p;
       fillVendors(p);
+      fillRecentClients(citySelect.value, vendorSelect.value);
       setActiveTab("city");
       return;
     }
@@ -1630,13 +1974,14 @@
 
   // ===== Init =====
   function init(){
-    buildStamp.textContent = "BUILD v5 " + new Date().toISOString().slice(0,19).replace("T"," ");
+    buildStamp.textContent = "BUILD v9 metas semanal y mensual " + new Date().toISOString().slice(0,19).replace("T"," ");
 
     // City selects
     fillCity();
     citySelect.value = "GDL";
     fillVendors("GDL");
     fillTypes();
+    fillRecentClients("GDL", vendorSelect.value);
 
     // Admin selects
     refreshAdminCityOptions();
@@ -1646,6 +1991,17 @@
     const d = todayISO();
     adminFrom.value = d;
     adminTo.value = d;
+
+    const draft = loadDraft();
+    if(draft.city && CITY_META.some(c=>c.code===draft.city)){
+      citySelect.value = draft.city;
+      fillVendors(draft.city);
+    }
+    if(draft.vendor && [...vendorSelect.options].some(o=>o.value===draft.vendor)) vendorSelect.value = draft.vendor;
+    if(draft.client) clientInput.value = draft.client;
+    if(draft.type && VISIT_TYPES.includes(draft.type)) typeSelect.value = draft.type;
+    if(draft.notes) notesInput.value = draft.notes;
+    fillRecentClients(citySelect.value, vendorSelect.value);
 
     // cloud indicator
     if(cloudConfigured()){
@@ -1666,13 +2022,43 @@
     // events
     citySelect.addEventListener("change", ()=>{
       fillVendors(citySelect.value);
+      saveDraft({city: citySelect.value, vendor: vendorSelect.value});
+      fillRecentClients(citySelect.value, vendorSelect.value);
       renderCity();
       refreshAnnouncement();
     });
     vendorSelect.addEventListener("change", ()=>{
+      saveDraft({city: citySelect.value, vendor: vendorSelect.value});
+      fillRecentClients(citySelect.value, vendorSelect.value);
       renderCity();
       refreshAnnouncement();
     });
+
+    [clientInput, typeSelect, notesInput].forEach(el=>{
+      el.addEventListener("input", ()=> saveDraft({
+        city: citySelect.value,
+        vendor: vendorSelect.value,
+        client: clientInput.value,
+        type: typeSelect.value,
+        notes: notesInput.value
+      }));
+      el.addEventListener("change", ()=> saveDraft({
+        city: citySelect.value,
+        vendor: vendorSelect.value,
+        client: clientInput.value,
+        type: typeSelect.value,
+        notes: notesInput.value
+      }));
+    });
+
+    if(recentClientSelect){
+      recentClientSelect.addEventListener("change", ()=>{
+        if(recentClientSelect.value){
+          clientInput.value = recentClientSelect.value;
+          saveDraft({client: clientInput.value});
+        }
+      });
+    }
 
     btnLocate.addEventListener("click", locate);
     btnStart.addEventListener("click", startVisit);
@@ -1683,6 +2069,8 @@
 
     adminCity.addEventListener("change", ()=>{ refreshAdminVendorOptions(); applyAdmin(); });
     adminVendor.addEventListener("change", ()=>applyAdmin());
+    if(msgCity) msgCity.addEventListener("change", ()=>{ refreshAdminVendorOptions(); syncAnnouncementTitle(); });
+    if(msgVendor) msgVendor.addEventListener("change", ()=> syncAnnouncementTitle());
     adminSource.addEventListener("change", ()=>applyAdmin());
     btnAdminApply.addEventListener("click", ()=>applyAdmin());
 
@@ -1718,6 +2106,7 @@
     if(btnListMsgs) btnListMsgs.addEventListener("click", loadAnnouncementsList);
     if(btnDeleteMsgDay) btnDeleteMsgDay.addEventListener("click", ()=> deleteAnnouncementsByDay(msgDeleteDay.value));
     if(msgDeleteDay && !msgDeleteDay.value) msgDeleteDay.value = todayISO();
+    syncAnnouncementTitle(true);
     loadAnnouncementsList();
 
     if(btnDismissAnn){
@@ -1745,8 +2134,12 @@
 
     btnPublishMsg.addEventListener("click", publishAnnouncement);
 
+    // navegación robusta
+    tabCity.addEventListener("click", (e)=>{ e.preventDefault(); location.hash = "#/"; handleRoute(); });
+    tabAdmin.addEventListener("click", (e)=>{ e.preventDefault(); location.hash = "#/admin"; handleRoute(); });
+
     // floating admin
-    fabAdmin.addEventListener("click", ()=>{ location.hash = "#/admin"; });
+    fabAdmin.addEventListener("click", ()=>{ location.hash = "#/admin"; handleRoute(); });
 
     // routing
     window.addEventListener("hashchange", handleRoute);
