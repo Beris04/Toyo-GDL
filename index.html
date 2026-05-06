@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>App Visitas · Cloud + Mapa Pro (1 archivo)</title>
+  <title>App Visitas · Cloud + Mapa Pro (1 archivo) · Promos móvil</title>
 
   <!-- Leaflet (CDN). Si el CDN falla, la app sigue funcionando sin mapa -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -256,9 +256,6 @@
       grid-template-columns:repeat(2,minmax(0,1fr));
       gap:12px;
     }
-    @media (max-width:620px){
-      .promoGrid{grid-template-columns:1fr}
-    }
     .promoCard{
       border:1px solid var(--line);
       background:rgba(255,255,255,.88);
@@ -304,6 +301,23 @@
       color:var(--muted);
       font-size:12px;
       font-weight:700;
+    }
+
+    @media (max-width:620px){
+      #promotionsCard{order:-1}
+      #promotionsCard .hd{padding:12px 12px 8px}
+      #promotionsCard .bd{padding:10px}
+      #promotionsCard .hint{display:none}
+      #promotionsCard .hr{display:none}
+      .promoGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+      .promoCard{border-radius:16px}
+      .promoMedia{padding:10px;min-height:132px}
+      .promoMedia img{max-height:116px;border-radius:10px;box-shadow:0 8px 18px rgba(15,23,42,.10)}
+      .promoBody{padding:10px 10px 12px}
+      .promoTitle{font-size:11px;margin:0 0 4px}
+      .promoText{font-size:12px;line-height:1.22}
+      .promoSub{font-size:10px;margin-top:5px}
+      #promotionsScope{font-size:10px}
     }
 
 
