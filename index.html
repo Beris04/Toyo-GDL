@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>App Visitas · Cloud + Mapa Pro (1 archivo) · Promos móvil</title>
+  <title>Visitas de Vendedor · Toyo Foods</title>
 
   <!-- Leaflet (CDN). Si el CDN falla, la app sigue funcionando sin mapa -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -42,14 +42,55 @@
       position:sticky;top:0;z-index:50;padding:10px 0 12px;
       backdrop-filter: blur(10px);
     }
-    .brand{display:flex;align-items:center;gap:10px}
-    .logo{
-      width:34px;height:34px;border-radius:12px;
-      background: linear-gradient(135deg,#111827,#334155);
-      box-shadow: 0 10px 22px rgba(0,0,0,.18);
+    .brand{display:flex;align-items:center;gap:12px}
+    .brandLogo{
+      width:48px;height:48px;border-radius:14px;display:block;object-fit:cover;flex:0 0 48px;
+      box-shadow: 0 12px 26px rgba(15,23,42,.18);
+      background:#0f4ea8;
+      border:1px solid rgba(255,255,255,.7);
     }
+    .logo{display:none}
     h1{font-size:15px;margin:0;letter-spacing:.2px}
     .sub{font-size:12px;color:var(--muted);margin-top:2px}
+    .logoutBtn{
+      border:1px solid rgba(15,23,42,.12);
+      background:rgba(255,255,255,.92);
+      color:var(--text);
+      padding:10px 12px;border-radius:999px;
+      font-weight:900;font-size:12px;cursor:pointer;
+      display:inline-flex;align-items:center;justify-content:center;
+    }
+    .logoutBtn:hover{background:#fff}
+    .loginGate{
+      position:fixed;inset:0;z-index:999999;
+      background:linear-gradient(180deg, rgba(239,244,255,.98), rgba(245,247,251,.98));
+      display:none;align-items:center;justify-content:center;padding:22px;
+    }
+    body.appLocked .loginGate{display:flex}
+    body.appLocked .wrap,
+    body.appLocked .fab{display:none}
+    body.appLocked{overflow:hidden}
+    .loginCard{
+      width:min(420px,100%);
+      background:rgba(255,255,255,.98);
+      border:1px solid rgba(15,23,42,.10);
+      border-radius:26px;
+      box-shadow:0 28px 70px rgba(15,23,42,.18);
+      padding:24px;
+    }
+    .loginBrand{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+    .loginBrand .brandLogo{width:58px;height:58px;flex-basis:58px;border-radius:16px}
+    .loginTitle{font-size:22px;font-weight:950;line-height:1.05;margin:0}
+    .loginSub{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.35}
+    .loginHint{margin-top:10px;font-size:12px;color:var(--muted);background:rgba(15,23,42,.04);border:1px solid rgba(15,23,42,.08);padding:10px 12px;border-radius:14px}
+    .loginError{margin-top:10px;font-size:12px;color:#b91c1c;display:none}
+    .loginError.show{display:block}
+    .loginField{margin-top:12px}
+    @media (max-width:620px){
+      .loginCard{padding:20px;border-radius:22px}
+      .loginTitle{font-size:20px}
+      .brandLogo{width:44px;height:44px;flex-basis:44px}
+    }
     .tabs{display:flex;gap:8px;flex-wrap:wrap}
     .tab{
       border:1px solid var(--line);
@@ -323,19 +364,44 @@
 
   </style>
 </head>
-<body>
+<body class="appLocked">
+  <div class="loginGate" id="loginGate">
+    <div class="loginCard">
+      <div class="loginBrand">
+        <img class="brandLogo" src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22240%22%20height%3D%22240%22%20viewBox%3D%220%200%20240%20240%22%3E%0A%3Cdefs%3E%0A%20%20%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%0A%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230f4ea8%22/%3E%0A%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%230b3f8a%22/%3E%0A%20%20%3C/linearGradient%3E%0A%3C/defs%3E%0A%3Crect%20width%3D%22240%22%20height%3D%22240%22%20rx%3D%2242%22%20fill%3D%22url%28%23g%29%22/%3E%0A%3Crect%20x%3D%2210%22%20y%3D%2210%22%20width%3D%22220%22%20height%3D%22220%22%20rx%3D%2234%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C.14%29%22%20stroke-width%3D%224%22/%3E%0A%3Ctext%20x%3D%2248%22%20y%3D%22105%22%20font-family%3D%22Arial%2C%20Helvetica%2C%20sans-serif%22%20font-size%3D%2260%22%20font-weight%3D%22700%22%20fill%3D%22%23ffffff%22%3Etoyo%3C/text%3E%0A%3Ctext%20x%3D%2248%22%20y%3D%22165%22%20font-family%3D%22Arial%2C%20Helvetica%2C%20sans-serif%22%20font-size%3D%2254%22%20font-weight%3D%22700%22%20fill%3D%22%23ffffff%22%3Efoods%3C/text%3E%0A%3C/svg%3E" alt="Toyo Foods" />
+        <div>
+          <h2 class="loginTitle">Visitas de Vendedor</h2>
+          <div class="loginSub">Acceso general para el equipo comercial de Toyo Foods.</div>
+        </div>
+      </div>
+      <div class="loginHint">Ingresa tus credenciales para continuar.</div>
+      <div class="loginField field">
+        <label>Usuario</label>
+        <input id="loginUser" type="text" autocomplete="username" placeholder="Usuario" />
+      </div>
+      <div class="loginField field">
+        <label>Contraseña</label>
+        <input id="loginPass" type="password" autocomplete="current-password" placeholder="Contraseña" />
+      </div>
+      <div class="btnbar">
+        <button class="btn primary" id="btnLogin" type="button">Entrar</button>
+      </div>
+      <div class="loginError" id="loginError">Usuario o contraseña incorrectos.</div>
+    </div>
+  </div>
   <div class="wrap">
     <div class="topbar">
       <div class="brand">
-        <div class="logo" aria-hidden="true"></div>
+        <img class="brandLogo" src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22240%22%20height%3D%22240%22%20viewBox%3D%220%200%20240%20240%22%3E%0A%3Cdefs%3E%0A%20%20%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%0A%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230f4ea8%22/%3E%0A%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%230b3f8a%22/%3E%0A%20%20%3C/linearGradient%3E%0A%3C/defs%3E%0A%3Crect%20width%3D%22240%22%20height%3D%22240%22%20rx%3D%2242%22%20fill%3D%22url%28%23g%29%22/%3E%0A%3Crect%20x%3D%2210%22%20y%3D%2210%22%20width%3D%22220%22%20height%3D%22220%22%20rx%3D%2234%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C255%2C255%2C.14%29%22%20stroke-width%3D%224%22/%3E%0A%3Ctext%20x%3D%2248%22%20y%3D%22105%22%20font-family%3D%22Arial%2C%20Helvetica%2C%20sans-serif%22%20font-size%3D%2260%22%20font-weight%3D%22700%22%20fill%3D%22%23ffffff%22%3Etoyo%3C/text%3E%0A%3Ctext%20x%3D%2248%22%20y%3D%22165%22%20font-family%3D%22Arial%2C%20Helvetica%2C%20sans-serif%22%20font-size%3D%2254%22%20font-weight%3D%22700%22%20fill%3D%22%23ffffff%22%3Efoods%3C/text%3E%0A%3C/svg%3E" alt="Toyo Foods" />
         <div>
-          <h1>App Visitas · Cloud + Mapa Pro</h1>
-          <div class="sub">1 solo archivo (index.html) · GitHub Pages · Cloud (Supabase) · Mejoras UX</div>
+          <h1>Visitas de Vendedor</h1>
+          <div class="sub">Toyo Foods · App interna · GitHub Pages · Cloud (Supabase)</div>
         </div>
       </div>
       <nav class="tabs" role="tablist" aria-label="Navegación">
         <a class="tab" id="tabCity" href="#/">Vendedor</a>
         <a class="tab" id="tabAdmin" href="#/admin">Admin (Cloud)</a>
+        <button class="logoutBtn" id="btnLogout" type="button">Salir</button>
       </nav>
     </div>
 
@@ -793,6 +859,12 @@
   const pageCity = $("#pageCity");
   const pageAdmin = $("#pageAdmin");
   const fabAdmin = $("#fabAdmin");
+  const btnLogout = $("#btnLogout");
+  const loginGate = $("#loginGate");
+  const loginUser = $("#loginUser");
+  const loginPass = $("#loginPass");
+  const btnLogin = $("#btnLogin");
+  const loginError = $("#loginError");
 
   const citySelect = $("#citySelect");  const vendorSelect = $("#vendorSelect");
   const clientInput = $("#clientInput");
@@ -875,6 +947,45 @@
   const btnClearToday = $("#btnClearToday");
 
   // ===== Utilities =====
+
+  const AUTH_USER = "Vendedor";
+  const AUTH_PASS = "Toyo2026";
+  const AUTH_KEY = "app_visitas_auth_v1";
+
+  function isAuthenticated(){
+    try{ return sessionStorage.getItem(AUTH_KEY) === "1"; }catch(e){ return false; }
+  }
+  function setAuth(ok){
+    try{
+      if(ok) sessionStorage.setItem(AUTH_KEY, "1");
+      else sessionStorage.removeItem(AUTH_KEY);
+    }catch(e){}
+    document.body.classList.toggle("appLocked", !ok);
+  }
+  function doLogin(){
+    const user = (loginUser?.value || "").trim();
+    const pass = (loginPass?.value || "").trim();
+    const ok = (user === AUTH_USER && pass === AUTH_PASS);
+    setAuth(ok);
+    if(loginError) loginError.classList.toggle("show", !ok);
+    if(ok){
+      if(loginPass) loginPass.value = "";
+      handleRoute();
+      if(hasLeaflet() && mapCity) setTimeout(()=>mapCity.invalidateSize(), 120);
+      if(hasLeaflet() && mapAdmin) setTimeout(()=>mapAdmin.invalidateSize(), 120);
+      toast("Acceso correcto");
+    }
+    return ok;
+  }
+  function doLogout(){
+    setAuth(false);
+    if(loginUser) loginUser.value = "";
+    if(loginPass) loginPass.value = "";
+    if(loginError) loginError.classList.remove("show");
+    location.hash = "#/";
+    setTimeout(()=> loginUser && loginUser.focus(), 50);
+  }
+
   function todayISO(){
     const d = new Date();
     const yyyy = d.getFullYear();
@@ -2099,6 +2210,12 @@ if(!list.length){
   }
 
   function handleRoute(){
+    if(!isAuthenticated()){
+      document.body.classList.add("appLocked");
+      tabCity.classList.remove("active");
+      tabAdmin.classList.remove("active");
+      return;
+    }
     const h = parseHash();
     if(h.startsWith("/admin")){
       setActiveTab("admin");
@@ -2118,7 +2235,14 @@ if(!list.length){
 
   // ===== Init =====
   function init(){
-    buildStamp.textContent = "BUILD v9 metas semanal y mensual " + new Date().toISOString().slice(0,19).replace("T"," ");
+    if(btnLogin) btnLogin.addEventListener("click", doLogin);
+    if(loginUser) loginUser.addEventListener("keydown", (e)=>{ if(e.key === "Enter") doLogin(); });
+    if(loginPass) loginPass.addEventListener("keydown", (e)=>{ if(e.key === "Enter") doLogin(); });
+    if(btnLogout) btnLogout.addEventListener("click", doLogout);
+    setAuth(isAuthenticated());
+    if(!isAuthenticated()){ setTimeout(()=> loginUser && loginUser.focus(), 80); }
+
+    buildStamp.textContent = "BUILD v10 acceso Toyo " + new Date().toISOString().slice(0,19).replace("T"," ");
 
     // City selects
     fillCity();
