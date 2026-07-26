@@ -1,4 +1,4 @@
-<!-- BUILD V3.4 - LOGIN REAL (SUPABASE AUTH) + VENDEDORES EN CLOUD + XLSX REAL -->
+<!-- BUILD V3.3 OPTIMIZADA PARA 4G -->
 <!doctype html>
 <html lang="es">
 <head>
@@ -530,7 +530,7 @@
           <div class="loginSub">Acceso general para el equipo comercial de Toyo Foods.</div>
         </div>
       </div>
-      <div class="loginHint">Selecciona tu nombre e ingresa tu contraseña personal.</div>
+      <div class="loginHint">Ingresa tus credenciales para continuar.</div>
       <div class="loginField field">
         <label>Usuario</label>
         <select id="loginUser" autocomplete="username"><option value="">Selecciona usuario</option></select>
@@ -1014,30 +1014,7 @@
   let ORDER_INDEX_PROMISE = null;
 
   // ===== Data =====
-  // Los vendedores ya NO se escriben aquí a mano: se cargan desde la tabla
-  // "vendors" de Supabase (ver CONFIGURACION_SUPABASE.md) y se guardan en caché
-  // local para que la app siga funcionando sin conexión.
-  const VENDORS_CACHE_KEY = "app_visitas_vendors_cache_v1";
-  let SELLERS = safeJsonParse(localStorage.getItem(VENDORS_CACHE_KEY) || "{}", {});
-  async function refreshVendorsFromCloud(){
-    if(!cloudConfigured()) return false;
-    try{
-      const rows = await sbFetch(`/rest/v1/vendors?select=city,name&active=eq.true&order=city.asc,name.asc`);
-      const grouped = {};
-      (rows||[]).forEach(r=>{
-        if(!r || !r.city || !r.name) return;
-        (grouped[r.city] ||= []).push(r.name);
-      });
-      if(Object.keys(grouped).length){
-        SELLERS = grouped;
-        localStorage.setItem(VENDORS_CACHE_KEY, JSON.stringify(SELLERS));
-      }
-      return true;
-    }catch(e){
-      // Sin conexión o sin permisos: seguimos con la última caché conocida.
-      return false;
-    }
-  }
+  const SELLERS = {"CDMX":["David Adrian Hernández Guzmán","Javier Espinosa Olivares","Ricardo Gutierrez Bandera","Abraham Rene Valdes Gonzales","Jesus Antonio Ramirez Rivera","Sergio Servin Rivera","Eduardo Faustino Hernandez Sanchez","Khiroyuki Sakurai","Andres Fierro Ibañez","Jonathan Ramirez","Tohru Kurasawa","Tanno Nobuko"],"MTY":["Jessica Palomo","Luis Heredia","Carla Hernández","Salomé Barron"],"GDL":["Aguilar Neri Daniel","De la Cruz Ponce Julio Cesar","Garibay Ortiz Sergio Joel","Sierra de Anda Aldo","Perez Mar Alan Roberto","Reynoso Aguilar Maricela","Sandra Navarro Navarro","Aguirre Ojeda Arcenio","Velez Castellanos Antonio","Yepez Mora Oscar Alberto","Sanchez Esmeralda","Reynaga Valeria","González Guzmán Cristian Eduardo"],"AGS":["Hernandez Gonzalez Angel Miguel"],"PUE":["Victor Mendez","Yael Mojica"],"QRO":["Roberto Lopez"]};
 
   const CITY_META = [{"code":"GDL","label":"Guadalajara"},{"code":"MTY","label":"Monterrey"},{"code":"CDMX","label":"México"},{"code":"AGS","label":"Aguascalientes"},{"code":"PUE","label":"Puebla"},{"code":"QRO","label":"Querétaro"}];
 
@@ -1172,14 +1149,26 @@
   // ===== Utilities =====
 
 
+  const AUTH_PASS = "Toyo2026";
   const AUTH_KEY = "app_visitas_auth_v2";
-  // El refresco anticipado evita que un token expire a media captura de visita.
-  const AUTH_REFRESH_MARGIN_SEC = 60;
+
+  function buildUserAccounts(){
+    const users = {
+      "Admin": {role:"admin", city:"ALL", vendor:"ALL", label:"Admin"}
+    };
+    Object.entries(SELLERS).forEach(([city, vendors])=>{
+      vendors.forEach(v=>{
+        users[v] = {role:"seller", city, vendor:v, label:v};
+      });
+    });
+    return users;
+  }
+  const USER_ACCOUNTS = buildUserAccounts();
 
   function getAuthState(){
     try{
       const raw = safeJsonParse(localStorage.getItem(AUTH_KEY) || sessionStorage.getItem(AUTH_KEY) || "null", null);
-      if(raw && raw.ok && raw.access_token){
+      if(raw && raw.ok){
         localStorage.setItem(AUTH_KEY, JSON.stringify(raw));
         return raw;
       }
@@ -1195,67 +1184,8 @@
     const auth = getAuthState();
     return `${LS_DRAFT}:${auth?.user || "guest"}`;
   }
-
-  // ----- Supabase Auth (correo + contraseña verificados en el servidor) -----
-  async function sbAuthRequest(grantType, body){
-    const res = await fetch(sbUrl(`/auth/v1/token?grant_type=${grantType}`), {
-      method: "POST",
-      headers: { "apikey": SUPABASE_ANON_KEY, "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
-    const txt = await res.text().catch(()=> "");
-    let data = null;
-    try{ data = txt ? JSON.parse(txt) : null; }catch(e){}
-    if(!res.ok){
-      throw new Error((data && (data.error_description || data.msg || data.error)) || "No se pudo iniciar sesión");
-    }
-    return data;
-  }
-  async function sbFetchProfile(userId, accessToken){
-    const res = await fetch(sbUrl(`/rest/v1/profiles?select=role,city,vendor&id=eq.${encodeURIComponent(userId)}`), {
-      headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": "Bearer " + accessToken }
-    });
-    if(!res.ok) throw new Error("No se pudo leer el perfil del usuario");
-    const rows = await res.json().catch(()=>[]);
-    return (rows && rows[0]) || null;
-  }
-  async function ensureFreshSession(){
-    const auth = getAuthState();
-    if(!auth) return null;
-    const secsLeft = (auth.expires_at||0) - Math.floor(Date.now()/1000);
-    if(secsLeft > AUTH_REFRESH_MARGIN_SEC) return auth;
-    try{
-      const data = await sbAuthRequest("refresh_token", { refresh_token: auth.refresh_token });
-      const next = {
-        ...auth,
-        access_token: data.access_token,
-        refresh_token: data.refresh_token || auth.refresh_token,
-        expires_at: Math.floor(Date.now()/1000) + (data.expires_in || 3600)
-      };
-      setAuth(next, {silent:true});
-      return next;
-    }catch(e){
-      // El refresh token también expiró o fue revocado: hay que iniciar sesión de nuevo.
-      setAuth(null);
-      return null;
-    }
-  }
-  // Convierte el nombre visible ("Javier Espinosa Olivares") en un correo
-  // interno determinista para Supabase Auth ("javier.espinosa.olivares@toyofoods.local").
-  // Nadie ve ni escribe este correo: solo sirve para identificar la cuenta.
-  // Debe generarse igual aquí y al crear cada usuario en el panel de Supabase.
-  const LOGIN_EMAIL_DOMAIN = "toyofoods.local";
-  function slugifyLoginEmail(name){
-    const base = (name||"")
-      .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g,".")
-      .replace(/^\.+|\.+$/g,"");
-    return `${base}@${LOGIN_EMAIL_DOMAIN}`;
-  }
   function populateLoginUsers(){
     if(!loginUser) return;
-    const current = loginUser.value;
     const options = [["","Selecciona usuario"],["Admin","Admin"]];
     Object.entries(SELLERS).forEach(([city, vendors])=>{
       vendors.slice().sort((a,b)=> a.localeCompare(b, "es")).forEach(v=>{
@@ -1269,7 +1199,6 @@
       opt.textContent = label;
       loginUser.appendChild(opt);
     });
-    if(current && options.some(([v])=>v===current)) loginUser.value = current;
   }
   function updateSessionUi(){
     const auth = getAuthState();
@@ -1288,6 +1217,9 @@
     if(sessionScope){
       sessionScope.textContent = auth ? (auth.role === "admin" ? "Vista: Admin total" : `Vista: ${auth.city} · ${auth.vendor}`) : "Vista: general";
     }
+    if(loginUser){
+      loginUser.value = auth?.user || "";
+    }
     if(tabAdmin) tabAdmin.style.display = auth && auth.role === "admin" ? "" : "none";
     if(fabAdmin) fabAdmin.style.display = auth && auth.role === "admin" ? "" : "none";
     if(citySelect && vendorSelect){
@@ -1305,7 +1237,7 @@
       }
     }
   }
-  function setAuth(payload, opts={}){
+  function setAuth(payload){
     try{
       if(payload && payload.ok){
         const raw = JSON.stringify(payload);
@@ -1316,71 +1248,34 @@
         sessionStorage.removeItem(AUTH_KEY);
       }
     }catch(e){}
-    if(!opts.silent) updateSessionUi();
+    updateSessionUi();
   }
-  async function doLogin(){
+  function doLogin(){
     const user = (loginUser?.value || "").trim();
     const pass = (loginPass?.value || "").trim();
-    if(loginError) loginError.classList.remove("show");
-    if(!user || !pass){
-      if(loginError){ loginError.textContent = "Selecciona tu usuario e ingresa tu contraseña."; loginError.classList.add("show"); }
-      return false;
-    }
-    if(!cloudConfigured()){
-      if(loginError){ loginError.textContent = "La app no tiene Cloud configurado; no se puede iniciar sesión."; loginError.classList.add("show"); }
-      return false;
-    }
-    const email = slugifyLoginEmail(user);
-    if(btnLogin){ btnLogin.disabled = true; btnLogin.textContent = "Entrando…"; }
-    try{
-      const data = await sbAuthRequest("password", { email, password: pass });
-      const profile = await sbFetchProfile(data.user.id, data.access_token);
-      if(!profile) throw new Error("Tu usuario no tiene un perfil asignado. Pide a un administrador que lo cree.");
-      const payload = {
-        ok: true,
-        user: profile.role === "admin" ? "Admin" : profile.vendor,
-        role: profile.role,
-        city: profile.city,
-        vendor: profile.vendor,
-        user_id: data.user.id,
-        access_token: data.access_token,
-        refresh_token: data.refresh_token,
-        expires_at: Math.floor(Date.now()/1000) + (data.expires_in || 3600)
-      };
-      setAuth(payload);
+    const profile = USER_ACCOUNTS[user];
+    const ok = !!profile && pass === AUTH_PASS;
+    setAuth(ok ? {ok:true, user, role:profile.role, city:profile.city, vendor:profile.vendor} : null);
+    if(loginError) loginError.classList.toggle("show", !ok);
+    if(ok){
       if(loginPass) loginPass.value = "";
-      await refreshVendorsFromCloud();
+      if(loginUser) loginUser.value = user;
       location.hash = profile.role === "admin" ? "#/admin" : "#/";
       enforceCurrentUserContext();
       handleRoute();
       const schedule = window.requestIdleCallback || ((fn)=>setTimeout(fn,800));
       schedule(()=> profile.role === "admin" ? ensureAdminMap() : ensureCityMap());
       toast("Acceso correcto");
-      return true;
-    }catch(e){
-      setAuth(null);
-      if(loginError){ loginError.textContent = "Correo o contraseña incorrectos."; loginError.classList.add("show"); }
-      return false;
-    }finally{
-      if(btnLogin){ btnLogin.disabled = false; btnLogin.textContent = "Entrar"; }
     }
+    return ok;
   }
-  async function doLogout(){
-    const auth = getAuthState();
+  function doLogout(){
     setAuth(null);
     if(loginUser) loginUser.value = "";
     if(loginPass) loginPass.value = "";
     if(loginError) loginError.classList.remove("show");
     location.hash = "#/";
     setTimeout(()=> loginUser && loginUser.focus(), 50);
-    if(auth?.access_token && cloudConfigured()){
-      try{
-        await fetch(sbUrl("/auth/v1/logout"), {
-          method: "POST",
-          headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": "Bearer " + auth.access_token }
-        });
-      }catch(e){ /* si falla la revocación en el servidor, la sesión local ya quedó cerrada */ }
-    }
   }
 
   function todayISO(){
@@ -1793,12 +1688,9 @@
   function sbUrl(path){ return SUPABASE_URL.replace(/\/+$/,"") + path; }
 
   async function sbFetch(path, {method="GET", body=null, headers={}}={}){
-    // Usamos el token de sesión del usuario (no la anon key sola) para que las
-    // políticas RLS en Supabase sepan quién es y limiten lo que puede ver/escribir.
-    const session = await ensureFreshSession();
     const h = {
       "apikey": SUPABASE_ANON_KEY,
-      "Authorization": "Bearer " + (session?.access_token || SUPABASE_ANON_KEY),
+      "Authorization": "Bearer " + SUPABASE_ANON_KEY,
       ...headers
     };
     const opts = { method, headers: h };
@@ -2005,21 +1897,11 @@
   }
 
   // ===== Geolocation =====
-  function getPosOnce(opts){
+  function getPos(){
     return new Promise((resolve, reject)=>{
-      navigator.geolocation.getCurrentPosition(resolve, reject, opts);
+      if(!navigator.geolocation) return reject(new Error("Tu dispositivo no soporta GPS."));
+      navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy:true, timeout:15000, maximumAge:10000 });
     });
-  }
-  // En campo el primer intento de GPS de alta precisión a veces falla o tarda
-  // demasiado (edificios, sótanos, señal débil). En vez de obligar al vendedor
-  // a tocar "Ubicar" otra vez, reintentamos una vez con menor exigencia.
-  async function getPos(){
-    if(!navigator.geolocation) throw new Error("Tu dispositivo no soporta GPS.");
-    try{
-      return await getPosOnce({ enableHighAccuracy:true, timeout:15000, maximumAge:10000 });
-    }catch(e){
-      return await getPosOnce({ enableHighAccuracy:false, timeout:20000, maximumAge:60000 });
-    }
   }
   function setLastLoc(pos){
     const lat = pos?.coords?.latitude;
@@ -2560,49 +2442,19 @@ if(!list.length){
     downloadBlob(new Blob([lines.join("\n")], {type:"text/csv;charset=utf-8"}), `visitas_${day}.csv`);
   }
 
-  let sheetJsPromise = null;
-  function hasSheetJs(){ return !!(window.XLSX && window.XLSX.utils); }
-  async function loadSheetJs(){
-    if(hasSheetJs()) return true;
-    if(sheetJsPromise) return sheetJsPromise;
-    sheetJsPromise = (async()=>{
-      const sources = [
-        "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.20.3/xlsx.full.min.js",
-        "https://cdn.jsdelivr.net/npm/xlsx@0.20.3/dist/xlsx.full.min.js"
-      ];
-      for(const src of sources){
-        const ok = await loadScript(src);
-        if(ok && hasSheetJs()) return true;
-      }
-      return false;
-    })();
-    const ok = await sheetJsPromise;
-    if(!ok) sheetJsPromise = null;
-    return ok;
-  }
-
-  // Exporta un .xlsx real (no una tabla HTML disfrazada de .xls) para que Excel
-  // lo abra sin advertencias de "formato distinto a la extensión".
-  async function toExcelXls(rows, filename){
+  function toExcelXls(rows, filename){
+    // HTML table compatible con Excel (xls)
     const headers = ["day","city","vendor","client","type","notes","start_ts","end_ts","duration_sec","start_lat","start_lng","end_lat","end_lng","id"];
-    const readable = (rows||[]).map(r=>{
-      const out = {};
-      headers.forEach(h=>{
-        if(h==="start_ts" || h==="end_ts") out[h] = r[h] ? fmtTime(r[h]) : "";
-        else out[h] = r[h] ?? "";
-      });
-      return out;
-    });
-    const ok = await loadSheetJs();
-    if(!ok){
-      toast("No se pudo cargar el generador de Excel (sin conexión). Usa Exportar CSV.");
-      return;
-    }
-    const sheet = XLSX.utils.json_to_sheet(readable, {header: headers});
-    const book = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(book, sheet, "Visitas");
-    const outName = filename.replace(/\.xls$/i, ".xlsx");
-    XLSX.writeFile(book, outName.endsWith(".xlsx") ? outName : outName + ".xlsx");
+    const esc = (v)=> String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+    const trh = headers.map(h=>`<th>${esc(h)}</th>`).join("");
+    const trs = rows.map(r=>{
+      return "<tr>"+headers.map(h=>`<td>${esc(r[h])}</td>`).join("")+"</tr>";
+    }).join("");
+    const html = `<!doctype html><html><head><meta charset="utf-8"></head><body>
+  <div style="display:none" aria-hidden="true"><span id="sessionBadge"></span><span id="sessionScope"></span></div>
+      <table border="1"><thead><tr>${trh}</tr></thead><tbody>${trs}</tbody></table>
+    </body></html>`;
+    downloadBlob(new Blob([html], {type:"application/vnd.ms-excel;charset=utf-8"}), filename);
   }
 
   // ===== Vendor actions =====
@@ -2756,33 +2608,25 @@ if(!list.length){
     }
   }
 
-  // Preferencias de anuncios por dispositivo, consolidadas en una sola clave
-  // de localStorage (antes eran varias claves sueltas: dismissed_msgs_v1 y
-  // una ann_exp_v1:<id> por cada comunicado distinto que se abría alguna vez).
-  const ANN_PREFS_KEY = "app_visitas_ann_prefs_v1";
-  function loadAnnPrefs(){
-    return safeJsonParse(localStorage.getItem(ANN_PREFS_KEY) || "{}", {dismissed:[], expanded:{}});
-  }
-  function saveAnnPrefs(prefs){ localStorage.setItem(ANN_PREFS_KEY, JSON.stringify(prefs)); }
   function getDismissedMsgIds(){
-    return new Set(loadAnnPrefs().dismissed || []);
+    try{
+      return new Set(JSON.parse(localStorage.getItem("app_visitas_dismissed_msgs_v1") || "[]"));
+    }catch(e){
+      return new Set();
+    }
   }
   function addDismissedMsgId(id){
     if(!id) return;
-    const prefs = loadAnnPrefs();
-    const set = new Set(prefs.dismissed || []);
+    const set = getDismissedMsgIds();
     set.add(id);
-    prefs.dismissed = [...set];
-    saveAnnPrefs(prefs);
+    localStorage.setItem("app_visitas_dismissed_msgs_v1", JSON.stringify([...set]));
   }
+
+
   // Expand/Collapse del comunicado (por dispositivo)
-  function isAnnExpanded(id){ return !!loadAnnPrefs().expanded?.[id]; }
-  function setAnnExpanded(id, v){
-    const prefs = loadAnnPrefs();
-    prefs.expanded = prefs.expanded || {};
-    prefs.expanded[id] = !!v;
-    saveAnnPrefs(prefs);
-  }
+  function annKey(id){ return "app_visitas_ann_exp_v1:" + (id||""); }
+  function isAnnExpanded(id){ return localStorage.getItem(annKey(id)) === "1"; }
+  function setAnnExpanded(id, v){ localStorage.setItem(annKey(id), v ? "1" : "0"); }
 
   async function refreshAnnouncement(){
     if(!cloudConfigured()){
@@ -3128,20 +2972,13 @@ if(!list.length){
   // ===== Init =====
   function init(){
     populateLoginUsers();
-    if(!isAuthenticated()){
-      // Antes de iniciar sesión no hay token de usuario todavía; esta llamada
-      // usa la anon key (tabla vendors de solo lectura pública) únicamente
-      // para poder mostrar la lista de nombres en el login.
-      refreshVendorsFromCloud().then(changed=>{ if(changed) populateLoginUsers(); });
-    }
     if(btnLogin) btnLogin.addEventListener("click", doLogin);
-    if(loginUser) loginUser.addEventListener("keydown", (e)=>{ if(e.key === "Enter") doLogin(); });
     if(loginPass) loginPass.addEventListener("keydown", (e)=>{ if(e.key === "Enter") doLogin(); });
     if(btnLogout) btnLogout.addEventListener("click", doLogout);
     updateSessionUi();
     if(!isAuthenticated()){ setTimeout(()=> loginUser && loginUser.focus(), 80); }
 
-    buildStamp.textContent = "BUILD v3.4 · login real + 4G " + new Date().toISOString().slice(0,19).replace("T"," ");
+    buildStamp.textContent = "BUILD v3.3 optimizada 4G " + new Date().toISOString().slice(0,19).replace("T"," ");
 
     // City selects
     fillCity();
@@ -3406,14 +3243,6 @@ if(!list.length){
     if(isAuthenticated()){
       const schedule = window.requestIdleCallback || ((fn)=>setTimeout(fn,1200));
       schedule(()=>ensureCityMap());
-      // La caché local de vendedores basta para pintar la pantalla al instante;
-      // aquí la refrescamos en segundo plano si hay conexión.
-      refreshVendorsFromCloud().then(changed=>{
-        if(changed){
-          if(citySelect) fillVendors(citySelect.value);
-          if(isAdminSession()){ refreshAdminCityOptions(); refreshAdminVendorOptions(); }
-        }
-      });
     }
   }
 
