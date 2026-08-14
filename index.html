@@ -1,4 +1,4 @@
-<!-- BUILD V3.3 OPTIMIZADA PARA 4G -->
+<!-- BUILD V3.4 · VISITAS + COTIZADOR -->
 <!doctype html>
 <html lang="es">
 <head>
@@ -499,7 +499,7 @@
       .topbar{padding:10px 12px;border-radius:18px;margin-bottom:10px}
       .brandLogo{width:43px;height:43px;flex-basis:43px;border-radius:13px}
       h1{font-size:16px}.sub{display:none}
-      .tabs{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:7px}
+      .tabs{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
       .tabs .tab,.tabs .logoutBtn{width:100%;padding:9px 8px;min-height:39px}
       .card{border-radius:19px}.card .hd{padding:14px}.bd{padding:14px}
       .heroStats{grid-template-columns:1fr 1fr}.heroCard,.goalWrap{padding:13px}.heroCard .heroValue{font-size:27px}
@@ -556,6 +556,7 @@
       </div>
       <nav class="tabs" role="tablist" aria-label="Navegación">
         <a class="tab" id="tabCity" href="#/">Vendedor</a>
+        <button class="tab" id="btnQuote" type="button" title="Abrir cotizador Toyo Foods">Cotizar</button>
         <a class="tab" id="tabAdmin" href="#/admin">Admin (Cloud)</a>
         <button class="logoutBtn" id="btnLogout" type="button">Salir</button>
       </nav>
@@ -1033,6 +1034,7 @@
 
   const tabCity = $("#tabCity");
   const tabAdmin = $("#tabAdmin");
+  const btnQuote = $("#btnQuote");
   const pageCity = $("#pageCity");
   const pageAdmin = $("#pageAdmin");
   const fabAdmin = $("#fabAdmin");
@@ -1221,6 +1223,7 @@
       loginUser.value = auth?.user || "";
     }
     if(tabAdmin) tabAdmin.style.display = auth && auth.role === "admin" ? "" : "none";
+    if(btnQuote) btnQuote.style.display = auth && auth.role === "seller" ? "" : "none";
     if(fabAdmin) fabAdmin.style.display = auth && auth.role === "admin" ? "" : "none";
     if(citySelect && vendorSelect){
       if(auth && auth.role === "seller"){
@@ -1568,6 +1571,23 @@
       ta.remove();
     }
     toast("Liga de pedido copiada");
+  }
+
+  function openQuoteTool(){
+    const auth = getAuthState();
+    if(!auth || auth.role !== "seller"){
+      toast("El cotizador está disponible para vendedores.");
+      return;
+    }
+    const rec = getSelectedClientRecord();
+    const url = new URL("cotizador.html", window.location.href);
+    url.searchParams.set("from", "visitas");
+    url.searchParams.set("seller", auth.vendor || auth.user || "");
+    url.searchParams.set("city", auth.city || "");
+    if(rec?.code) url.searchParams.set("clientCode", rec.code);
+    if(rec?.name) url.searchParams.set("clientName", rec.name);
+    const opened = window.open(url.href, "_blank");
+    if(!opened) window.location.href = url.href;
   }
 
   function openOrderLink(){
@@ -3096,11 +3116,12 @@ if(!list.length){
     populateLoginUsers();
     if(btnLogin) btnLogin.addEventListener("click", doLogin);
     if(loginPass) loginPass.addEventListener("keydown", (e)=>{ if(e.key === "Enter") doLogin(); });
+    if(btnQuote) btnQuote.addEventListener("click", openQuoteTool);
     if(btnLogout) btnLogout.addEventListener("click", doLogout);
     updateSessionUi();
     if(!isAuthenticated()){ setTimeout(()=> loginUser && loginUser.focus(), 80); }
 
-    buildStamp.textContent = "BUILD v3.3 optimizada 4G " + new Date().toISOString().slice(0,19).replace("T"," ");
+    buildStamp.textContent = "BUILD v3.4 visitas + cotizador " + new Date().toISOString().slice(0,19).replace("T"," ");
 
     // City selects
     fillCity();
