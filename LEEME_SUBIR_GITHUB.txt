@@ -1,26 +1,19 @@
-TOYO FOODS · APP COMERCIAL MÓVIL V4.1
+TOYO FOODS · APP COMERCIAL V5.0 MÓVIL UNIVERSAL
 
-Sube TODO el contenido de esta carpeta a la raíz del repositorio de GitHub Pages:
+Esta versión está optimizada para Safari, Chrome y navegadores móviles.
 
-- index.html
-- visitas.html
-- cotizador.html
-- sw.js
-- manifest.webmanifest
-- carpeta assets
-- carpeta data
+CAMBIOS CLAVE
+- La pantalla inicial no usa Service Worker ni depende de PWA para abrir.
+- Visitas ya NO descarga el índice grande de ligas de pedidos al iniciar.
+- Cloud/Supabase se conecta después de mostrar la interfaz.
+- Solo se carga el padrón del vendedor autenticado.
+- Cotizador abierto desde Visitas NO descarga los 64,509 clientes.
+- El padrón completo del cotizador se descarga únicamente al cambiar/seleccionar otro cliente.
+- Se conservan visita activa, cotizador, PDF/imagen, promociones y Admin.
 
-Cambios V4.1:
-- La app vuelve a pedir contraseña al abrir/reabrir el portal.
-- Ya no guarda la autenticación en localStorage.
-- Las visitas activas y borradores SÍ continúan guardándose localmente para evitar pérdida de información.
-- Cotizador: botón Compartir imagen.
-- Cotizador: botón Descargar PDF real, sin depender del diálogo de impresión.
-- PDF en tamaño Carta con paginación para evitar cortes.
-- Impresión CSS corregida con márgenes seguros.
-- Service Worker actualizado para evitar quedarse con HTML viejo.
-
-Después de copiar los archivos:
-1) Commit to main
-2) Push origin
-3) Abre GitHub Pages una vez con ?v=41 para forzar actualización del navegador.
+PARA SUBIR
+1. Reemplaza TODO el contenido del repositorio por esta carpeta.
+2. Commit to main.
+3. Push origin.
+4. La primera vez abre con Wi-Fi para que Safari descarte cualquier Service Worker viejo.
+5. Después prueba únicamente con 4G/5G.

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b2b52">
-<title>Toyo Foods · Cotizador móvil con clientes</title>
+<title>Toyo Foods · Cotizador móvil</title>
 <style>
 :root {
   --navy:#0b2b52; --navy2:#123f71; --blue:#1f6feb; --bg:#f3f6fa; --card:#fff;
@@ -898,17 +898,11 @@ async function applyLaunchContext(){
       };
     }
   }
+  // Cuando Cotizador se abre desde Visitas NO descargamos los 64 mil clientes.
+  // Usamos inmediatamente el código/nombre enviado por Visitas. El padrón completo
+  // solo se descarga si el vendedor toca "Cambiar cliente / Seleccionar cliente".
   if(clientCode || clientName){
-    try{ await loadClients(); }catch(e){}
-  }
-  let idx=-1;
-  if(clientCode) idx=CLIENTS.findIndex(c=>String(c[C_CODE]||'').trim().toUpperCase()===clientCode.toUpperCase());
-  if(idx<0 && clientName){
-    const n=norm(clientName);
-    idx=CLIENTS.findIndex(c=>norm(c[C_NAME]||'')===n || norm(c[C_COMM]||'')===n);
-  }
-  if(idx>=0){
-    selectedClient=CLIENTS[idx];
+    selectedClient=[clientCode||'', clientName||'Cliente', '', '', seller||'', '', ''];
     renderSelectedClient();
     if(seller) $('#quoteMeta').textContent=`Desde Visitas · ${seller}`;
   }else if(seller){

@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#0b4ea2">
-<link rel="manifest" href="manifest.webmanifest">
 <title>Toyo Foods · App Comercial</title>
 <style>
 :root{--brand:#0b4ea2;--brand2:#073675;--bg:#f2f6fb;--text:#11213b;--muted:#6b7b92;--line:#dce5f0;--safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px)}
@@ -36,7 +35,7 @@
   </header>
   <main class="stage">
     <section id="home" class="home">
-      <div class="welcome"><small>TOYO FOODS · APP MÓVIL</small><h1 id="welcomeTitle">Hola</h1><p>Trabaja por módulos. La información pesada se carga únicamente cuando abres una herramienta.</p></div>
+      <div class="welcome"><small>TOYO FOODS · APP MÓVIL</small><h1 id="welcomeTitle">Hola</h1><p>Modo móvil universal: abre primero la app y carga cada herramienta solo cuando la necesitas.</p></div>
       <div class="sectionTitle">Módulos</div>
       <div class="moduleGrid">
         <button class="moduleCard primary" data-module="visitas"><div class="icon">📍</div><div><b>Visitas</b><span>Registrar, finalizar y consultar visitas.</span></div></button>
@@ -45,7 +44,7 @@
       </div>
       <div class="quickInfo"><div class="avatar">👤</div><div><b id="userName">—</b><span id="userScope">—</span></div></div>
       <div class="sectionTitle">Carga optimizada</div>
-      <div class="quickInfo"><div class="avatar">⚡</div><div><b>Modo móvil ligero</b><span>Clientes por vendedor y bases del cotizador se descargan solo cuando se necesitan.</span></div></div>
+      <div class="quickInfo"><div class="avatar">⚡</div><div><b>Modo móvil universal</b><span>Compatible con Safari, Chrome y navegadores móviles. Sin cargas pesadas al iniciar.</span></div></div>
     </section>
     <div id="frameWrap" class="frameWrap"><div class="loader" id="frameLoader"><div class="loaderBox"><div class="spinner"></div><b>Abriendo módulo…</b><div style="margin-top:4px">La primera carga puede tardar según tu señal.</div></div></div><iframe id="moduleFrame" title="Módulo Toyo" allow="geolocation; clipboard-write; fullscreen"></iframe></div>
   </main>
@@ -69,7 +68,7 @@ const AUTH_KEY='app_visitas_auth_v2', AUTH_PASS='Toyo2026';
 // La sesión vive solo mientras esta pestaña/app está abierta.
 // Borra credenciales persistentes de builds anteriores para volver a pedir contraseña al reabrir.
 try{ localStorage.removeItem(AUTH_KEY); sessionStorage.removeItem(AUTH_KEY); }catch(e){}
-const MODULES={visitas:{title:'Visitas',sub:'Registro y seguimiento',src:'visitas.html?embedded=1'},cotizador:{title:'Cotizador',sub:'Precios y cotizaciones',src:'cotizador.html?embedded=1'},admin:{title:'Admin',sub:'Cloud y reportes',src:'visitas.html?embedded=1#/admin'}};
+const MODULES={visitas:{title:'Visitas',sub:'Registro y seguimiento',src:'visitas.html?v=50&embedded=1'},cotizador:{title:'Cotizador',sub:'Precios y cotizaciones',src:'cotizador.html?v=50&embedded=1'},admin:{title:'Admin',sub:'Cloud y reportes',src:'visitas.html?v=50&embedded=1#/admin'}};
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 function accounts(){const a={Admin:{role:'admin',city:'ALL',vendor:'ALL'}};Object.entries(SELLERS).forEach(([city,vs])=>vs.forEach(v=>a[v]={role:'seller',city,vendor:v}));return a}const ACC=accounts();
 function auth(){try{const x=JSON.parse(sessionStorage.getItem(AUTH_KEY)||'null');return x&&x.ok?x:null}catch{return null}}
@@ -86,6 +85,8 @@ $$('[data-module]').forEach(b=>b.addEventListener('click',()=>openModule(b.datas
 function net(){const on=navigator.onLine;$('#netPill').textContent=on?'● En línea':'● Sin conexión';$('#netPill').style.opacity=on?'1':'.75'}window.addEventListener('online',net);window.addEventListener('offline',net);
 fillUsers();syncUserUI();net();
 window.addEventListener('pagehide',()=>{try{sessionStorage.removeItem(AUTH_KEY)}catch(e){}});
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+// V5 universal: no dependemos de Service Worker para abrir. Safari/Chrome cargan el HTML directo.
+if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())).catch(()=>{});}
+if('caches' in window){caches.keys().then(keys=>Promise.all(keys.filter(k=>/^toyo-comercial-/i.test(k)).map(k=>caches.delete(k)))).catch(()=>{});}
 </script>
 </body></html>

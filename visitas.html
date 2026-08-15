@@ -1478,7 +1478,8 @@
     if(orderLinkBadge){
       orderLinkBadge.textContent = mode === "ready" ? "Liga disponible" : mode === "loading" ? "Buscando…" : mode === "missing" ? "Sin liga" : "Portal Toyo";
     }
-    [btnOpenOrderLink, btnShareOrderLink, btnCopyOrderLink].forEach(btn=>{ if(btn) btn.disabled = !url; });
+    // La consulta de la liga es bajo demanda. No descargamos el índice pesado al abrir Visitas.
+    [btnOpenOrderLink, btnShareOrderLink, btnCopyOrderLink].forEach(btn=>{ if(btn) btn.disabled = !hasClient; });
   }
 
   function getSelectedClientRecord(){
@@ -1516,8 +1517,9 @@
       return;
     }
     if(!ORDER_INDEX_LOADED){
-      setOrderLinkState("loading", "La app ya está lista. Buscando la liga del pedido en segundo plano…");
-        return;
+      setOrderLinkState("idle", "Liga de pedido bajo demanda · se consulta solo cuando la necesites.");
+      if(orderLinkBadge) orderLinkBadge.textContent = "Consultar liga";
+      return;
     }
     const entry = findOrderEntry();
     if(!entry || !entry.path){
@@ -1577,8 +1579,17 @@
     return ORDER_INDEX_PROMISE;
   }
 
+  async function ensureOrderLinkReady(){
+    if(CURRENT_ORDER_URL) return true;
+    if(!(clientInput?.value || "").trim()) return false;
+    setOrderLinkState("loading", "Consultando liga del pedido…");
+    const ok = await loadOrderClientIndex();
+    if(ok) updateOrderLinkPanel();
+    return !!CURRENT_ORDER_URL;
+  }
+
   async function copyOrderLink(){
-    if(!CURRENT_ORDER_URL) return;
+    if(!(await ensureOrderLinkReady())){ toast("No se encontró la liga del pedido"); return; }
     try{
       await navigator.clipboard.writeText(CURRENT_ORDER_URL);
     }catch(e){
@@ -1609,13 +1620,13 @@
     if(!opened) window.location.href = url.href;
   }
 
-  function openOrderLink(){
-    if(!CURRENT_ORDER_URL) return;
+  async function openOrderLink(){
+    if(!(await ensureOrderLinkReady())){ toast("No se encontró la liga del pedido"); return; }
     window.open(CURRENT_ORDER_URL, "_blank", "noopener");
   }
 
   async function shareOrderLink(){
-    if(!CURRENT_ORDER_URL) return;
+    if(!(await ensureOrderLinkReady())){ toast("No se encontró la liga del pedido"); return; }
     const rec = getSelectedClientRecord();
     const name = rec?.name || "cliente";
     const code = rec?.code ? ` (${rec.code})` : "";
@@ -2145,7 +2156,8 @@
       });
     }
 
-    ensureCityMap();
+    // El mapa no se descarga al abrir/actualizar la pantalla.
+    // Si el vendedor ya lo abrió manualmente, sí actualizamos la ruta.
     if(hasLeaflet()){
       const pts = plotRoute(layerCity, sellerRecs.slice().sort((a,b)=> (a.start_ts||0)-(b.start_ts||0)));
       fitToPoints(mapCity, pts);
@@ -2634,10 +2646,12 @@ if(!list.length){
       const pos = await getPos();
       setLastLoc(pos);
       toast("Ubicación capturada");
-      ensureCityMap();
-      if(hasLeaflet()){
-        mapCity.setView([pos.coords.latitude, pos.coords.longitude], 16);
-      }
+      // Mapa bajo demanda: solo se descarga después de que el vendedor pide ubicación.
+      ensureCityMap().then(ok=>{
+        if(ok && hasLeaflet() && mapCity){
+          mapCity.setView([pos.coords.latitude, pos.coords.longitude], 16);
+        }
+      });
     }catch(e){
       toast("No se pudo obtener ubicación");
     }
@@ -3089,7 +3103,7 @@ if(!list.length){
     if(isAdmin){
       safeOpenAdmin();
     }else{
-      ensureCityMap();
+      // No cargar Leaflet automáticamente. La captura y el GPS funcionan sin mapa.
       setTimeout(()=>{ if(hasLeaflet() && mapCity) mapCity.invalidateSize(); }, 80);
       renderCity();
     }
@@ -3150,17 +3164,20 @@ if(!list.length){
     updateSessionUi();
     if(!isAuthenticated()){ setTimeout(()=> loginUser && loginUser.focus(), 80); }
 
-    buildStamp.textContent = "BUILD v3.4 visitas + cotizador " + new Date().toISOString().slice(0,19).replace("T"," ");
+    buildStamp.textContent = "BUILD v5.0 móvil universal " + new Date().toISOString().slice(0,19).replace("T"," ");
 
-    // City selects
+    // City/clientes: arrancar directamente en el usuario autenticado.
+    // Evita descargar primero el padrón del primer vendedor de GDL y luego el padrón real.
     fillCity();
-    citySelect.value = "GDL";
-    fillVendors("GDL");
+    const startAuth = getAuthState();
+    const startCity = startAuth && startAuth.role === "seller" && CITY_META.some(c=>c.code===startAuth.city) ? startAuth.city : "GDL";
+    citySelect.value = startCity;
+    fillVendors(startCity);
+    if(startAuth && startAuth.role === "seller" && [...vendorSelect.options].some(o=>o.value===startAuth.vendor)) vendorSelect.value = startAuth.vendor;
     fillTypes();
     renderPromotions();
-    fillRecentClients("GDL", vendorSelect.value);
-    fillAssignedClients("GDL", vendorSelect.value);
-    loadOrderClientIndex();
+    fillRecentClients(startCity, vendorSelect.value);
+    fillAssignedClients(startCity, vendorSelect.value);
 
     // Admin selects
     refreshAdminCityOptions();
@@ -3195,13 +3212,15 @@ if(!list.length){
     renderClientHistory();
     enforceCurrentUserContext();
 
-    // cloud indicator
+    // Cloud en segundo plano: primero mostramos la interfaz y el padrón del vendedor.
     if(cloudConfigured()){
-      setCloudIndicator("warn","Cloud: verificando...");
-      cloudTest().then(async()=>{ setCloudIndicator("ok","Cloud: online"); await flushSyncQueue(); })
-        .catch(()=>{ setCloudIndicator("bad","Cloud: error"); });
+      setCloudIndicator("warn","Cloud: conectando...");
       adminSource.value="CLOUD";
-      refreshAnnouncement();
+      setTimeout(()=>{
+        cloudTest().then(async()=>{ setCloudIndicator("ok","Cloud: online"); await flushSyncQueue(); })
+          .catch(()=>{ setCloudIndicator("bad","Cloud: error"); });
+        refreshAnnouncement();
+      }, 1400);
     }else{
       setCloudIndicator("warn","Cloud: sin configurar");
       adminSource.value="LOCAL";
@@ -3411,11 +3430,8 @@ if(!list.length){
     window.addEventListener("hashchange", handleRoute);
     handleRoute();
 
-    // El mapa se carga después del acceso y nunca bloquea la pantalla inicial.
-    if(isAuthenticated()){
-      const schedule = window.requestIdleCallback || ((fn)=>setTimeout(fn,1200));
-      schedule(()=>ensureCityMap());
-    }
+    // V5 móvil: el mapa se carga únicamente cuando el usuario solicita ubicación.
+    // Esto evita descargar Leaflet y mosaicos en 4G durante la apertura.
   }
 
   init();
