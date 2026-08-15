@@ -1177,14 +1177,13 @@
   }
   const USER_ACCOUNTS = buildUserAccounts();
 
+  // La autenticación no se guarda de forma permanente.
+  // Las visitas y borradores sí continúan usando localStorage para no perderse.
+  try{ localStorage.removeItem(AUTH_KEY); if(window.top===window.self) sessionStorage.removeItem(AUTH_KEY); }catch(e){}
   function getAuthState(){
     try{
-      const raw = safeJsonParse(localStorage.getItem(AUTH_KEY) || sessionStorage.getItem(AUTH_KEY) || "null", null);
-      if(raw && raw.ok){
-        localStorage.setItem(AUTH_KEY, JSON.stringify(raw));
-        return raw;
-      }
-      return null;
+      const raw = safeJsonParse(sessionStorage.getItem(AUTH_KEY) || "null", null);
+      return raw && raw.ok ? raw : null;
     }catch(e){ return null; }
   }
   function isAuthenticated(){ return !!getAuthState(); }
@@ -1252,12 +1251,10 @@
   }
   function setAuth(payload){
     try{
+      localStorage.removeItem(AUTH_KEY);
       if(payload && payload.ok){
-        const raw = JSON.stringify(payload);
-        localStorage.setItem(AUTH_KEY, raw);
-        sessionStorage.setItem(AUTH_KEY, raw);
+        sessionStorage.setItem(AUTH_KEY, JSON.stringify(payload));
       }else{
-        localStorage.removeItem(AUTH_KEY);
         sessionStorage.removeItem(AUTH_KEY);
       }
     }catch(e){}

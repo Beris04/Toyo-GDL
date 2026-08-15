@@ -90,17 +90,17 @@ button{cursor:pointer}
 .discInput{width:58px;border:1px solid var(--line);border-radius:8px;padding:6px;text-align:right}
 .drawerActions{
  position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
- padding:9px 10px calc(9px + var(--safe-b));display:grid;grid-template-columns:.75fr 1fr 1.25fr;gap:7px;z-index:90
+ padding:9px 10px calc(9px + var(--safe-b));display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;z-index:90
 }
 .drawerActions button{border:0;border-radius:11px;padding:11px 6px;font-size:11px;font-weight:900}
-.newBtn{background:#eef2f7;color:#20364d} .previewBtn{background:#eaf2ff;color:var(--blue)} .pdfBtn{background:var(--blue);color:#fff}
+.newBtn{background:#eef2f7;color:#20364d} .previewBtn{background:#eaf2ff;color:var(--blue)} .shareBtn{background:#e8f7f1;color:#087852}.pdfBtn{background:var(--blue);color:#fff}
 
 .previewOverlay{position:fixed;inset:0;background:#cfd6de;z-index:120;display:none;overflow:auto}
 .previewOverlay.open{display:block}
-.previewTop{position:sticky;top:0;z-index:4;background:var(--navy);color:#fff;padding:9px 10px;display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center}
+.previewTop{position:sticky;top:0;z-index:4;background:var(--navy);color:#fff;padding:9px 10px;display:grid;grid-template-columns:auto 1fr auto auto;gap:6px;align-items:center}
 .previewTop span{text-align:center;font-size:11px;font-weight:800}
 .previewTop button{border:0;border-radius:9px;padding:9px 10px;font-size:10px;font-weight:900}
-.backBtn{background:#fff;color:var(--navy)} .printBtn{background:var(--blue);color:#fff}
+.backBtn{background:#fff;color:var(--navy)} .imageBtn{background:#e7f6ef;color:#087852}.printBtn{background:var(--blue);color:#fff}
 .previewStage{padding:10px 0 28px;overflow:auto}
 .paperWrap{width:100%;display:flex;justify-content:center}
 #printDocument{width:216mm;min-height:279mm;background:#fff;box-shadow:0 12px 32px #102a4330;transform-origin:top center}
@@ -191,14 +191,17 @@ button{cursor:pointer}
  .product{grid-template-columns:1fr auto}
 }
 
-@page{size:Letter portrait;margin:0}
+@page{size:Letter portrait;margin:8mm}
 @media print{
- body{background:#fff!important;overflow:visible!important}
+ html,body{width:auto!important;height:auto!important;background:#fff!important;overflow:visible!important}
  .app,.previewTop{display:none!important}
  .previewOverlay{display:block!important;position:static!important;background:#fff!important;overflow:visible!important}
- .previewStage{padding:0!important} .paperWrap{display:block!important}
- #printDocument{width:auto!important;min-height:0!important;transform:none!important;box-shadow:none!important}
- .printPage{width:216mm;min-height:279mm;padding:10mm 11mm 12mm}
+ .previewStage{padding:0!important;overflow:visible!important}.paperWrap{display:block!important}
+ #printDocument{width:auto!important;min-height:0!important;transform:none!important;box-shadow:none!important;margin:0!important}
+ .printPage{width:auto!important;min-height:0!important;padding:0!important;display:block!important}
+ .printHead,.infoGrid,.after,.signatures,.footer{break-inside:avoid;page-break-inside:avoid}
+ .ptable{font-size:7pt!important}.ptable th,.ptable td{padding:1.2mm .9mm!important}
+ .signatures{margin-top:10mm!important}
 }
 
 body.embedded .brandRow{display:none}
@@ -290,7 +293,8 @@ body.embedded .content{padding-top:9px}
       <div class="drawerActions">
         <button id="newQuote" class="newBtn">Nueva</button>
         <button id="preview" class="previewBtn">Vista previa</button>
-        <button id="print" class="pdfBtn">PDF / imprimir</button>
+        <button id="shareImage" class="shareBtn">Compartir imagen</button>
+        <button id="downloadPdf" class="pdfBtn">Descargar PDF</button>
       </div>
     </section>
   </div>
@@ -319,7 +323,8 @@ body.embedded .content{padding-top:9px}
   <div class="previewTop">
     <button id="backPreview" class="backBtn">← Volver</button>
     <span>Vista previa</span>
-    <button id="printPreview" class="printBtn">PDF / imprimir</button>
+    <button id="shareImagePreview" class="imageBtn">Imagen</button>
+    <button id="downloadPdfPreview" class="printBtn">PDF</button>
   </div>
   <div class="previewStage">
     <div class="paperWrap"><div id="printDocument"></div></div>
@@ -679,6 +684,169 @@ function closePreview(){
   $('#printDocument').style.transform='none';
 }
 
+
+function quoteRowsData(){
+  return Object.entries(cart).map(([code,qty])=>{
+    const p=PRODUCTS.find(x=>x.code===code);
+    if(!p) return null;
+    const unit=pval(p);
+    return {code:p.code,name:p.name,qty:Number(qty)||0,unit,total:unit*(Number(qty)||0),currency:p.currency||'MXP'};
+  }).filter(Boolean);
+}
+function safeFilePart(v){
+  return String(v||'cliente').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9_-]+/g,'_').replace(/^_+|_+$/g,'').slice(0,52)||'cliente';
+}
+function quoteFileBase(){
+  return `Cotizacion_${safeFilePart(clientValue(C_CODE,clientValue(C_COMM,clientValue(C_NAME,'cliente'))))}_${new Date().toISOString().slice(0,10)}`;
+}
+function downloadBlob(blob,filename){
+  const a=document.createElement('a');
+  const url=URL.createObjectURL(blob);
+  a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+function wrapCanvasText(ctx,text,maxWidth){
+  const words=String(text||'').split(/\s+/); const lines=[]; let line='';
+  for(const w of words){
+    const test=line?line+' '+w:w;
+    if(ctx.measureText(test).width>maxWidth && line){lines.push(line);line=w;} else line=test;
+  }
+  if(line)lines.push(line); return lines.length?lines:[''];
+}
+async function loadCanvasLogo(){
+  return new Promise(resolve=>{
+    const img=new Image();
+    img.onload=()=>resolve(img);img.onerror=()=>resolve(null);img.src='assets/toyo_logo.png';
+  });
+}
+async function buildQuoteImageBlob(){
+  const rows=quoteRowsData();
+  if(!rows.length){alert('Agrega al menos un producto antes de compartir la cotización.');return null;}
+  const W=1200, M=64, rowH=70;
+  const notes=($('#notes').value||'').trim();
+  const notesExtra=Math.min(260,Math.max(110,Math.ceil((notes.length||40)/75)*34));
+  const H=Math.max(1500,720 + rows.length*rowH + notesExtra + 250);
+  const canvas=document.createElement('canvas'); canvas.width=W; canvas.height=H;
+  const ctx=canvas.getContext('2d'); if(!ctx)return null;
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#0b2b52';ctx.fillRect(0,0,W,190);
+  const logo=await loadCanvasLogo();
+  if(logo)ctx.drawImage(logo,M,35,120,120);
+  ctx.fillStyle='#fff';ctx.font='700 34px Arial';ctx.fillText('COMERCIAL TOYO S.A. DE C.V.',220,82);
+  ctx.font='600 22px Arial';ctx.fillText('COTIZACIÓN COMERCIAL',220,122);
+  ctx.font='18px Arial';ctx.fillText(`${quoteNo} · ${today()}`,220,154);
+  ctx.textAlign='right';ctx.font='700 36px Arial';ctx.fillText('COTIZACIÓN',W-M,82);ctx.textAlign='left';
+
+  let y=230;
+  ctx.fillStyle='#f4f7fb';ctx.strokeStyle='#cbd5e1';ctx.lineWidth=2;ctx.fillRect(M,y,W-2*M,250);ctx.strokeRect(M,y,W-2*M,250);
+  ctx.fillStyle='#0b2b52';ctx.font='700 18px Arial';ctx.fillText('CLIENTE',M+24,y+36);
+  ctx.fillStyle='#172536';ctx.font='700 25px Arial';
+  const clientLines=wrapCanvasText(ctx,clientValue(C_NAME,'CLIENTE POR DEFINIR'),650).slice(0,2);clientLines.forEach((ln,i)=>ctx.fillText(ln,M+24,y+74+i*31));
+  ctx.font='17px Arial';ctx.fillStyle='#52647e';
+  const info=[`Código: ${clientValue(C_CODE)}`,`RFC: ${clientValue(C_RFC)}`,`Comercial: ${clientValue(C_COMM)}`,`Vendedor: ${clientValue(C_SELLER)}`,`Condiciones: ${clientValue(C_TERMS)}`,`Forma de venta: ${clientValue(C_SALE)}`];
+  info.forEach((ln,i)=>ctx.fillText(ln,M+24+(i%2)*535,y+148+Math.floor(i/2)*30));
+  y+=290;
+
+  const xCode=M, xDesc=M+205, xQty=W-360, xUnit=W-265, xTotal=W-M;
+  ctx.fillStyle='#0b2b52';ctx.fillRect(M,y,W-2*M,50);ctx.fillStyle='#fff';ctx.font='700 15px Arial';
+  ctx.fillText('CÓDIGO',xCode+12,y+31);ctx.fillText('DESCRIPCIÓN',xDesc,y+31);ctx.textAlign='right';ctx.fillText('CANT.',xQty,y+31);ctx.fillText('P. UNIT.',xUnit,y+31);ctx.fillText('TOTAL',xTotal-12,y+31);ctx.textAlign='left';y+=50;
+  rows.forEach((r,i)=>{
+    if(i%2===0){ctx.fillStyle='#f8fafc';ctx.fillRect(M,y,W-2*M,rowH);}
+    ctx.strokeStyle='#e2e8f0';ctx.beginPath();ctx.moveTo(M,y+rowH);ctx.lineTo(W-M,y+rowH);ctx.stroke();
+    ctx.fillStyle='#1f6feb';ctx.font='700 15px Arial';ctx.fillText(r.code,xCode+12,y+28);
+    ctx.fillStyle='#172536';ctx.font='600 16px Arial';const ls=wrapCanvasText(ctx,r.name,535).slice(0,2);ls.forEach((ln,j)=>ctx.fillText(ln,xDesc,y+25+j*22));
+    ctx.textAlign='right';ctx.font='16px Arial';ctx.fillText(String(r.qty),xQty,y+30);ctx.fillText(fmt(r.unit,'MXP').replace(' MXP',''),xUnit,y+30);ctx.font='700 16px Arial';ctx.fillText(fmt(r.total,'MXP').replace(' MXP',''),xTotal-12,y+30);ctx.textAlign='left';y+=rowH;
+  });
+  y+=28; const t=totals();
+  ctx.fillStyle='#f4f7fb';ctx.fillRect(W-470,y,406,145);ctx.strokeStyle='#cbd5e1';ctx.strokeRect(W-470,y,406,145);
+  const totalsLines=[['Subtotal',fmt(t.sub,'MXP')],[`Descuento ${t.d.toFixed(2)}%`,'-'+fmt(t.da,'MXP')],['TOTAL',fmt(t.total,'MXP')]];
+  totalsLines.forEach((r,i)=>{ctx.fillStyle=i===2?'#0b2b52':'#52647e';ctx.font=i===2?'700 25px Arial':'600 18px Arial';ctx.fillText(r[0],W-445,y+35+i*43);ctx.textAlign='right';ctx.fillText(r[1],W-88,y+35+i*43);ctx.textAlign='left';});
+  ctx.fillStyle='#172536';ctx.font='700 17px Arial';ctx.fillText('NOTAS / CONDICIONES',M,y+28);
+  ctx.font='16px Arial';ctx.fillStyle='#52647e';const noteText=notes||'Precios expresados en MXP. Cotización sujeta a disponibilidad de producto y vigencia indicada.';const nlines=wrapCanvasText(ctx,noteText,560).slice(0,8);nlines.forEach((ln,i)=>ctx.fillText(ln,M,y+60+i*24));
+  y=Math.max(y+notesExtra, y+170)+80;
+  ctx.strokeStyle='#94a3b8';ctx.beginPath();ctx.moveTo(M,y);ctx.lineTo(M+390,y);ctx.moveTo(W-M-390,y);ctx.lineTo(W-M,y);ctx.stroke();
+  ctx.fillStyle='#52647e';ctx.font='15px Arial';ctx.fillText(clientValue(C_SELLER,'Vendedor'),M,y+28);ctx.textAlign='right';ctx.fillText(clientValue(C_COMM,clientValue(C_NAME,'Cliente')),W-M,y+28);ctx.textAlign='left';
+  ctx.fillStyle='#0b2b52';ctx.fillRect(0,H-72,W,72);ctx.fillStyle='#fff';ctx.font='600 16px Arial';ctx.fillText('Toyo Foods · Cotización comercial',M,H-31);ctx.textAlign='right';ctx.fillText(`${quoteNo} · ${today()}`,W-M,H-31);ctx.textAlign='left';
+  return new Promise(resolve=>canvas.toBlob(resolve,'image/png',0.96));
+}
+async function shareQuoteImage(){
+  const blob=await buildQuoteImageBlob(); if(!blob)return;
+  const filename=quoteFileBase()+'.png';
+  const file=new File([blob],filename,{type:'image/png'});
+  try{
+    if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))){
+      await navigator.share({title:`Cotización Toyo Foods · ${clientValue(C_NAME,'Cliente')}`,text:`Cotización ${quoteNo}`,files:[file]});
+      return;
+    }
+  }catch(e){ if(e && e.name==='AbortError')return; }
+  downloadBlob(blob,filename);
+  alert('Tu teléfono no permitió compartir el archivo directamente. La imagen se descargó para que puedas enviarla por WhatsApp o correo.');
+}
+
+function normalizePdfText(s){
+  return String(s??'').replace(/[“”]/g,'"').replace(/[‘’]/g,"'").replace(/[–—]/g,'-').replace(/…/g,'...').replace(/[^\x00-\xFF]/g,'?');
+}
+function pdfEsc(s){return normalizePdfText(s).replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)').replace(/[\r\n]+/g,' ')}
+function pdfBytes(s){const a=new Uint8Array(s.length);for(let i=0;i<s.length;i++)a[i]=s.charCodeAt(i)&255;return a;}
+function pdfText(x,y,size,text,bold=false){return `BT /${bold?'F2':'F1'} ${size} Tf ${x.toFixed(1)} ${y.toFixed(1)} Td (${pdfEsc(text)}) Tj ET\n`;}
+function pdfLine(x1,y1,x2,y2,w=.6){return `${w} w ${x1} ${y1} m ${x2} ${y2} l S\n`;}
+function pdfRect(x,y,w,h,fill=false){return `${x} ${y} ${w} ${h} re ${fill?'f':'S'}\n`;}
+function truncText(s,n){s=normalizePdfText(s);return s.length>n?s.slice(0,n-1)+'…':s;}
+function buildPdfBlob(){
+  const rows=quoteRowsData();
+  if(!rows.length){alert('Agrega al menos un producto antes de descargar el PDF.');return null;}
+  const pages=[]; const rowsPerPage=18; const chunks=[];
+  for(let i=0;i<rows.length;i+=rowsPerPage)chunks.push(rows.slice(i,i+rowsPerPage));
+  const t=totals();
+  chunks.forEach((chunk,pi)=>{
+    let c='';
+    c+='0.043 0.169 0.322 rg\n';c+=pdfRect(0,722,612,70,true);c+='0 0 0 rg\n';
+    c+=pdfText(42,760,16,'COMERCIAL TOYO S.A. DE C.V.',true);c+=pdfText(42,739,9,'Cotización comercial de productos');
+    c+=pdfText(430,760,18,'COTIZACIÓN',true);c+=pdfText(430,741,8,quoteNo);
+    let y=700;
+    if(pi===0){
+      c+=pdfText(42,y,8,'CLIENTE',true);y-=15;c+=pdfText(42,y,11,truncText(clientValue(C_NAME,'CLIENTE POR DEFINIR'),75),true);y-=14;
+      c+=pdfText(42,y,8,`Código: ${clientValue(C_CODE)}   RFC: ${clientValue(C_RFC)}`);y-=13;
+      c+=pdfText(42,y,8,`Comercial: ${truncText(clientValue(C_COMM),55)}`);y-=13;
+      c+=pdfText(42,y,8,`Vendedor: ${truncText(clientValue(C_SELLER),55)}`);y-=13;
+      c+=pdfText(42,y,8,`Pago: ${truncText(clientValue(C_TERMS),32)}   Venta: ${truncText(clientValue(C_SALE),28)}`);y-=20;
+    }else{c+=pdfText(42,y,9,`Cliente: ${truncText(clientValue(C_NAME,'Cliente'),70)} · Página ${pi+1}/${chunks.length}`,true);y-=25;}
+    const x=[42,132,390,430,505,570];
+    c+='0.92 g\n';c+=pdfRect(42,y-16,528,20,true);c+='0 g\n';
+    c+=pdfText(47,y-3,7,'CÓDIGO',true);c+=pdfText(137,y-3,7,'DESCRIPCIÓN',true);c+=pdfText(394,y-3,7,'CANT.',true);c+=pdfText(438,y-3,7,'P.UNIT.',true);c+=pdfText(510,y-3,7,'TOTAL',true);y-=20;
+    chunk.forEach(r=>{
+      c+=pdfLine(42,y,570,y,.35);c+=pdfText(47,y-14,7,truncText(r.code,18));c+=pdfText(137,y-14,7,truncText(r.name,55));c+=pdfText(396,y-14,7,String(r.qty));c+=pdfText(438,y-14,7,fmt(r.unit,'MXP').replace(' MXP',''));c+=pdfText(510,y-14,7,fmt(r.total,'MXP').replace(' MXP',''),true);y-=21;
+    });
+    c+=pdfLine(42,y,570,y,.6);
+    if(pi===chunks.length-1){
+      y-=28;c+=pdfText(360,y,9,'Subtotal',true);c+=pdfText(475,y,9,fmt(t.sub,'MXP'));y-=18;c+=pdfText(360,y,9,`Descuento ${t.d.toFixed(2)}%`,true);c+=pdfText(475,y,9,'-'+fmt(t.da,'MXP'));y-=22;c+=pdfText(360,y,12,'TOTAL',true);c+=pdfText(475,y,12,fmt(t.total,'MXP'),true);
+      y-=32;c+=pdfText(42,y,8,'NOTAS / CONDICIONES',true);y-=14;const note=($('#notes').value||'').trim()||'Precios expresados en MXP. Cotización sujeta a disponibilidad de producto y vigencia indicada.';let remain=normalizePdfText(note);for(let ln=0;ln<4&&remain;ln++){let part=remain.slice(0,92);let cut=part.lastIndexOf(' ');if(cut>55)part=part.slice(0,cut);c+=pdfText(42,y,7,part);remain=remain.slice(part.length).trim();y-=11;}
+    }
+    c+=pdfText(42,25,6,`Toyo Foods · ${quoteNo} · ${today()} · Página ${pi+1} de ${chunks.length}`);
+    pages.push(c);
+  });
+  const pageCount=pages.length; const objects=[];
+  objects[1]='<< /Type /Catalog /Pages 2 0 R >>';
+  const kids=[];for(let i=0;i<pageCount;i++)kids.push(`${4+i*2} 0 R`);
+  objects[2]=`<< /Type /Pages /Count ${pageCount} /Kids [${kids.join(' ')}] >>`;
+  objects[3]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>';
+  objects[4+pageCount*2]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>';
+  const boldObj=4+pageCount*2;
+  for(let i=0;i<pageCount;i++){
+    const pageObj=4+i*2, contObj=5+i*2; const data=pages[i]; const len=pdfBytes(data).length;
+    objects[pageObj]=`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 ${boldObj} 0 R >> >> /Contents ${contObj} 0 R >>`;
+    objects[contObj]=`<< /Length ${len} >>\nstream\n${data}endstream`;
+  }
+  const maxObj=objects.length-1; let parts=[];let offset=0;const offsets=new Array(maxObj+1).fill(0);
+  function add(str){const b=pdfBytes(str);parts.push(b);offset+=b.length;}
+  add('%PDF-1.4\n%âãÏÓ\n');
+  for(let i=1;i<=maxObj;i++){offsets[i]=offset;add(`${i} 0 obj\n${objects[i]}\nendobj\n`);}
+  const xref=offset;add(`xref\n0 ${maxObj+1}\n0000000000 65535 f \n`);for(let i=1;i<=maxObj;i++)add(String(offsets[i]).padStart(10,'0')+' 00000 n \n');
+  add(`trailer\n<< /Size ${maxObj+1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`);
+  return new Blob(parts,{type:'application/pdf'});
+}
+function downloadQuotePdf(){const blob=buildPdfBlob();if(blob)downloadBlob(blob,quoteFileBase()+'.pdf');}
+
 $('#search').addEventListener('input',()=>{limit=60;renderProducts()});
 $('#more').onclick=()=>{limit+=60;renderProducts()};
 $('#priceSwitch').onclick=()=>{
@@ -693,8 +861,10 @@ $('#openQuote').onclick=()=>$('#drawer').classList.add('open');
 $('#closeDrawer').onclick=()=>$('#drawer').classList.remove('open');
 $('#discount').oninput=renderCart;
 $('#preview').onclick=openPreview;
-$('#print').onclick=()=>{buildPrint();window.print()};
-$('#printPreview').onclick=()=>{buildPrint();window.print()};
+$('#shareImage').onclick=shareQuoteImage;
+$('#downloadPdf').onclick=downloadQuotePdf;
+$('#shareImagePreview').onclick=shareQuoteImage;
+$('#downloadPdfPreview').onclick=downloadQuotePdf;
 $('#backPreview').onclick=closePreview;
 $('#newQuote').onclick=()=>{
   if(Object.keys(cart).length && !confirm('¿Crear una cotización nueva? Se eliminarán los productos actuales.')) return;
