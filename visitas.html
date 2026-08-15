@@ -1,0 +1,3428 @@
+<!-- BUILD V3.4 · VISITAS + COTIZADOR -->
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Visitas de Vendedor · Toyo Foods</title>
+
+  <!-- El mapa se carga después de abrir la app para no bloquear redes 4G -->
+  <meta name="theme-color" content="#0b4ea2" />
+
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --line:rgba(15,23,42,.10);
+      --shadow:0 18px 45px rgba(2,6,23,.12);
+      --radius:18px;
+      --btn:#0f172a;
+      --btnText:#fff;
+      --chip:#eef2ff;
+      --chipText:#3730a3;
+      --good:#22c55e;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 700px at 20% -10%, #e9efff 0%, transparent 55%),
+                  radial-gradient(900px 600px at 100% 10%, #eafff4 0%, transparent 50%),
+                  var(--bg);
+      color:var(--text);
+    }
+    .wrap{max-width:1100px;margin:0 auto;padding:16px 14px 28px}
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+      position:sticky;top:0;z-index:50;padding:10px 0 12px;
+      backdrop-filter: blur(10px);
+    }
+    .brand{display:flex;align-items:center;gap:12px}
+    .brandLogo{
+      width:48px;height:48px;border-radius:14px;display:block;object-fit:cover;flex:0 0 48px;
+      box-shadow: 0 12px 26px rgba(15,23,42,.18);
+      background:#0f4ea8;
+      border:1px solid rgba(255,255,255,.7);
+    }
+    .logo{display:none}
+    h1{font-size:15px;margin:0;letter-spacing:.2px}
+    .sub{font-size:12px;color:var(--muted);margin-top:2px}
+    .logoutBtn{
+      border:1px solid rgba(15,23,42,.12);
+      background:rgba(255,255,255,.92);
+      color:var(--text);
+      padding:10px 12px;border-radius:999px;
+      font-weight:900;font-size:12px;cursor:pointer;
+      display:inline-flex;align-items:center;justify-content:center;
+    }
+    .logoutBtn:hover{background:#fff}
+    .loginGate{
+      position:fixed;inset:0;z-index:999999;
+      background:linear-gradient(180deg, rgba(239,244,255,.98), rgba(245,247,251,.98));
+      display:none;align-items:center;justify-content:center;padding:22px;
+    }
+    body.appLocked .loginGate{display:flex}
+    body.appLocked .wrap,
+    body.appLocked .fab{display:none}
+    body.appLocked{overflow:hidden}
+    .loginCard{
+      width:min(420px,100%);
+      background:rgba(255,255,255,.98);
+      border:1px solid rgba(15,23,42,.10);
+      border-radius:26px;
+      box-shadow:0 28px 70px rgba(15,23,42,.18);
+      padding:24px;
+    }
+    .loginBrand{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+    .loginBrand .brandLogo{width:58px;height:58px;flex-basis:58px;border-radius:16px}
+    .loginTitle{font-size:22px;font-weight:950;line-height:1.05;margin:0}
+    .loginSub{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.35}
+    .loginHint{margin-top:10px;font-size:12px;color:var(--muted);background:rgba(15,23,42,.04);border:1px solid rgba(15,23,42,.08);padding:10px 12px;border-radius:14px}
+    .loginError{margin-top:10px;font-size:12px;color:#b91c1c;display:none}
+    .loginError.show{display:block}
+    .loginField{margin-top:12px}
+    @media (max-width:620px){
+      .loginCard{padding:20px;border-radius:22px}
+      .loginTitle{font-size:20px}
+      .brandLogo{width:44px;height:44px;flex-basis:44px}
+    }
+    .tabs{display:flex;gap:8px;flex-wrap:wrap}
+    .tab{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.7);
+      padding:10px 12px;border-radius:999px;
+      font-weight:900;font-size:12px;
+      cursor:pointer;
+      text-decoration:none;
+      color:inherit;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .tab.active{
+      background:var(--btn);color:var(--btnText);
+      border-color:transparent;
+      box-shadow: 0 12px 28px rgba(2,6,23,.18);
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:14px;
+      align-items:start;
+    }
+    @media (max-width: 920px){
+      .grid{grid-template-columns: 1fr}
+    }
+    .card{
+      background:rgba(255,255,255,.9);
+      border:1px solid rgba(255,255,255,.35);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+    }
+    .card .hd .title{font-size:13px;font-weight:950}
+    .badge{
+      font-size:11px;font-weight:900;
+      padding:7px 10px;border-radius:999px;
+      background:rgba(15,23,42,.06);
+      border:1px solid rgba(15,23,42,.10);
+      color:var(--text);
+      display:flex;align-items:center;gap:8px;
+    }
+    .dot{width:8px;height:8px;border-radius:999px;background:var(--good);box-shadow:0 0 0 4px rgba(34,197,94,.18)}
+    .bd{padding:14px}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .field{flex:1;min-width:150px}
+    .field label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
+    input, select, textarea{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(15,23,42,.12);
+      background:rgba(255,255,255,.92);
+      outline:none;
+      font-size:14px;
+    }
+    textarea{min-height:88px;resize:vertical}
+    .btnbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .btn{
+      border:1px solid rgba(15,23,42,.12);
+      background:rgba(255,255,255,.92);
+      color:var(--text);
+      padding:12px 14px;border-radius:14px;
+      font-weight:900;cursor:pointer;
+    }
+    .btn.primary{
+      background:var(--btn);
+      color:var(--btnText);
+      border-color:transparent;
+    }
+    .btn:disabled{opacity:.55;cursor:not-allowed}
+    .kpis{display:grid;grid-template-columns: repeat(3,1fr);gap:10px}
+    @media (max-width:520px){ .kpis{grid-template-columns: 1fr} }
+    .kpi{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.8);
+      border-radius:16px;
+      padding:12px;
+    }
+    .kpi .lbl{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;gap:10px}
+    .kpi .val{font-size:22px;font-weight:950;margin-top:6px}
+    #mapCity, #mapAdmin{height:340px;border-radius:16px;border:1px solid var(--line);overflow:hidden}
+    .mapFallback{
+      height:340px;border-radius:16px;border:1px dashed rgba(15,23,42,.18);
+      display:flex;align-items:center;justify-content:center;text-align:center;
+      color:var(--muted);padding:12px;background:rgba(255,255,255,.65)
+    }
+    .list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+    .item{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.85);
+      border-radius:16px;
+      padding:12px;
+    }
+    .item .top{
+      display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;
+      align-items:flex-start;
+    }
+    .item .name{font-weight:950}
+    .item .meta{font-size:12px;color:var(--muted);white-space:pre-wrap}
+    .chip{
+      display:inline-flex;align-items:center;gap:6px;
+      background:var(--chip);color:var(--chipText);
+      border:1px solid rgba(55,48,163,.18);
+      padding:6px 10px;border-radius:999px;
+      font-weight:900;font-size:11px;
+      white-space:nowrap;
+    }
+    .muted{color:var(--muted)}
+    .hr{height:1px;background:var(--line);margin:14px 0}
+    .hint{font-size:12px;color:var(--muted);line-height:1.35}
+    .footer{
+      margin-top:14px;
+      font-size:11px;color:var(--muted);
+      display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;
+    }
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
+
+
+    .wrapText{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
+    .chipWide{white-space:normal;max-width:100%;line-height:1.15}
+    .btnMini{width:28px;height:28px;border-radius:999px;border:1px solid rgba(15,23,42,.12);background:rgba(255,255,255,.9);cursor:pointer;font-weight:950;line-height:1}
+    .btnMini:hover{background:#fff}
+    .annBody{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
+    .annBody.collapsed{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+    /* Botón flotante de Admin (por si el sticky/topbar se complica en móvil) */
+    .fab{
+      position:fixed; right:14px; bottom:14px; z-index:99999;
+      width:auto; padding:12px 14px; border-radius:999px;
+      background:rgba(15,23,42,.92); color:#fff; border:0; cursor:pointer;
+      font-weight:900; box-shadow: 0 16px 40px rgba(0,0,0,.25);
+      display:none;
+    }
+    @media (max-width:920px){ .fab{display:block;} }
+  
+    .heroStats{
+      display:grid;
+      grid-template-columns: 1.3fr .7fr;
+      gap:10px;
+      margin-bottom:12px;
+    }
+    @media (max-width: 720px){ .heroStats{grid-template-columns:1fr} }
+    .heroCard{
+      border:1px solid var(--line);
+      background:linear-gradient(135deg, rgba(15,23,42,.98), rgba(30,41,59,.96));
+      color:#fff;
+      border-radius:18px;
+      padding:14px;
+      box-shadow:0 20px 38px rgba(15,23,42,.18);
+    }
+    .heroCard .heroTitle{font-size:12px;opacity:.82}
+    .heroCard .heroValue{font-size:28px;font-weight:950;line-height:1;margin-top:8px}
+    .heroCard .heroMeta{font-size:12px;opacity:.88;margin-top:8px}
+    .goalWrap{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.78);
+      border-radius:16px;
+      padding:12px;
+    }
+    .goalTop{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      font-size:12px;font-weight:900;margin-bottom:10px;
+    }
+    .progress{
+      width:100%;height:12px;border-radius:999px;background:rgba(15,23,42,.08);overflow:hidden;
+    }
+    .progress > span{
+      display:block;height:100%;width:0%;
+      background:linear-gradient(90deg,#22c55e,#3b82f6);
+      border-radius:999px;
+      transition:width .25s ease;
+    }
+    .pillRow{display:flex;gap:8px;flex-wrap:wrap}
+    .pillBtn{
+      border:1px solid rgba(15,23,42,.10);
+      background:#fff;
+      border-radius:999px;
+      padding:8px 10px;
+      font-size:12px;
+      font-weight:900;
+      cursor:pointer;
+    }
+    .pillBtn:hover{transform:translateY(-1px)}
+    .quickCard{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.82);
+      border-radius:16px;
+      padding:12px;
+      margin-top:12px;
+    }
+    .sectionLabel{font-size:12px;color:var(--muted);margin:0 0 8px}
+
+    .assignHint{margin-top:10px}
+    .pillRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .pillBtn{
+      border:1px solid rgba(15,23,42,.10);background:rgba(255,255,255,.92);color:var(--text);
+      padding:8px 10px;border-radius:999px;font-weight:800;font-size:11px;cursor:pointer;
+      max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    }
+    .pillBtn:hover{background:#fff}
+    .userMeta{
+      display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;
+    }
+    .userChip{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:7px 10px;border-radius:999px;font-size:11px;font-weight:900;
+      background:rgba(15,23,42,.06);border:1px solid rgba(15,23,42,.10);
+    }
+    .historyCard{margin-top:10px}
+    .compactList{display:flex;flex-direction:column;gap:8px}
+    .compactItem{
+      border:1px solid var(--line);border-radius:14px;padding:10px;background:rgba(255,255,255,.82);
+    }
+    .compactItem .meta{font-size:12px;color:var(--muted)}
+    .field[hidden]{display:none !important}
+    datalist{display:none}
+
+    .promoSection{display:none}
+    .promoSection.visible{display:block}
+    .promoGrid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+    }
+    .promoCard{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.88);
+      border-radius:20px;
+      overflow:hidden;
+      box-shadow:0 14px 34px rgba(2,6,23,.08);
+    }
+    .promoMedia{
+      background:linear-gradient(180deg,#f8fafc 0%, #eef2ff 100%);
+      padding:16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:250px;
+    }
+    .promoMedia img{
+      max-width:100%;
+      max-height:230px;
+      object-fit:contain;
+      border-radius:14px;
+      box-shadow:0 10px 24px rgba(15,23,42,.12);
+    }
+    .promoBody{
+      padding:14px 16px 16px;
+      border-top:1px solid var(--line);
+    }
+    .promoTitle{
+      font-size:14px;
+      font-weight:950;
+      color:#0b4aa5;
+      text-transform:uppercase;
+      letter-spacing:.2px;
+      margin:0 0 8px;
+    }
+    .promoText{
+      font-size:15px;
+      line-height:1.3;
+      font-weight:850;
+      margin:0;
+    }
+    .promoSub{
+      margin-top:8px;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:700;
+    }
+
+    @media (max-width:620px){
+      #promotionsCard{order:-1}
+      #promotionsCard .hd{padding:12px 12px 8px}
+      #promotionsCard .bd{padding:10px}
+      #promotionsCard .hint{display:none}
+      #promotionsCard .hr{display:none}
+      .promoGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+      .promoCard{border-radius:16px}
+      .promoMedia{padding:10px;min-height:132px}
+      .promoMedia img{max-height:116px;border-radius:10px;box-shadow:0 8px 18px rgba(15,23,42,.10)}
+      .promoBody{padding:10px 10px 12px}
+      .promoTitle{font-size:11px;margin:0 0 4px}
+      .promoText{font-size:12px;line-height:1.22}
+      .promoSub{font-size:10px;margin-top:5px}
+      #promotionsScope{font-size:10px}
+    }
+
+
+
+    /* ===== Refresh V3 · Toyo Foods ===== */
+    :root{
+      --brand:#0b4ea2;
+      --brand-dark:#073675;
+      --brand-soft:#eaf2ff;
+      --bg:#eef3f9;
+      --card:#ffffff;
+      --text:#10213d;
+      --muted:#66758d;
+      --line:#dce5f0;
+      --shadow:0 14px 38px rgba(18,48,86,.10);
+      --radius:22px;
+      --btn:var(--brand);
+    }
+    body{
+      background:
+        radial-gradient(1000px 620px at 0% 0%, rgba(66,133,244,.14), transparent 58%),
+        radial-gradient(850px 520px at 100% 0%, rgba(16,185,129,.09), transparent 55%),
+        var(--bg);
+    }
+    .wrap{max-width:1280px;padding:18px 18px 38px}
+    .topbar{
+      top:10px;padding:12px 16px;margin-bottom:16px;
+      background:rgba(255,255,255,.88);border:1px solid rgba(255,255,255,.82);
+      border-radius:22px;box-shadow:0 12px 34px rgba(18,48,86,.09);
+      backdrop-filter:blur(18px);
+    }
+    .brandLogo{width:54px;height:54px;flex-basis:54px;border-radius:16px;object-fit:contain;background:transparent;border:0}
+    h1{font-size:19px;letter-spacing:-.25px;color:var(--text)}
+    .sub{font-size:12px;color:var(--muted)}
+    .tab,.logoutBtn{min-height:42px;padding:10px 16px;background:#fff}
+    .tab.active{background:linear-gradient(135deg,var(--brand),var(--brand-dark));box-shadow:0 10px 24px rgba(11,78,162,.24)}
+    .grid{grid-template-columns:minmax(0,1.25fr) minmax(330px,.75fr);gap:18px}
+    .card{border:1px solid rgba(205,218,233,.9);box-shadow:var(--shadow);background:rgba(255,255,255,.96)}
+    .card .hd{padding:18px 20px 14px;background:linear-gradient(180deg,#fff,rgba(246,249,253,.8))}
+    .card .hd .title{font-size:15px;color:var(--text)}
+    .bd{padding:20px}
+    input,select,textarea{border:1px solid #cfdbea;background:#fff;min-height:48px;border-radius:15px;font-size:15px;transition:border .2s,box-shadow .2s}
+    input:focus,select:focus,textarea:focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(11,78,162,.10)}
+    textarea{min-height:105px}
+    .btn{min-height:46px;border-radius:14px;padding:12px 17px;transition:transform .16s,box-shadow .16s,background .16s}
+    .btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 20px rgba(18,48,86,.12)}
+    .btn.primary{background:linear-gradient(135deg,var(--brand),var(--brand-dark));box-shadow:0 10px 22px rgba(11,78,162,.22)}
+    .btn.success{background:linear-gradient(135deg,#0f9f6e,#087a55);color:#fff;border-color:transparent}
+    .heroStats{grid-template-columns:1.25fr .75fr;gap:12px}
+    .heroCard{background:linear-gradient(135deg,#0b4ea2 0%,#08386f 100%);border:0;box-shadow:0 18px 38px rgba(11,78,162,.22);padding:18px}
+    .heroCard .heroValue{font-size:34px}
+    .goalWrap{padding:16px;background:linear-gradient(180deg,#fff,#f7faff)}
+    .progress{height:10px}
+    .progress > span{background:linear-gradient(90deg,#0f9f6e,#2f80ed)}
+    .sellerProfile{display:flex;align-items:center;gap:12px;padding:13px 14px;margin:12px 0;border:1px solid var(--line);border-radius:17px;background:linear-gradient(135deg,#f8fbff,#eef5ff)}
+    .sellerAvatar{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:var(--brand);color:#fff;font-size:19px;box-shadow:0 8px 18px rgba(11,78,162,.18)}
+    .sellerProfileText{display:flex;flex-direction:column;min-width:0;flex:1}
+    .sellerProfileText span{font-size:11px;color:var(--muted)}
+    .sellerProfileText strong{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .sellerProfileText small{font-size:11px;color:var(--muted)}
+    .autoSaveBadge,.securePill{display:inline-flex;align-items:center;justify-content:center;padding:7px 10px;border-radius:999px;background:#e8f8f1;color:#087a55;border:1px solid #bfe9d7;font-size:10px;font-weight:900;white-space:nowrap}
+    .quickCard{padding:16px;border-radius:19px;background:linear-gradient(180deg,#fff,#f8fbff);border:1px solid #d8e4f1}
+    .sectionHead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:13px}
+    .sectionHead .sectionLabel{margin-bottom:3px}
+    .orderLinkBox{margin-top:14px;padding:14px;border-radius:17px;border:1px solid #cfe0f2;background:linear-gradient(135deg,#f5f9ff,#eef7ff);display:none}
+    .orderLinkBox.show{display:block}
+    .orderLinkTop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .orderLinkTitle{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:950;color:var(--text)}
+    .orderLinkIcon{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:var(--brand);color:#fff;font-size:15px;box-shadow:0 7px 16px rgba(11,78,162,.18)}
+    .orderLinkStatus{margin-top:4px;font-size:11px;color:var(--muted);line-height:1.35}
+    .orderLinkUrl{margin-top:10px;padding:9px 11px;border-radius:11px;background:#fff;border:1px solid #d9e5f2;font-size:10px;color:#52647e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .orderLinkActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
+    .orderLinkActions .btn{min-height:40px;padding:9px 12px;font-size:11px;flex:1;min-width:128px}
+    .orderLinkActions .btn.shareOrder{background:linear-gradient(135deg,#13a267,#087a55);color:#fff;border-color:transparent}
+    .orderLinkBox.loading{opacity:.78}
+    .orderLinkBox.missing{background:#fffaf0;border-color:#f0d7a5}
+    .orderLinkBox.missing .orderLinkIcon{background:#b7791f}
+    .visitActionBar{gap:9px}
+    .visitActionBar .btn{flex:1;min-width:150px}
+    .visitProtect{display:flex;align-items:center;gap:11px;margin-top:12px;padding:12px 14px;border-radius:15px;background:#f4f8fd;border:1px solid #d9e5f2;color:var(--muted)}
+    .visitProtect.active{background:#eaf8f2;border-color:#bce8d5;color:#176b50}
+    .visitProtect .protectIcon{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:#dce9f8;color:var(--brand);font-weight:950}
+    .visitProtect.active .protectIcon{background:#bce8d5;color:#087a55}
+    .visitProtect div:last-child{display:flex;flex-direction:column;gap:2px}
+    .visitProtect strong{font-size:12px;color:var(--text)}
+    .visitProtect span{font-size:11px;line-height:1.35}
+    .kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .kpi{border-radius:17px;padding:14px;background:linear-gradient(180deg,#fff,#f8fbff)}
+    .kpi .val{color:var(--brand);font-size:25px}
+    #mapCity,#mapAdmin{height:360px;border-radius:19px}
+    .promoSection{border-color:#d7e2ef}
+    .promoGrid{grid-template-columns:1fr}
+    .promoCard{display:grid;grid-template-columns:minmax(220px,.8fr) minmax(240px,1fr);align-items:stretch;border-radius:20px}
+    .promoMedia{min-height:280px;padding:12px;background:#f4ead4}
+    .promoMedia img{width:100%;max-height:360px;object-fit:contain;border-radius:14px;box-shadow:none}
+    .promoBody{display:flex;flex-direction:column;justify-content:center;padding:22px;border-top:0;border-left:1px solid var(--line)}
+    .promoTitle{font-size:17px;color:var(--brand)}
+    .promoText{font-size:24px;color:var(--text)}
+    .promoSub{font-size:13px}
+    body.sellerSession #sellerContextRow{display:none}
+    body.adminSession .sellerProfile{display:none}
+    .loginGate{background:radial-gradient(900px 520px at 20% 0%,rgba(47,128,237,.18),transparent 55%),linear-gradient(160deg,#eef4ff,#f7fbff)}
+    .loginCard{border-radius:28px;padding:28px;box-shadow:0 30px 80px rgba(18,48,86,.20)}
+    .loginBrand .brandLogo{width:70px;height:70px;flex-basis:70px;border-radius:18px}
+    .loginTitle{font-size:25px;color:var(--text)}
+    .loginHint{background:var(--brand-soft);border-color:#d4e4fb;color:#40536f}
+    @media(max-width:920px){
+      .grid{grid-template-columns:1fr}
+      .topbar{top:6px}
+      .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media(max-width:620px){
+      .wrap{padding:8px 8px 24px}
+      .topbar{padding:10px 12px;border-radius:18px;margin-bottom:10px}
+      .brandLogo{width:43px;height:43px;flex-basis:43px;border-radius:13px}
+      h1{font-size:16px}.sub{display:none}
+      .tabs{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+      .tabs .tab,.tabs .logoutBtn{width:100%;padding:9px 8px;min-height:39px}
+      .card{border-radius:19px}.card .hd{padding:14px}.bd{padding:14px}
+      .heroStats{grid-template-columns:1fr 1fr}.heroCard,.goalWrap{padding:13px}.heroCard .heroValue{font-size:27px}
+      .sellerProfile{padding:10px}.autoSaveBadge{display:none}
+      .sectionHead{align-items:center}.securePill{font-size:9px;padding:6px 8px}
+      .orderLinkBox{padding:12px}.orderLinkActions{display:grid;grid-template-columns:1fr 1fr}.orderLinkActions .btn{min-width:0}.orderLinkActions .btn:first-child{grid-column:1/-1}
+      .visitActionBar{position:sticky;bottom:8px;z-index:45;background:rgba(255,255,255,.91);backdrop-filter:blur(14px);padding:8px;border:1px solid var(--line);border-radius:17px;box-shadow:0 14px 34px rgba(18,48,86,.18)}
+      .visitActionBar .btn{min-width:0;padding:10px 7px;font-size:12px}
+      .kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.kpi{padding:11px}.kpi .val{font-size:22px}
+      #mapCity,#mapAdmin{height:300px}
+      #promotionsCard{order:-1}
+      .promoCard{display:block}.promoMedia{min-height:auto;padding:8px}.promoMedia img{max-height:none;width:100%}
+      .promoBody{display:none}
+      #promotionsCard .hd{padding:12px 14px}
+      #promotionsCard .bd{padding:8px}
+      #promotionsCard .hint,#promotionsCard .hr{display:none}
+    }
+
+  
+    body.embedded .topbar{display:none!important}
+    body.embedded .wrap{max-width:none;padding:8px 8px 22px}
+    body.embedded .fab{display:none!important}
+    body.embedded .grid{grid-template-columns:1fr}
+    body.embedded .card{box-shadow:0 5px 20px rgba(18,48,86,.07)}
+  </style>
+</head>
+<body class="appLocked">
+  <div class="loginGate" id="loginGate">
+    <div class="loginCard">
+      <div class="loginBrand">
+        <img class="brandLogo" src="assets/toyo_logo.png" alt="Toyo Foods" />
+        <div>
+          <h2 class="loginTitle">Visitas de Vendedor</h2>
+          <div class="loginSub">Acceso general para el equipo comercial de Toyo Foods.</div>
+        </div>
+      </div>
+      <div class="loginHint">Ingresa tus credenciales para continuar.</div>
+      <div class="loginField field">
+        <label>Usuario</label>
+        <select id="loginUser" autocomplete="username"><option value="">Selecciona usuario</option></select>
+      </div>
+      <div class="loginField field">
+        <label>Contraseña</label>
+        <input id="loginPass" type="password" autocomplete="current-password" placeholder="Contraseña" />
+      </div>
+      <div class="btnbar">
+        <button class="btn primary" id="btnLogin" type="button">Entrar</button>
+      </div>
+      <div class="loginError" id="loginError">Usuario o contraseña incorrectos.</div>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <img class="brandLogo" src="assets/toyo_logo.png" alt="Toyo Foods" />
+        <div>
+          <h1>Visitas de Vendedor</h1>
+          <div class="sub">Toyo Foods · App interna · GitHub Pages · Cloud (Supabase)</div>
+        </div>
+      </div>
+      <nav class="tabs" role="tablist" aria-label="Navegación">
+        <a class="tab" id="tabCity" href="#/">Vendedor</a>
+        <button class="tab" id="btnQuote" type="button" title="Abrir cotizador Toyo Foods">Cotizar</button>
+        <a class="tab" id="tabAdmin" href="#/admin">Admin (Cloud)</a>
+        <button class="logoutBtn" id="btnLogout" type="button">Salir</button>
+      </nav>
+    </div>
+
+    <!-- VENDEDOR -->
+    <section id="pageCity" class="grid">
+      <div class="card">
+        <div class="hd">
+          <div class="title">Registro de visita</div>
+          <div class="badge" title="Estado de sincronización">
+            <span class="dot" id="cloudDot" style="background:var(--warn);box-shadow:0 0 0 4px rgba(245,158,11,.18)"></span>
+            <span id="cloudStatus">Cloud: sin configurar</span>
+          </div>
+        </div>
+        <div class="bd">
+
+          <!-- Banner de mensajes -->
+          <div class="item" id="announceBox" style="display:none">
+            <div class="top">
+              <div>
+                <div class="name" id="announceTitle">Comunicado</div>
+                <div class="meta annBody collapsed" id="announceMsg"></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px"><button class="btnMini" id="btnToggleAnn" type="button" title="Ver más">+</button><button class="btnMini" id="btnDismissAnn" type="button" title="Ocultar en este dispositivo">×</button><span class="chip" id="announceMeta">—</span></div>
+            </div>
+          </div>
+
+          <div class="heroStats">
+            <div class="heroCard">
+              <div class="heroTitle">Resumen del día</div>
+              <div class="heroValue" id="heroVisits">0 / 5</div>
+              <div class="heroMeta" id="heroMessage">Empieza tu ruta y registra cada visita con ubicación.</div>
+            </div>
+            <div class="goalWrap">
+              <div class="goalTop">
+                <span>Meta diaria</span>
+                <span id="goalPct">0%</span>
+              </div>
+              <div class="progress"><span id="goalBar"></span></div>
+              <div class="hint" style="margin-top:10px">Objetivo sugerido: 5 visitas por día.</div>
+            </div>
+          </div>
+
+          <div class="sellerProfile" id="sellerProfile">
+            <div class="sellerAvatar">👤</div>
+            <div class="sellerProfileText">
+              <span>Sesión activa</span>
+              <strong id="sellerProfileName">—</strong>
+              <small id="sellerProfileCity">—</small>
+            </div>
+            <div class="autoSaveBadge">✓ Guardado automático</div>
+          </div>
+
+          <div class="row" id="sellerContextRow">
+            <div class="field">
+              <label>Ciudad</label>
+              <select id="citySelect"></select>
+            </div>
+            <div class="field">
+              <label>Vendedor</label>
+              <select id="vendorSelect"></select>
+            </div>
+          </div>
+
+          <div class="quickCard">
+            <div class="sectionHead">
+              <div>
+                <div class="sectionLabel">Captura rápida</div>
+                <strong>Selecciona el cliente de la visita</strong>
+              </div>
+              <span class="securePill">Padrón por vendedor</span>
+            </div>
+            <div class="row">
+              <div class="field">
+                <label>Buscar cliente</label>
+                <input id="clientSearchInput" type="search" placeholder="Escribe parte del nombre…" autocomplete="off" />
+              </div>
+            </div>
+            <div class="row" style="margin-top:10px">
+              <div class="field">
+                <label>Clientes asignados</label>
+                <select id="assignedClientSelect">
+                  <option value="">Selecciona un cliente de tu padrón</option>
+                </select>
+              </div>
+            </div>
+            <div class="row" id="manualClientRow" style="display:none;margin-top:10px">
+              <div class="field">
+                <label>Otro cliente o prospecto</label>
+                <input id="manualClientInput" type="text" placeholder="Escribe el nombre del cliente" autocomplete="off" />
+              </div>
+            </div>
+            <input id="clientInput" type="hidden" />
+            <div class="hint" id="clientCodeMeta" style="display:none"></div>
+
+            <div class="orderLinkBox" id="orderLinkBox">
+              <div class="orderLinkTop">
+                <div>
+                  <div class="orderLinkTitle"><span class="orderLinkIcon">↗</span><span>Liga de pedido del cliente</span></div>
+                  <div class="orderLinkStatus" id="orderLinkStatus">Selecciona un cliente para localizar su formato de pedido.</div>
+                </div>
+                <span class="securePill" id="orderLinkBadge">Portal Toyo</span>
+              </div>
+              <div class="orderLinkUrl" id="orderLinkUrl">—</div>
+              <div class="orderLinkActions">
+                <button class="btn primary" id="btnOpenOrderLink" type="button" disabled>Abrir pedido</button>
+                <button class="btn shareOrder" id="btnShareOrderLink" type="button" disabled>Compartir liga</button>
+                <button class="btn" id="btnCopyOrderLink" type="button" disabled>Copiar liga</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px">
+            <div class="field">
+              <label>Tipo de visita</label>
+              <select id="typeSelect"></select>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px">
+            <div class="field">
+              <label>Comentarios</label>
+              <textarea id="notesInput" placeholder="Comentarios, faltantes, acuerdos, etc."></textarea>
+            </div>
+          </div>
+
+          <div class="btnbar visitActionBar" id="visitActionBar">
+            <button class="btn primary" id="btnStart" type="button"><span>▶</span> Iniciar visita</button>
+            <button class="btn success" id="btnEnd" type="button" disabled><span>✓</span> Terminar visita</button>
+            <button class="btn" id="btnLocate" type="button"><span>⌖</span> Ubicación</button>
+          </div>
+
+          <div class="visitProtect" id="visitProtect">
+            <div class="protectIcon">✓</div>
+            <div>
+              <strong id="visitProtectTitle">Registro protegido</strong>
+              <span id="visitProtectText">El formulario y la visita activa se guardan en este dispositivo.</span>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="kpis">
+            <div class="kpi">
+              <div class="lbl"><span>Visitas hoy</span><span class="mono" id="kpiDate"></span></div>
+              <div class="val" id="kpiCount">0</div>
+            </div>
+            <div class="kpi">
+              <div class="lbl"><span>Tiempo total</span><span class="muted">hrs</span></div>
+              <div class="val" id="kpiHours">0.0</div>
+            </div>
+            <div class="kpi">
+              <div class="lbl"><span>Clientes únicos</span><span class="muted">hoy</span></div>
+              <div class="val" id="kpiClients">0</div>
+            </div>
+            <div class="kpi">
+              <div class="lbl"><span>Cumplimiento meta</span><span class="muted">5 visitas</span></div>
+              <div class="val" id="kpiGoal">0%</div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px">
+            <div id="mapCity"></div>
+            <div id="mapCityFallback" class="mapFallback" style="display:none">
+              Mapa no disponible (CDN bloqueado o sin internet).<br>
+              La app sigue funcionando (visitas, cloud y export).
+            </div>
+          </div>
+
+          <div class="list" id="listCity"></div>
+
+          <div class="footer">
+            <span>Tip: para GPS abre en <b>HTTPS</b> (GitHub Pages ya lo es).</span>
+            <span class="mono" id="buildStamp"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card promoSection" id="promotionsCard">
+        <div class="hd">
+          <div class="title">Promoción destacada</div>
+          <div class="badge">
+            <span style="width:8px;height:8px;border-radius:999px;background:#0b4aa5;box-shadow:0 0 0 4px rgba(11,74,165,.14)"></span>
+            <span id="promotionsScope">Todas las ciudades</span>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="hint" id="promotionsHint">Promoción vigente para el equipo comercial.</div>
+          <div class="hr"></div>
+          <div class="promoGrid" id="promotionsGrid"></div>
+        </div>
+      </div>
+
+
+
+      <div class="card">
+        <div class="hd">
+          <div class="title">Acciones rápidas</div>
+          <div class="badge" title="Exporta para mandar a Dirección o para backup">
+            <span style="width:8px;height:8px;border-radius:999px;background:#3b82f6;box-shadow:0 0 0 4px rgba(59,130,246,.18)"></span>
+            Export
+          </div>
+        </div>
+        <div class="bd">
+          <div class="hint">
+            Guardado local (este dispositivo) + Cloud (Supabase) si lo configuras.
+            <br><br>
+            <b>Admin</b> ve todo lo que esté en Supabase.
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="btnbar">
+            <button class="btn" id="btnExportCsv" type="button">Exportar CSV (hoy)</button>
+            <button class="btn" id="btnClearToday" type="button">Borrar hoy</button>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="small muted">
+            <div><b>Estado visita actual:</b> <span id="visitState">Sin visita activa</span></div>
+            <div style="margin-top:6px"><b>Última ubicación:</b> <span class="mono" id="lastLoc">—</span></div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="hint">
+            Si el mapa o Admin “no abre”, casi siempre es:
+            <ul>
+              <li>caché (abre con <span class="mono">?v=1</span>)</li>
+              <li>CDN bloqueado (Leaflet) → este build ya no se rompe</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADMIN -->
+    <section id="pageAdmin" class="grid" style="display:none">
+      <div class="card">
+        <div class="hd">
+          <div class="title">Admin (Cloud)</div>
+          <div class="badge" title="Fuente de datos">
+            <span class="dot" id="adminDot" style="background:#3b82f6;box-shadow:0 0 0 4px rgba(59,130,246,.18)"></span>
+            <span id="adminSourceLbl">Admin: Local</span>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="row">
+            <div class="field">
+              <label>Desde</label>
+              <input id="adminFrom" type="date" />
+            </div>
+            <div class="field">
+              <label>Hasta</label>
+              <input id="adminTo" type="date" />
+            </div>
+            <div class="field">
+              <label>Ciudad</label>
+              <select id="adminCity">
+                <option value="ALL">Todas</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Vendedor</label>
+              <select id="adminVendor">
+                <option value="ALL">Todos</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Fuente</label>
+              <select id="adminSource">
+                <option value="CLOUD">Cloud</option>
+                <option value="LOCAL">Local</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="btnbar">
+            <button class="btn primary" id="btnAdminApply" type="button">Aplicar</button>
+            <button class="btn" id="btnAdminTestCloud" type="button">Probar Cloud</button>
+            <button class="btn" id="btnAdminExcelFiltered" type="button">Excel (filtros · sin internet)</button>
+            <button class="btn" id="btnAdminExcelAll" type="button">Excel (todo · sin internet)</button>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="kpis">
+            <div class="kpi">
+              <div class="lbl"><span>Registros</span><span class="muted">rango</span></div>
+              <div class="val" id="adminKpiCount">0</div>
+            </div>
+            <div class="kpi">
+              <div class="lbl"><span>Horas</span><span class="muted">total</span></div>
+              <div class="val" id="adminKpiHours">0.0</div>
+            </div>
+            <div class="kpi">
+              <div class="lbl"><span>Clientes únicos</span><span class="muted">rango</span></div>
+              <div class="val" id="adminKpiClients">0</div>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="kpis">
+            <div class="kpi">
+              <div class="lbl"><span>GDL</span><span class="muted">registros</span></div>
+              <div class="val" id="adminKpiGDL">0</div>
+            </div>
+            <div class="kpi">
+              <div class="lbl"><span>MTY</span><span class="muted">registros</span></div>
+              <div class="val" id="adminKpiMTY">0</div>
+            </div>
+            <div class="kpi">
+              <div class="lbl"><span>CDMX</span><span class="muted">registros</span></div>
+              <div class="val" id="adminKpiCDMX">0</div>
+            </div>
+            <div class="kpi">
+              <div class="lbl"><span>AGS</span><span class="muted">registros</span></div>
+              <div class="val" id="adminKpiAGS">0</div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px">
+            <div id="mapAdmin"></div>
+            <div id="mapAdminFallback" class="mapFallback" style="display:none">
+              Mapa no disponible (CDN bloqueado).<br>
+              Admin sigue funcionando: filtros, ranking y export.
+            </div>
+          </div>
+
+          <div class="list" id="listAdmin"></div>
+
+          <div class="footer">
+            <span class="hint">Admin Cloud = ve todas las visitas (Supabase).</span>
+            <span class="mono">Ruta: puntos conectados en orden</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="hd">
+          <div class="title">Ranking por vendedor</div>
+          <div class="badge">
+            <span style="width:8px;height:8px;border-radius:999px;background:#a855f7;box-shadow:0 0 0 4px rgba(168,85,247,.18)"></span>
+            Ranking
+          </div>
+        </div>
+        <div class="bd">
+          <div class="hint">Incluye visitas del filtro, avance semanal y avance mensual por vendedor. Meta semanal: 25 visitas · Meta mensual: 100 visitas.</div>
+          <div class="hr"></div>
+          <div class="list" id="adminVendorsSummary"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="hd">
+          <div class="title">Comunicados</div>
+          <div class="badge">
+            <span style="width:8px;height:8px;border-radius:999px;background:#3b82f6;box-shadow:0 0 0 4px rgba(59,130,246,.18)"></span>
+            Mensaje
+          </div>
+        </div>
+        <div class="bd">
+          <div class="hint">
+            Publica un mensaje por ciudad o por vendedor. Los vendedores lo verán como banner al abrir la app.
+            <br><br>
+            <b>Nota:</b> requiere tabla <span class="mono">announcements</span> en Supabase. Si no existe, no pasa nada.
+          </div>
+          <div class="hr"></div>
+
+          <div class="row">
+            <div class="field">
+              <label>Ciudad</label>
+              <select id="msgCity">
+                <option value="ALL">Todas</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Vendedor</label>
+              <select id="msgVendor">
+                <option value="ALL">Todos</option>
+              </select>
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <div class="field">
+              <label>Título</label>
+              <input id="msgTitle" placeholder="Se genera según ciudad y vendedor" />
+              <div class="hint" style="margin-top:8px">El título puede llenarse automáticamente según la ciudad o el vendedor seleccionado.</div>
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <div class="field">
+              <label>Mensaje</label>
+              <textarea id="msgBody" placeholder="Ej. Empujar Hillway Taro 260g + 10% por caja. Objetivo: 2 recompras por día."></textarea>
+            </div>
+          </div>
+          <div class="btnbar">
+            <button class="btn primary" id="btnPublishMsg" type="button">Publicar</button>
+            <button class="btn" id="btnRefreshMsg" type="button">Actualizar</button>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="row">
+            <div class="field">
+              <label>Eliminar mensajes del día</label>
+              <input id="msgDeleteDay" type="date" />
+            </div>
+          </div>
+
+          <div class="btnbar">
+            <button class="btn danger" id="btnDeleteMsgDay" type="button">Eliminar del día</button>
+            <button class="btn" id="btnListMsgs" type="button">Ver últimos</button>
+          </div>
+
+          <div class="list" id="msgList" style="margin-top:12px"></div>
+
+          <div class="hr"></div>
+
+          <div class="hint">
+            Los comunicados se muestran en la vista de <b>Vendedor</b> (cuando Cloud está en línea).
+            Usa esto para: productos a empujar, promociones, foco de la semana, etc.
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+  </div>
+
+  <button class="fab" id="fabAdmin" type="button">Admin</button>
+
+<script>
+(function(){
+  const EMBEDDED = new URLSearchParams(location.search).get("embedded") === "1";
+  if(EMBEDDED) document.body.classList.add("embedded");
+  // ==============================
+  // 1) CONFIG SUPABASE (pega aquí)
+  // ==============================
+  // Si lo dejas vacío, la app funciona en modo local (sin cloud)
+  const SUPABASE_URL = "https://cqgctmpbvlsodfnwscnx.supabase.co";       // ej: https://xxxxx.supabase.co
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxZ2N0bXBidmxzb2RmbndzY254Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzQyOTIsImV4cCI6MjA4MzMxMDI5Mn0.gSOhlIgGFo5cwimH6hJ_yk5lquVsxKxDGJLAR9dA5xM";  // ej: eyJhbGciOi...
+
+  const SUPABASE_TABLE = "visits";
+  const ANNOUNCE_TABLE = "announcements"; // opcional
+
+  // Portal de Pedidos Toyo Foods
+  const ORDER_PORTAL_BASE = "https://beris04.github.io/Toyo-MX/";
+  const ORDER_CLIENTS_URL = ORDER_PORTAL_BASE + "clients.json";
+  let ORDER_CLIENTS = [];
+  let ORDER_BY_CODE = new Map();
+  let ORDER_BY_NAME = new Map();
+  let CURRENT_ORDER_URL = "";
+  let ORDER_INDEX_LOADED = false;
+  let ORDER_INDEX_PROMISE = null;
+
+  // ===== Data =====
+  const SELLERS = {"CDMX":["David Adrian Hernández Guzmán","Javier Espinosa Olivares","Ricardo Gutierrez Bandera","Abraham Rene Valdes Gonzales","Jesus Antonio Ramirez Rivera","Sergio Servin Rivera","Eduardo Faustino Hernandez Sanchez","Khiroyuki Sakurai","Andres Fierro Ibañez","Jonathan Ramirez","Tohru Kurasawa","Tanno Nobuko"],"MTY":["Jessica Palomo","Luis Heredia","Carla Hernández","Salomé Barron"],"GDL":["Aguilar Neri Daniel","De la Cruz Ponce Julio Cesar","Garibay Ortiz Sergio Joel","Sierra de Anda Aldo","Perez Mar Alan Roberto","Reynoso Aguilar Maricela","Sandra Navarro Navarro","Aguirre Ojeda Arcenio","Velez Castellanos Antonio","Yepez Mora Oscar Alberto","Sanchez Esmeralda","Reynaga Valeria","González Guzmán Cristian Eduardo"],"AGS":["Hernandez Gonzalez Angel Miguel"],"PUE":["Victor Mendez","Yael Mojica"],"QRO":["Roberto Lopez"]};
+
+  const CITY_META = [{"code":"GDL","label":"Guadalajara"},{"code":"MTY","label":"Monterrey"},{"code":"CDMX","label":"México"},{"code":"AGS","label":"Aguascalientes"},{"code":"PUE","label":"Puebla"},{"code":"QRO","label":"Querétaro"}];
+
+  const CLIENTS_BY_VENDOR = {};
+  const CLIENT_FILES = {"David Adrian Hernández Guzmán":"data/visitas/david_adrian_hernandez_guzman.json","Javier Espinosa Olivares":"data/visitas/javier_espinosa_olivares.json","Ricardo Gutierrez Bandera":"data/visitas/ricardo_gutierrez_bandera.json","Abraham Rene Valdes Gonzales":"data/visitas/abraham_rene_valdes_gonzales.json","Jesus Antonio Ramirez Rivera":"data/visitas/jesus_antonio_ramirez_rivera.json","Sergio Servin Rivera":"data/visitas/sergio_servin_rivera.json","Eduardo Faustino Hernandez Sanchez":"data/visitas/eduardo_faustino_hernandez_sanchez.json","Khiroyuki Sakurai":"data/visitas/khiroyuki_sakurai.json","Andres Fierro Ibañez":"data/visitas/andres_fierro_ibanez.json","Jonathan Ramirez":"data/visitas/jonathan_ramirez.json","Tohru Kurasawa":"data/visitas/tohru_kurasawa.json","Tanno Nobuko":"data/visitas/tanno_nobuko.json","Jessica Palomo":"data/visitas/jessica_palomo.json","Luis Heredia":"data/visitas/luis_heredia.json","Carla Hernández":"data/visitas/carla_hernandez.json","Salomé Barron":"data/visitas/salome_barron.json","Aguilar Neri Daniel":"data/visitas/aguilar_neri_daniel.json","De la Cruz Ponce Julio Cesar":"data/visitas/de_la_cruz_ponce_julio_cesar.json","Garibay Ortiz Sergio Joel":"data/visitas/garibay_ortiz_sergio_joel.json","Sierra de Anda Aldo":"data/visitas/sierra_de_anda_aldo.json","Perez Mar Alan Roberto":"data/visitas/perez_mar_alan_roberto.json","Reynoso Aguilar Maricela":"data/visitas/reynoso_aguilar_maricela.json","Sandra Navarro Navarro":"data/visitas/sandra_navarro_navarro.json","Aguirre Ojeda Arcenio":"data/visitas/aguirre_ojeda_arcenio.json","Velez Castellanos Antonio":"data/visitas/velez_castellanos_antonio.json","Yepez Mora Oscar Alberto":"data/visitas/yepez_mora_oscar_alberto.json","Sanchez Esmeralda":"data/visitas/sanchez_esmeralda.json","Reynaga Valeria":"data/visitas/reynaga_valeria.json","González Guzmán Cristian Eduardo":"data/visitas/gonzalez_guzman_cristian_eduardo.json","Hernandez Gonzalez Angel Miguel":"data/visitas/hernandez_gonzalez_angel_miguel.json","Victor Mendez":"data/visitas/victor_mendez.json","Yael Mojica":"data/visitas/yael_mojica.json","Roberto Lopez":"data/visitas/roberto_lopez.json"};
+  const CLIENT_LOAD_PROMISES = {};
+  const CLIENTS_BY_VENDOR_COUNTS = {"David Adrian Hernández Guzmán":67,"Javier Espinosa Olivares":138,"Ricardo Gutierrez Bandera":86,"Abraham Rene Valdes Gonzales":60,"Jesus Antonio Ramirez Rivera":104,"Sergio Servin Rivera":133,"Eduardo Faustino Hernandez Sanchez":153,"Khiroyuki Sakurai":2,"Andres Fierro Ibañez":67,"Jonathan Ramirez":28,"Tohru Kurasawa":180,"Tanno Nobuko":180,"Jessica Palomo":84,"Luis Heredia":83,"Carla Hernández":37,"Salomé Barron":1,"Aguilar Neri Daniel":105,"De la Cruz Ponce Julio Cesar":70,"Garibay Ortiz Sergio Joel":121,"Sierra de Anda Aldo":40,"Perez Mar Alan Roberto":78,"Reynoso Aguilar Maricela":148,"Sandra Navarro Navarro":93,"Aguirre Ojeda Arcenio":42,"Velez Castellanos Antonio":57,"Yepez Mora Oscar Alberto":57,"Sanchez Esmeralda":856,"Reynaga Valeria":0,"González Guzmán Cristian Eduardo":121,"Hernandez Gonzalez Angel Miguel":562,"Victor Mendez":0,"Yael Mojica":0,"Roberto Lopez":0};
+  const CLIENTS_BY_VENDOR_SOURCES = {"David Adrian Hernández Guzmán":["CDMX ADRIAN","CDMX DAVID"],"Javier Espinosa Olivares":["CDMX JAVIER"],"Ricardo Gutierrez Bandera":["CDMX RICARDO"],"Abraham Rene Valdes Gonzales":["CDMX ABRAHAM"],"Jesus Antonio Ramirez Rivera":["CDMX JESUS"],"Sergio Servin Rivera":["CDMX SERGIO"],"Eduardo Faustino Hernandez Sanchez":["CDMX EDUARDO"],"Khiroyuki Sakurai":["CDMX SAKURAI HIROYUKI"],"Andres Fierro Ibañez":["CDMX ANDRES"],"Jonathan Ramirez":["CDMX JONATHAN"],"Tohru Kurasawa":["AGENTE CLAVE CDMX","AGENTE CLAVE JAPONES CDMX","CDMX OFICINA AGENTE CLAVE"],"Tanno Nobuko":["AGENTE CLAVE CDMX","AGENTE CLAVE JAPONES CDMX","CDMX OFICINA AGENTE CLAVE"],"Jessica Palomo":["MTY 01 - JESICA PALOMO"],"Luis Heredia":["MTY 02 - LUIS HEREDIA"],"Carla Hernández":["MTY 05 - CARLA HERNANDEZ"],"Salomé Barron":["MTY 06 - SALOME BARRON"],"Aguilar Neri Daniel":["GDL6 - DANIEL  AGUILAR"],"De la Cruz Ponce Julio Cesar":["GDL4 - JULIO DE LA CRUZ"],"Garibay Ortiz Sergio Joel":["AGENTE CLAVE  GDL"],"Sierra de Anda Aldo":["GDL15 - ALDO SIERRA"],"Perez Mar Alan Roberto":["GDL5 - ALAN PEREZ"],"Reynoso Aguilar Maricela":["GDL3 - MARICELA REYNOSO"],"Sandra Navarro Navarro":["GDL13 - SANDRA NAVARRO"],"Aguirre Ojeda Arcenio":["GDL14- ARCENIO AGUIRRE"],"Velez Castellanos Antonio":["GDL9 - ANTONIO V."],"Yepez Mora Oscar Alberto":["GDL1 - OSCAR YEPEZ"],"Sanchez Esmeralda":["OFICINA GDL"],"Reynaga Valeria":[],"González Guzmán Cristian Eduardo":["AGENTE CLAVE  GDL"],"Hernandez Gonzalez Angel Miguel":["AGUASCALIENTES MAYOREO","AGUASCALIENTES NORTE","AGUASCALIENTES SUR"],"Victor Mendez":["PUE 01 VICTOR MENDEZ"],"Yael Mojica":["PUE 02 YAEL MOJICA"],"Roberto Lopez":["QRO 01 ROBERTO LOPEZ"]};
+  const PROMOTIONS_BY_CITY = {"ALL":[{"title":"Ichimasa Jumbo Crab Sticks 240 g","text":"Precio especial $113.50 MXP","sub":"Ideal para tempura · Código CO-PDM452-13639","img":"assets/promo_ichimasa.webp"}]};
+
+  const VISIT_TYPES = [
+    "Degustación","Entrega de Faltantes","Entrega de Nuevos Productos","Visita Potencialidad",
+    "Visita de Seguimiento","Cobranza","Prospecto","Recolección"
+  ];
+
+  // ===== DOM =====
+  const $ = (q)=>document.querySelector(q);
+
+  const tabCity = $("#tabCity");
+  const tabAdmin = $("#tabAdmin");
+  const btnQuote = $("#btnQuote");
+  const pageCity = $("#pageCity");
+  const pageAdmin = $("#pageAdmin");
+  const fabAdmin = $("#fabAdmin");
+  const btnLogout = $("#btnLogout");
+  const sessionBadge = $("#sessionBadge");
+  const sessionScope = $("#sessionScope");
+  const loginGate = $("#loginGate");
+  const loginUser = $("#loginUser");
+  const loginPass = $("#loginPass");
+  const btnLogin = $("#btnLogin");
+  const loginError = $("#loginError");
+
+  const citySelect = $("#citySelect");  const vendorSelect = $("#vendorSelect");
+  const clientInput = $("#clientInput");
+  const assignedClientSelect = $("#assignedClientSelect");
+  const clientSearchInput = $("#clientSearchInput");
+  const manualClientRow = $("#manualClientRow");
+  const manualClientInput = $("#manualClientInput");
+  const assignedClientHint = $("#assignedClientHint");
+  const assignedClientTags = $("#assignedClientTags");
+  const clientCodeMeta = $("#clientCodeMeta");
+  const orderLinkBox = $("#orderLinkBox");
+  const orderLinkStatus = $("#orderLinkStatus");
+  const orderLinkUrl = $("#orderLinkUrl");
+  const orderLinkBadge = $("#orderLinkBadge");
+  const btnOpenOrderLink = $("#btnOpenOrderLink");
+  const btnShareOrderLink = $("#btnShareOrderLink");
+  const btnCopyOrderLink = $("#btnCopyOrderLink");
+  const clientHistoryEmpty = $("#clientHistoryEmpty");
+  const clientHistoryList = $("#clientHistoryList");
+  const typeSelect = $("#typeSelect");
+  const notesInput = $("#notesInput");
+  const btnStart = $("#btnStart");
+  const btnEnd = $("#btnEnd");
+  const btnLocate = $("#btnLocate");
+
+  const cloudDot = $("#cloudDot");
+  const cloudStatus = $("#cloudStatus");
+
+  const kpiDate = $("#kpiDate");
+  const kpiCount = $("#kpiCount");
+  const kpiHours = $("#kpiHours");
+  const kpiClients = $("#kpiClients");
+  const kpiGoal = $("#kpiGoal");
+  const heroVisits = $("#heroVisits");
+  const heroMessage = $("#heroMessage");
+  const goalPct = $("#goalPct");
+  const goalBar = $("#goalBar");
+  const recentClientSelect = $("#recentClientSelect");
+
+  const listCity = $("#listCity");
+  const visitState = $("#visitState");
+  const lastLoc = $("#lastLoc");
+  const buildStamp = $("#buildStamp");
+  const sellerProfileName = $("#sellerProfileName");
+  const sellerProfileCity = $("#sellerProfileCity");
+  const visitProtect = $("#visitProtect");
+  const visitProtectTitle = $("#visitProtectTitle");
+  const visitProtectText = $("#visitProtectText");
+
+  const promotionsCard = $("#promotionsCard");
+  const promotionsGrid = $("#promotionsGrid");
+  const promotionsScope = $("#promotionsScope");
+  const promotionsHint = $("#promotionsHint");
+
+  // Admin
+  const adminFrom = $("#adminFrom");
+  const adminTo = $("#adminTo");
+  const adminCity = $("#adminCity");
+  const adminVendor = $("#adminVendor");
+  const adminSource = $("#adminSource");
+  const btnAdminApply = $("#btnAdminApply");
+  const btnAdminTestCloud = $("#btnAdminTestCloud");
+  const btnAdminExcelFiltered = $("#btnAdminExcelFiltered");
+  const btnAdminExcelAll = $("#btnAdminExcelAll");
+
+  const adminSourceLbl = $("#adminSourceLbl");
+  const adminDot = $("#adminDot");
+
+  const adminKpiCount = $("#adminKpiCount");
+  const adminKpiHours = $("#adminKpiHours");
+  const adminKpiClients = $("#adminKpiClients");
+  const adminKpiGDL = $("#adminKpiGDL");
+  const adminKpiMTY = $("#adminKpiMTY");
+  const adminKpiCDMX = $("#adminKpiCDMX");
+  const adminKpiAGS = $("#adminKpiAGS");
+
+  const listAdmin = $("#listAdmin");
+  const adminVendorsSummary = $("#adminVendorsSummary");
+
+  // Messages
+  const announceBox = $("#announceBox");
+  const announceTitle = $("#announceTitle");
+  const announceMsg = $("#announceMsg");
+  const announceMeta = $("#announceMeta");
+  const btnDismissAnn = $("#btnDismissAnn");
+  const btnToggleAnn = $("#btnToggleAnn");
+
+  const msgCity = $("#msgCity");
+  const msgVendor = $("#msgVendor");
+  const msgTitle = $("#msgTitle");
+  const msgBody = $("#msgBody");
+  const btnPublishMsg = $("#btnPublishMsg");
+  const btnRefreshMsg = $("#btnRefreshMsg");
+  const msgDeleteDay = $("#msgDeleteDay");
+  const btnDeleteMsgDay = $("#btnDeleteMsgDay");
+  const btnListMsgs = $("#btnListMsgs");
+  const msgList = $("#msgList");
+
+  // Local exports
+  const btnExportCsv = $("#btnExportCsv");
+  const btnClearToday = $("#btnClearToday");
+
+  // ===== Utilities =====
+
+
+  const AUTH_PASS = "Toyo2026";
+  const AUTH_KEY = "app_visitas_auth_v2";
+
+  function buildUserAccounts(){
+    const users = {
+      "Admin": {role:"admin", city:"ALL", vendor:"ALL", label:"Admin"}
+    };
+    Object.entries(SELLERS).forEach(([city, vendors])=>{
+      vendors.forEach(v=>{
+        users[v] = {role:"seller", city, vendor:v, label:v};
+      });
+    });
+    return users;
+  }
+  const USER_ACCOUNTS = buildUserAccounts();
+
+  function getAuthState(){
+    try{
+      const raw = safeJsonParse(localStorage.getItem(AUTH_KEY) || sessionStorage.getItem(AUTH_KEY) || "null", null);
+      if(raw && raw.ok){
+        localStorage.setItem(AUTH_KEY, JSON.stringify(raw));
+        return raw;
+      }
+      return null;
+    }catch(e){ return null; }
+  }
+  function isAuthenticated(){ return !!getAuthState(); }
+  function isAdminSession(){ return (getAuthState()?.role || "") === "admin"; }
+  function getCurrentUserLabel(){ return getAuthState()?.user || ""; }
+  function getCurrentVendor(){ return getAuthState()?.vendor || ""; }
+  function getCurrentCity(){ return getAuthState()?.city || ""; }
+  function currentDraftKey(){
+    const auth = getAuthState();
+    return `${LS_DRAFT}:${auth?.user || "guest"}`;
+  }
+  function populateLoginUsers(){
+    if(!loginUser) return;
+    const options = [["","Selecciona usuario"],["Admin","Admin"]];
+    Object.entries(SELLERS).forEach(([city, vendors])=>{
+      vendors.slice().sort((a,b)=> a.localeCompare(b, "es")).forEach(v=>{
+        options.push([v, `${city} · ${v}`]);
+      });
+    });
+    loginUser.innerHTML = "";
+    options.forEach(([value, label])=>{
+      const opt = document.createElement("option");
+      opt.value = value;
+      opt.textContent = label;
+      loginUser.appendChild(opt);
+    });
+  }
+  function updateSessionUi(){
+    const auth = getAuthState();
+    const locked = !auth;
+    document.body.classList.toggle("appLocked", locked);
+    document.body.classList.toggle("sellerSession", !!auth && auth.role === "seller");
+    document.body.classList.toggle("adminSession", !!auth && auth.role === "admin");
+    if(sellerProfileName) sellerProfileName.textContent = auth?.role === "seller" ? auth.vendor : "Selección administrativa";
+    if(sellerProfileCity){
+      const cityLabel = CITY_META.find(c=>c.code===auth?.city)?.label || auth?.city || "Todas las ciudades";
+      sellerProfileCity.textContent = cityLabel;
+    }
+    if(sessionBadge){
+      sessionBadge.textContent = auth ? `Sesión: ${auth.user}` : "Sesión: bloqueada";
+    }
+    if(sessionScope){
+      sessionScope.textContent = auth ? (auth.role === "admin" ? "Vista: Admin total" : `Vista: ${auth.city} · ${auth.vendor}`) : "Vista: general";
+    }
+    if(loginUser){
+      loginUser.value = auth?.user || "";
+    }
+    if(tabAdmin) tabAdmin.style.display = auth && auth.role === "admin" ? "" : "none";
+    if(btnQuote) btnQuote.style.display = auth && auth.role === "seller" ? "" : "none";
+    if(fabAdmin) fabAdmin.style.display = auth && auth.role === "admin" ? "" : "none";
+    if(citySelect && vendorSelect){
+      if(auth && auth.role === "seller"){
+        if(CITY_META.some(c=>c.code === auth.city)){
+          citySelect.value = auth.city;
+          fillVendors(auth.city);
+          if([...vendorSelect.options].some(o=>o.value===auth.vendor)) vendorSelect.value = auth.vendor;
+        }
+        citySelect.disabled = true;
+        vendorSelect.disabled = true;
+      }else{
+        citySelect.disabled = false;
+        vendorSelect.disabled = false;
+      }
+    }
+  }
+  function setAuth(payload){
+    try{
+      if(payload && payload.ok){
+        const raw = JSON.stringify(payload);
+        localStorage.setItem(AUTH_KEY, raw);
+        sessionStorage.setItem(AUTH_KEY, raw);
+      }else{
+        localStorage.removeItem(AUTH_KEY);
+        sessionStorage.removeItem(AUTH_KEY);
+      }
+    }catch(e){}
+    updateSessionUi();
+  }
+  function doLogin(){
+    const user = (loginUser?.value || "").trim();
+    const pass = (loginPass?.value || "").trim();
+    const profile = USER_ACCOUNTS[user];
+    const ok = !!profile && pass === AUTH_PASS;
+    setAuth(ok ? {ok:true, user, role:profile.role, city:profile.city, vendor:profile.vendor} : null);
+    if(loginError) loginError.classList.toggle("show", !ok);
+    if(ok){
+      if(loginPass) loginPass.value = "";
+      if(loginUser) loginUser.value = user;
+      location.hash = profile.role === "admin" ? "#/admin" : "#/";
+      enforceCurrentUserContext();
+      handleRoute();
+      const schedule = window.requestIdleCallback || ((fn)=>setTimeout(fn,800));
+      schedule(()=> profile.role === "admin" ? ensureAdminMap() : ensureCityMap());
+      toast("Acceso correcto");
+    }
+    return ok;
+  }
+  function doLogout(){
+    setAuth(null);
+    if(loginUser) loginUser.value = "";
+    if(loginPass) loginPass.value = "";
+    if(loginError) loginError.classList.remove("show");
+    location.hash = "#/";
+    setTimeout(()=> loginUser && loginUser.focus(), 50);
+  }
+
+  function todayISO(){
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth()+1).padStart(2,"0");
+    const dd = String(d.getDate()).padStart(2,"0");
+    return `${yyyy}-${mm}-${dd}`;
+  }
+  function escapeHtml(s){
+    return (s ?? "").toString()
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+  function fmtTime(ts){
+    if(!ts) return "—";
+    const d = new Date(ts);
+    return d.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+  }
+  function secToH(sec){ return (sec/3600).toFixed(1); }
+  function pct(n, total){
+    if(!total) return 0;
+    return Math.max(0, Math.min(100, Math.round((n/total)*100)));
+  }
+  function safeJsonParse(raw, fallback){
+    try{return JSON.parse(raw);}catch(e){return fallback;}
+  }
+
+  function toast(msg){
+    const el = document.createElement("div");
+    el.textContent = msg;
+    el.style.position="fixed";
+    el.style.left="50%";
+    el.style.bottom="18px";
+    el.style.transform="translateX(-50%)";
+    el.style.padding="12px 14px";
+    el.style.borderRadius="999px";
+    el.style.background="rgba(15,23,42,.92)";
+    el.style.color="#fff";
+    el.style.fontWeight="900";
+    el.style.fontSize="12px";
+    el.style.boxShadow="0 16px 40px rgba(0,0,0,.22)";
+    el.style.zIndex="999999";
+    document.body.appendChild(el);
+    setTimeout(()=>{ el.style.opacity="0"; el.style.transition="opacity .35s"; }, 1800);
+    setTimeout(()=>{ el.remove(); }, 2300);
+  }
+
+  // ===== Storage =====
+  const LS_KEY = "app_visitas_local_v1";
+  const LS_ACTIVE = "app_visitas_active_v3";
+  const SS_ACTIVE_LEGACY = "app_visitas_active_v1";
+  const LS_SYNC_QUEUE = "app_visitas_sync_queue_v1";
+  const LS_DRAFT = "app_visitas_draft_v2";
+
+  function uuid(){
+    return (crypto?.randomUUID?.() || ("id-" + Date.now() + "-" + Math.random().toString(16).slice(2)));
+  }
+  function loadAll(){
+    try{return JSON.parse(localStorage.getItem(LS_KEY) || "{}");}catch(e){return {};}
+  }
+  function saveAll(data){ localStorage.setItem(LS_KEY, JSON.stringify(data)); }
+  function loadDay(day){
+    const all = loadAll();
+    return Array.isArray(all[day]) ? all[day] : [];
+  }
+  function saveDay(day, arr){
+    const all = loadAll();
+    all[day] = arr;
+    saveAll(all);
+  }
+  function activeGet(){
+    try{
+      let raw = localStorage.getItem(LS_ACTIVE);
+      if(!raw){
+        raw = sessionStorage.getItem(SS_ACTIVE_LEGACY);
+        if(raw) localStorage.setItem(LS_ACTIVE, raw);
+      }
+      return JSON.parse(raw || "null");
+    }catch(e){ return null; }
+  }
+  function activeSet(obj){
+    const raw = JSON.stringify({...obj, saved_at:new Date().toISOString()});
+    localStorage.setItem(LS_ACTIVE, raw);
+    sessionStorage.setItem(SS_ACTIVE_LEGACY, raw);
+  }
+  function activeClear(){
+    localStorage.removeItem(LS_ACTIVE);
+    sessionStorage.removeItem(SS_ACTIVE_LEGACY);
+  }
+  function loadSyncQueue(){ return safeJsonParse(localStorage.getItem(LS_SYNC_QUEUE) || "[]", []); }
+  function saveSyncQueue(rows){ localStorage.setItem(LS_SYNC_QUEUE, JSON.stringify(Array.isArray(rows) ? rows : [])); }
+  function queueForSync(rec){
+    const q=loadSyncQueue();
+    if(!q.some(x=>x.id===rec.id)) q.push(rec);
+    saveSyncQueue(q);
+    return q.length;
+  }
+  async function flushSyncQueue(){
+    if(!cloudConfigured()) return 0;
+    const q=loadSyncQueue();
+    if(!q.length) return 0;
+    const pending=[];
+    let sent=0;
+    for(const rec of q){
+      try{ await cloudInsertVisit(rec); sent++; }
+      catch(e){ pending.push(rec); }
+    }
+    saveSyncQueue(pending);
+    if(pending.length) setCloudIndicator("warn", `Cloud: ${pending.length} pendiente(s)`);
+    else if(sent) setCloudIndicator("ok", "Cloud: sincronizado");
+    return sent;
+  }
+  function loadDraft(){
+    return safeJsonParse(localStorage.getItem(currentDraftKey()) || "{}", {});
+  }
+  function saveDraft(patch){
+    const next = {...loadDraft(), ...patch};
+    localStorage.setItem(currentDraftKey(), JSON.stringify(next));
+  }
+  function getRecentClients(city, vendor, limit=12){
+    const all = loadAll();
+    const items = [];
+    Object.values(all).forEach(dayArr=>{
+      (Array.isArray(dayArr) ? dayArr : []).forEach(r=>{
+        if((r.city||"")===city && (r.vendor||"")===vendor && (r.client||"").trim()){
+          items.push({client:(r.client||"").trim(), ts:r.end_ts || r.start_ts || ""});
+        }
+      });
+    });
+    const unique = new Map();
+    items.sort((a,b)=> String(b.ts).localeCompare(String(a.ts)));
+    items.forEach(x=>{
+      const key = x.client.toUpperCase();
+      if(!unique.has(key)) unique.set(key, x.client);
+    });
+    return [...unique.values()].slice(0, limit);
+  }
+  function fillRecentClients(city, vendor){
+    if(!recentClientSelect) return;
+    const recents = getRecentClients(city, vendor);
+    recentClientSelect.innerHTML = `<option value="">Selecciona un cliente reciente</option>`;
+    recents.forEach(name=>{
+      const opt = document.createElement("option");
+      opt.value = name;
+      opt.textContent = name;
+      recentClientSelect.appendChild(opt);
+    });
+  }
+
+  function ensureVendorClients(vendor){
+    if(Object.prototype.hasOwnProperty.call(CLIENTS_BY_VENDOR, vendor)) return Promise.resolve(CLIENTS_BY_VENDOR[vendor]);
+    const file = CLIENT_FILES[vendor];
+    if(!file){ CLIENTS_BY_VENDOR[vendor]=[]; return Promise.resolve([]); }
+    if(!CLIENT_LOAD_PROMISES[vendor]){
+      CLIENT_LOAD_PROMISES[vendor] = fetch(file, {cache:"force-cache"})
+        .then(r=>{ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+        .then(rows=>{ CLIENTS_BY_VENDOR[vendor]=Array.isArray(rows)?rows:[]; return CLIENTS_BY_VENDOR[vendor]; })
+        .catch(err=>{ console.warn("No se pudo cargar padrón", vendor, err); CLIENTS_BY_VENDOR[vendor]=[]; return []; });
+    }
+    return CLIENT_LOAD_PROMISES[vendor];
+  }
+  function getAssignedClients(vendor){
+    return Array.isArray(CLIENTS_BY_VENDOR[vendor]) ? CLIENTS_BY_VENDOR[vendor] : [];
+  }
+  function normalizeOrderText(value){
+    return (value || "").toString().trim().toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, " ");
+  }
+
+  function slugOrderText(value){
+    return normalizeOrderText(value)
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "");
+  }
+
+  function setOrderLinkState(mode, message, url=""){
+    if(!orderLinkBox) return;
+    const hasClient = !!((clientInput?.value || "").trim());
+    orderLinkBox.classList.toggle("show", hasClient);
+    orderLinkBox.classList.toggle("loading", mode === "loading");
+    orderLinkBox.classList.toggle("missing", mode === "missing");
+    CURRENT_ORDER_URL = url || "";
+    if(orderLinkStatus) orderLinkStatus.textContent = message || "";
+    if(orderLinkUrl) orderLinkUrl.textContent = url || "—";
+    if(orderLinkBadge){
+      orderLinkBadge.textContent = mode === "ready" ? "Liga disponible" : mode === "loading" ? "Buscando…" : mode === "missing" ? "Sin liga" : "Portal Toyo";
+    }
+    [btnOpenOrderLink, btnShareOrderLink, btnCopyOrderLink].forEach(btn=>{ if(btn) btn.disabled = !url; });
+  }
+
+  function getSelectedClientRecord(){
+    const vendor = vendorSelect?.value || "";
+    const name = (clientInput?.value || "").trim();
+    if(!name) return null;
+    return getAssignedClients(vendor).find(x=>normalizeOrderText(x.name) === normalizeOrderText(name)) || {name, code:""};
+  }
+
+  function chooseOrderEntry(candidates, vendor){
+    if(!Array.isArray(candidates) || !candidates.length) return null;
+    const sources = (CLIENTS_BY_VENDOR_SOURCES[vendor] || []).map(slugOrderText).filter(Boolean);
+    const exactFolder = candidates.find(x=>sources.includes(slugOrderText(x.vendor_folder)));
+    if(exactFolder) return exactFolder;
+    const exactLabel = candidates.find(x=>sources.includes(slugOrderText(x.vendor_label)));
+    if(exactLabel) return exactLabel;
+    return candidates[0];
+  }
+
+  function findOrderEntry(){
+    const rec = getSelectedClientRecord();
+    if(!rec) return null;
+    const vendor = vendorSelect?.value || "";
+    const code = (rec.code || "").toString().trim().toUpperCase();
+    if(code && ORDER_BY_CODE.has(code)) return chooseOrderEntry(ORDER_BY_CODE.get(code), vendor);
+    const nameKey = normalizeOrderText(rec.name);
+    if(nameKey && ORDER_BY_NAME.has(nameKey)) return chooseOrderEntry(ORDER_BY_NAME.get(nameKey), vendor);
+    return null;
+  }
+
+  function updateOrderLinkPanel(){
+    const client = (clientInput?.value || "").trim();
+    if(!client){
+      setOrderLinkState("idle", "Selecciona un cliente para localizar su formato de pedido.");
+      return;
+    }
+    if(!ORDER_INDEX_LOADED){
+      setOrderLinkState("loading", "La app ya está lista. Buscando la liga del pedido en segundo plano…");
+        return;
+    }
+    const entry = findOrderEntry();
+    if(!entry || !entry.path){
+      setOrderLinkState("missing", "Este cliente todavía no tiene una liga localizada en el Portal de Pedidos.");
+      return;
+    }
+    const full = new URL(entry.path, ORDER_PORTAL_BASE).href;
+    setOrderLinkState("ready", `Formato localizado${entry.client_code ? " · " + entry.client_code : ""}`, full);
+  }
+
+  async function loadOrderClientIndex(){
+    if(ORDER_INDEX_LOADED) return true;
+    if(ORDER_INDEX_PROMISE) return ORDER_INDEX_PROMISE;
+
+    ORDER_INDEX_PROMISE = (async()=>{
+      const controller = new AbortController();
+      const timeout = setTimeout(()=>controller.abort(), 15000);
+      try{
+        // Sin cache-busting: el navegador puede reutilizar clients.json en 4G.
+        const response = await fetch(ORDER_CLIENTS_URL, {
+          cache:"force-cache",
+          signal:controller.signal
+        });
+        if(!response.ok) throw new Error("HTTP " + response.status);
+        const data = await response.json();
+        ORDER_CLIENTS = Array.isArray(data) ? data : (Array.isArray(data.clients) ? data.clients : []);
+        ORDER_BY_CODE = new Map();
+        ORDER_BY_NAME = new Map();
+        ORDER_CLIENTS.forEach(item=>{
+          const code = (item.client_code || item.code || "").toString().trim().toUpperCase();
+          const name = normalizeOrderText(item.client_name || item.client || "");
+          if(code){
+            if(!ORDER_BY_CODE.has(code)) ORDER_BY_CODE.set(code, []);
+            ORDER_BY_CODE.get(code).push(item);
+          }
+          if(name){
+            if(!ORDER_BY_NAME.has(name)) ORDER_BY_NAME.set(name, []);
+            ORDER_BY_NAME.get(name).push(item);
+          }
+        });
+        ORDER_INDEX_LOADED = true;
+        updateOrderLinkPanel();
+        return true;
+      }catch(error){
+        ORDER_CLIENTS = [];
+        ORDER_INDEX_LOADED = false;
+        if((clientInput?.value || "").trim()){
+          setOrderLinkState("missing", "No se pudo consultar el Portal de Pedidos. La visita sí puede registrarse; intenta la liga cuando mejore la señal.");
+        }
+        return false;
+      }finally{
+        clearTimeout(timeout);
+        ORDER_INDEX_PROMISE = null;
+      }
+    })();
+
+    return ORDER_INDEX_PROMISE;
+  }
+
+  async function copyOrderLink(){
+    if(!CURRENT_ORDER_URL) return;
+    try{
+      await navigator.clipboard.writeText(CURRENT_ORDER_URL);
+    }catch(e){
+      const ta=document.createElement("textarea");
+      ta.value=CURRENT_ORDER_URL;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+    }
+    toast("Liga de pedido copiada");
+  }
+
+  function openQuoteTool(){
+    const auth = getAuthState();
+    if(!auth || auth.role !== "seller"){
+      toast("El cotizador está disponible para vendedores.");
+      return;
+    }
+    const rec = getSelectedClientRecord();
+    const url = new URL("cotizador.html", window.location.href);
+    url.searchParams.set("from", "visitas");
+    url.searchParams.set("seller", auth.vendor || auth.user || "");
+    url.searchParams.set("city", auth.city || "");
+    if(rec?.code) url.searchParams.set("clientCode", rec.code);
+    if(rec?.name) url.searchParams.set("clientName", rec.name);
+    const opened = window.open(url.href, "_blank");
+    if(!opened) window.location.href = url.href;
+  }
+
+  function openOrderLink(){
+    if(!CURRENT_ORDER_URL) return;
+    window.open(CURRENT_ORDER_URL, "_blank", "noopener");
+  }
+
+  async function shareOrderLink(){
+    if(!CURRENT_ORDER_URL) return;
+    const rec = getSelectedClientRecord();
+    const name = rec?.name || "cliente";
+    const code = rec?.code ? ` (${rec.code})` : "";
+    const title = `Pedido Toyo Foods · ${name}`;
+    const text = `Hola, te comparto tu liga de pedido Toyo Foods para ${name}${code}: ${CURRENT_ORDER_URL}`;
+    if(navigator.share){
+      try{
+        await navigator.share({title, text, url:CURRENT_ORDER_URL});
+        return;
+      }catch(e){ if(e && e.name === "AbortError") return; }
+    }
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener");
+  }
+
+  function updateClientCodeMeta(){
+    if(!clientCodeMeta) return;
+    const vendor = vendorSelect?.value || "";
+    const typed = (clientInput?.value || "").trim().toUpperCase();
+    const match = getAssignedClients(vendor).find(x=> (x.name || "").trim().toUpperCase() === typed);
+    if(match){
+      clientCodeMeta.textContent = match.code ? `Cliente del padrón · Código ${match.code}` : "Cliente del padrón";
+    }else if(typed){
+      clientCodeMeta.textContent = "Cliente seleccionado fuera del padrón.";
+    }else{
+      clientCodeMeta.textContent = "Selecciona un cliente de tu padrón.";
+    }
+    updateOrderLinkPanel();
+  }
+  function fillAssignedClients(city, vendor){
+    if(!assignedClientSelect) return;
+    if(!Object.prototype.hasOwnProperty.call(CLIENTS_BY_VENDOR, vendor)){
+      assignedClientSelect.innerHTML = `<option value="">Cargando clientes asignados…</option>`;
+      assignedClientSelect.disabled = true;
+      ensureVendorClients(vendor).then(()=>{
+        assignedClientSelect.disabled = false;
+        if(vendorSelect.value===vendor) fillAssignedClients(citySelect.value, vendorSelect.value);
+      });
+      return;
+    }
+    assignedClientSelect.disabled = false;
+    const allClients = getAssignedClients(vendor);
+    const query = (clientSearchInput?.value || "").trim().toUpperCase();
+    const clients = query
+      ? allClients.filter(item => (item.name || "").toUpperCase().includes(query) || (item.code || "").toUpperCase().includes(query))
+      : allClients;
+    const current = clientInput?.value || "";
+    assignedClientSelect.innerHTML = `<option value="">Selecciona un cliente de tu padrón</option>`;
+    clients.forEach(item=>{
+      const opt = document.createElement("option");
+      opt.value = item.name;
+      opt.textContent = item.code ? `${item.name} · ${item.code}` : item.name;
+      opt.dataset.code = item.code || "";
+      assignedClientSelect.appendChild(opt);
+    });
+    const other = document.createElement("option");
+    other.value = "__OTHER__";
+    other.textContent = "Otro cliente o prospecto";
+    assignedClientSelect.appendChild(other);
+    if(current && clients.some(x=>x.name===current)) assignedClientSelect.value=current;
+    updateClientCodeMeta();
+  }
+  function getClientHistory(vendor, client, limit=5){
+    const all = loadAll();
+    const target = (client || "").trim().toUpperCase();
+    if(!target || !vendor) return [];
+    const hits = [];
+    Object.values(all).forEach(dayArr=>{
+      (Array.isArray(dayArr) ? dayArr : []).forEach(r=>{
+        if((r.vendor||"")===vendor && ((r.client||"").trim().toUpperCase()===target)){
+          hits.push(r);
+        }
+      });
+    });
+    hits.sort((a,b)=> String(b.end_ts || b.start_ts || "").localeCompare(String(a.end_ts || a.start_ts || "")));
+    return hits.slice(0, limit);
+  }
+  function renderClientHistory(){
+    if(!clientHistoryList || !clientHistoryEmpty) return;
+    const vendor = vendorSelect?.value || "";
+    const client = (clientInput?.value || "").trim();
+    if(!client){
+      clientHistoryList.innerHTML = "";
+      clientHistoryEmpty.style.display = "";
+      clientHistoryEmpty.textContent = "Selecciona o escribe un cliente para ver las últimas visitas registradas en este dispositivo.";
+      return;
+    }
+    const hits = getClientHistory(vendor, client, 5);
+    if(!hits.length){
+      clientHistoryList.innerHTML = "";
+      clientHistoryEmpty.style.display = "";
+      clientHistoryEmpty.textContent = "No hay historial local para este cliente todavía.";
+      return;
+    }
+    clientHistoryEmpty.style.display = "none";
+    clientHistoryList.innerHTML = hits.map(r=>{
+      return `
+        <div class="compactItem">
+          <div class="name">${escapeHtml(r.client||"—")}</div>
+          <div class="meta">${escapeHtml(r.day||"")} · ${fmtTime(r.start_ts)} - ${fmtTime(r.end_ts)} · ${escapeHtml(r.type||"—")}</div>
+          ${r.notes ? `<div class="meta" style="margin-top:6px">${escapeHtml(r.notes)}</div>` : ""}
+        </div>
+      `;
+    }).join("");
+  }
+  function enforceCurrentUserContext(){
+    updateSessionUi();
+    if(isAuthenticated()){
+      fillRecentClients(citySelect.value, vendorSelect.value);
+      fillAssignedClients(citySelect.value, vendorSelect.value);
+      renderClientHistory();
+      renderPromotions();
+    }
+  }
+
+  // ===== Cloud (Supabase REST) =====
+  function cloudConfigured(){
+    return !!(SUPABASE_URL && SUPABASE_URL.startsWith("http") && SUPABASE_ANON_KEY && SUPABASE_ANON_KEY.length>20);
+  }
+  function sbUrl(path){ return SUPABASE_URL.replace(/\/+$/,"") + path; }
+
+  async function sbFetch(path, {method="GET", body=null, headers={}}={}){
+    const h = {
+      "apikey": SUPABASE_ANON_KEY,
+      "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+      ...headers
+    };
+    const opts = { method, headers: h };
+    if(body!=null){
+      opts.headers["Content-Type"] = "application/json";
+      opts.body = JSON.stringify(body);
+    }
+    const res = await fetch(sbUrl(path), opts);
+    const txt = await res.text().catch(()=> "");
+    if(!res.ok){
+      let msg = (txt || `HTTP ${res.status}`).trim();
+      try{
+        const j = JSON.parse(msg);
+        msg = j.message || j.error_description || msg;
+        if(j.code) msg += ` (code ${j.code})`;
+        if(j.details) msg += ` · ${j.details}`;
+      }catch(e){}
+      throw new Error(msg);
+    }
+    if(!txt || !txt.trim()) return null;
+    try{ return JSON.parse(txt); }catch(e){ return txt; }
+  }
+
+  async function cloudTest(){
+    if(!cloudConfigured()) throw new Error("Cloud no configurado (SUPABASE_URL / ANON_KEY)");
+    const path = `/rest/v1/${encodeURIComponent(SUPABASE_TABLE)}?select=id&limit=1`;
+    await sbFetch(path);
+    return true;
+  }
+
+  async function cloudInsertVisit(rec){
+    const path = `/rest/v1/${encodeURIComponent(SUPABASE_TABLE)}`;
+    await sbFetch(path, {
+      method: "POST",
+      headers: { "Prefer": "return=minimal" },
+      body: rec
+    });
+  }
+
+  function setCloudIndicator(state, text){
+    cloudStatus.textContent = text;
+    if(state==="ok"){
+      cloudDot.style.background="var(--good)";
+      cloudDot.style.boxShadow="0 0 0 4px rgba(34,197,94,.18)";
+    }else if(state==="warn"){
+      cloudDot.style.background="var(--warn)";
+      cloudDot.style.boxShadow="0 0 0 4px rgba(245,158,11,.18)";
+    }else{
+      cloudDot.style.background="var(--bad)";
+      cloudDot.style.boxShadow="0 0 0 4px rgba(239,68,68,.18)";
+    }
+  }
+
+  // ===== Mapa bajo demanda (no bloquea la apertura en 4G) =====
+  const hasLeaflet = ()=> (typeof window.L !== "undefined");
+  let mapCity=null, mapAdmin=null, layerCity=null, layerAdmin=null;
+  let leafletPromise=null;
+
+  function loadStylesheet(url){
+    return new Promise((resolve)=>{
+      const existing=[...document.styleSheets].some(s=> (s.href||"").includes("leaflet"));
+      if(existing){ resolve(true); return; }
+      const link=document.createElement("link");
+      link.rel="stylesheet";
+      link.href=url;
+      link.onload=()=>resolve(true);
+      link.onerror=()=>resolve(false);
+      document.head.appendChild(link);
+      setTimeout(()=>resolve(false),7000);
+    });
+  }
+
+  function loadScript(url){
+    return new Promise((resolve)=>{
+      const script=document.createElement("script");
+      script.src=url;
+      script.async=true;
+      script.onload=()=>resolve(true);
+      script.onerror=()=>resolve(false);
+      document.head.appendChild(script);
+      setTimeout(()=>resolve(false),7000);
+    });
+  }
+
+  async function loadLeaflet(){
+    if(hasLeaflet()) return true;
+    if(leafletPromise) return leafletPromise;
+
+    leafletPromise=(async()=>{
+      const sources=[
+        {
+          css:"https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css",
+          js:"https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"
+        },
+        {
+          css:"https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
+          js:"https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        }
+      ];
+      for(const source of sources){
+        await loadStylesheet(source.css);
+        const ok=await loadScript(source.js);
+        if(ok && hasLeaflet()) return true;
+      }
+      return false;
+    })();
+
+    const ok=await leafletPromise;
+    if(!ok) leafletPromise=null;
+    return ok;
+  }
+
+  function showMapFallback(target, message){
+    const mapEl=$("#"+target);
+    const fallback=$("#"+target+"Fallback");
+    if(mapEl) mapEl.style.display="none";
+    if(fallback){
+      fallback.style.display="";
+      fallback.innerHTML=message || "Mapa no disponible con esta conexión.<br>La captura, el GPS y el guardado siguen funcionando.";
+    }
+  }
+
+  async function ensureCityMap(){
+    if(!isAuthenticated()){
+      const mapEl=$("#mapCity");
+      const fallback=$("#mapCityFallback");
+      if(mapEl) mapEl.style.display="none";
+      if(fallback) fallback.style.display="none";
+      return;
+    }
+    if(!hasLeaflet()){
+      showMapFallback("mapCity", "Cargando mapa en segundo plano…<br>La app ya puede usarse.");
+      const ok=await loadLeaflet();
+      if(!ok){
+        showMapFallback("mapCity", "Mapa no disponible con esta red.<br>La captura, ubicación y guardado siguen funcionando.");
+        return;
+      }
+    }
+    $("#mapCity").style.display="";
+    $("#mapCityFallback").style.display="none";
+    if(!mapCity){
+      mapCity = L.map("mapCity", { zoomControl:true });
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom:19,
+        attribution:'&copy; OpenStreetMap',
+        updateWhenIdle:true,
+        keepBuffer:1
+      }).addTo(mapCity);
+      layerCity = L.layerGroup().addTo(mapCity);
+      mapCity.setView([20.6736, -103.344], 11);
+    }
+    setTimeout(()=>mapCity && mapCity.invalidateSize(),80);
+  }
+
+  async function ensureAdminMap(){
+    if(!isAuthenticated() || !isAdminSession()) return;
+    if(!hasLeaflet()){
+      showMapFallback("mapAdmin", "Cargando mapa en segundo plano…<br>Admin ya puede usarse.");
+      const ok=await loadLeaflet();
+      if(!ok){
+        showMapFallback("mapAdmin", "Mapa no disponible con esta red.<br>Filtros, ranking y exportación siguen funcionando.");
+        return;
+      }
+    }
+    $("#mapAdmin").style.display="";
+    $("#mapAdminFallback").style.display="none";
+    if(!mapAdmin){
+      mapAdmin = L.map("mapAdmin", { zoomControl:true });
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom:19,
+        attribution:'&copy; OpenStreetMap',
+        updateWhenIdle:true,
+        keepBuffer:1
+      }).addTo(mapAdmin);
+      layerAdmin = L.layerGroup().addTo(mapAdmin);
+      mapAdmin.setView([23.6345, -102.5528], 5);
+    }
+    setTimeout(()=>mapAdmin && mapAdmin.invalidateSize(),80);
+  }
+
+  function clearLayer(layer){ if(layer) layer.clearLayers(); }
+
+  function plotRoute(layer, recs){
+    if(!hasLeaflet() || !layer) return [];
+    clearLayer(layer);
+    const pts=[];
+    recs.forEach(r=>{
+      const lat = (r.end_lat ?? r.start_lat);
+      const lng = (r.end_lng ?? r.start_lng);
+      if(typeof lat==="number" && typeof lng==="number"){
+        pts.push([lat,lng]);
+        const label = `<b>${escapeHtml(r.client || "—")}</b><br>${escapeHtml(r.city)} · ${escapeHtml(r.vendor||"—")}<br>${escapeHtml(r.type||"—")}<br><span style="color:#64748b">${fmtTime(r.start_ts)} - ${fmtTime(r.end_ts)}</span>`;
+        L.marker([lat,lng]).bindPopup(label).addTo(layer);
+      }
+    });
+    if(pts.length>=2) L.polyline(pts).addTo(layer);
+    return pts;
+  }
+
+  function fitToPoints(map, pts){
+    if(!hasLeaflet() || !map || !pts || !pts.length) return;
+    if(pts.length===1){ map.setView(pts[0], 15); return; }
+    map.fitBounds(L.latLngBounds(pts).pad(0.2));
+  }
+
+  // ===== Geolocation =====
+  function getPos(){
+    return new Promise((resolve, reject)=>{
+      if(!navigator.geolocation) return reject(new Error("Tu dispositivo no soporta GPS."));
+      navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy:true, timeout:15000, maximumAge:10000 });
+    });
+  }
+  function setLastLoc(pos){
+    const lat = pos?.coords?.latitude;
+    const lng = pos?.coords?.longitude;
+    if(typeof lat==="number" && typeof lng==="number"){
+      lastLoc.textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+    }
+  }
+
+  // ===== Select Fillers =====
+  function fillCity(){
+    citySelect.innerHTML="";
+    CITY_META.forEach(c=>{
+      const opt=document.createElement("option");
+      opt.value=c.code; opt.textContent=c.label;
+      citySelect.appendChild(opt);
+    });
+  }
+  function fillVendors(city){
+    vendorSelect.innerHTML="";
+    (SELLERS[city]||[]).forEach(v=>{
+      const opt=document.createElement("option");
+      opt.value=v; opt.textContent=v;
+      vendorSelect.appendChild(opt);
+    });
+  }
+  function fillTypes(){
+    typeSelect.innerHTML="";
+    VISIT_TYPES.forEach(t=>{
+      const opt=document.createElement("option");
+      opt.value=t; opt.textContent=t;
+      typeSelect.appendChild(opt);
+    });
+  }
+  function cityLabel(code){
+    const key = normalizeCity(code || "ALL");
+    const found = CITY_META.find(c=>c.code===key);
+    if(found) return found.label;
+    if(key === "ALL") return "Todas";
+    return key;
+  }
+
+  function defaultAnnouncementTitle(city, vendor){
+    const cityTxt = cityLabel(city || "ALL");
+    if(vendor && vendor !== "ALL") return `Comunicado · ${cityTxt} · ${vendor}`;
+    if(city && city !== "ALL") return `Comunicado · ${cityTxt}`;
+    return "Comunicado general";
+  }
+
+  function syncAnnouncementTitle(force=false){
+    if(!msgTitle) return;
+    const nextAuto = defaultAnnouncementTitle(msgCity?.value || "ALL", msgVendor?.value || "ALL");
+    const current = (msgTitle.value || "").trim();
+    const lastAuto = msgTitle.dataset.autoTitle || "";
+    msgTitle.placeholder = nextAuto;
+    if(force || !current || current === lastAuto){
+      msgTitle.value = nextAuto;
+    }
+    msgTitle.dataset.autoTitle = nextAuto;
+  }
+
+  // Admin options
+  function refreshAdminCityOptions(){
+    const seen = new Set([...adminCity.options].map(o=>o.value));
+    CITY_META.forEach(c=>{
+      if(!seen.has(c.code)){
+        const opt=document.createElement("option");
+        opt.value=c.code; opt.textContent=c.label;
+        adminCity.appendChild(opt);
+      }
+    });
+    // for messages selectors
+    const seen2 = new Set([...msgCity.options].map(o=>o.value));
+    CITY_META.forEach(c=>{
+      if(!seen2.has(c.code)){
+        const opt=document.createElement("option");
+        opt.value=c.code; opt.textContent=c.label;
+        msgCity.appendChild(opt);
+      }
+    });
+  }
+
+  function refreshAdminVendorOptions(){
+    const city = adminCity.value || "ALL";
+    const prev = adminVendor.value || "ALL";
+    adminVendor.innerHTML = `<option value="ALL">Todos</option>`;
+    let vendors=[];
+    if(city==="ALL") vendors = [...new Set(Object.values(SELLERS).flat())].sort();
+    else vendors = (SELLERS[city]||[]).slice().sort();
+    vendors.forEach(v=>{
+      const opt=document.createElement("option");
+      opt.value=v; opt.textContent=v;
+      adminVendor.appendChild(opt);
+    });
+    [...adminVendor.options].some(o=>o.value===prev) && (adminVendor.value=prev);
+
+    // msg vendor
+    const msgCitySelected = (msgCity && msgCity.value) ? msgCity.value : city;
+    const prev2 = msgVendor.value || "ALL";
+    msgVendor.innerHTML = `<option value="ALL">Todos</option>`;
+    const mv = (msgCitySelected==="ALL") ? [...new Set(Object.values(SELLERS).flat())].sort() : (SELLERS[msgCitySelected]||[]).slice().sort();
+    mv.forEach(v=>{
+      const opt=document.createElement("option");
+      opt.value=v; opt.textContent=v;
+      msgVendor.appendChild(opt);
+    });
+    [...msgVendor.options].some(o=>o.value===prev2) && (msgVendor.value=prev2);
+    syncAnnouncementTitle();
+  }
+
+
+  function renderPromotions(){
+    if(!promotionsCard || !promotionsGrid) return;
+    const city = (citySelect?.value || "").toUpperCase();
+    const promos = [...(PROMOTIONS_BY_CITY.ALL || []), ...(PROMOTIONS_BY_CITY[city] || [])];
+    if(!promos.length){
+      promotionsCard.classList.remove("visible");
+      promotionsCard.style.display = "none";
+      promotionsGrid.innerHTML = "";
+      return;
+    }
+    promotionsCard.style.display = "";
+    promotionsCard.classList.add("visible");
+    if(promotionsScope) promotionsScope.textContent = "Todas las ciudades";
+    if(promotionsHint) promotionsHint.textContent = "Promoción vigente para el equipo comercial.";
+    promotionsGrid.innerHTML = promos.map(p => `
+      <article class="promoCard">
+        <div class="promoMedia">
+          <img src="${p.img}" alt="${escapeHtml(p.title)}" loading="lazy" />
+        </div>
+        <div class="promoBody">
+          <h3 class="promoTitle">${escapeHtml(p.title)}</h3>
+          <p class="promoText">${escapeHtml(p.text)}</p>
+          ${p.sub ? `<div class="promoSub">${escapeHtml(p.sub)}</div>` : ""}
+        </div>
+      </article>
+    `).join("");
+  }
+
+  // ===== Render City =====
+  function renderCity(){
+    const day = todayISO();
+    kpiDate.textContent = day;
+    let recs = loadDay(day);
+    const auth = getAuthState();
+    if(auth && auth.role === "seller"){
+      recs = recs.filter(r=> normalizeCity(r.city)===auth.city && (r.vendor||"")===auth.vendor);
+    }
+    const selectedCity = citySelect.value || "GDL";
+    const selectedVendor = vendorSelect.value || "";
+
+    const total = recs.filter(r => (r.city||"")===selectedCity && (selectedVendor ? (r.vendor||"")===selectedVendor : true)).length;
+    const sellerRecs = recs.filter(r => (r.city||"")===selectedCity && (selectedVendor ? (r.vendor||"")===selectedVendor : true));
+    const totalSec = sellerRecs.reduce((a,r)=> a + (r.duration_sec || 0), 0);
+    const clients = new Set(sellerRecs.map(r=>(r.client||"").trim()).filter(Boolean)).size;
+    const goal = pct(total, 5);
+
+    kpiCount.textContent = total;
+    kpiHours.textContent = secToH(totalSec);
+    kpiClients.textContent = clients;
+    if(kpiGoal) kpiGoal.textContent = `${goal}%`;
+    if(heroVisits) heroVisits.textContent = `${total} / 5`;
+    if(goalPct) goalPct.textContent = `${goal}%`;
+    if(goalBar) goalBar.style.width = `${goal}%`;
+    if(heroMessage){
+      heroMessage.textContent = total >= 5
+        ? "Meta diaria cumplida. Puedes seguir registrando para superar el objetivo."
+        : `Te faltan ${Math.max(0, 5-total)} visita(s) para llegar a tu meta de hoy.`;
+    }
+
+    fillRecentClients(selectedCity, selectedVendor);
+    renderPromotions();
+
+    listCity.innerHTML="";
+    if(total===0){
+      listCity.innerHTML = `<div class="item"><div class="meta">Aún no hay visitas registradas hoy para este vendedor.</div></div>`;
+    }else{
+      sellerRecs.slice().sort((a,b)=> (a.start_ts||0)-(b.start_ts||0)).forEach(r=>{
+        const el=document.createElement("div");
+        el.className="item";
+        const dur = r.duration_sec ? Math.round(r.duration_sec/60) + " min" : "—";
+        el.innerHTML = `
+          <div class="top">
+            <div>
+              <div class="name">${escapeHtml(r.client||"—")}</div>
+              <div class="meta">${escapeHtml(r.city)} · ${escapeHtml(r.vendor||"—")} · ${fmtTime(r.start_ts)} - ${fmtTime(r.end_ts)} · ${dur}</div>
+            </div>
+            <span class="chip" title="${escapeHtml(r.type||"—")}">${escapeHtml(r.type||"—")}</span>
+          </div>
+          ${r.notes ? `<div class="meta wrapText" style="margin-top:8px">${escapeHtml(r.notes)}</div>` : ""}`;
+        listCity.appendChild(el);
+      });
+    }
+
+    ensureCityMap();
+    if(hasLeaflet()){
+      const pts = plotRoute(layerCity, sellerRecs.slice().sort((a,b)=> (a.start_ts||0)-(b.start_ts||0)));
+      fitToPoints(mapCity, pts);
+    }
+
+    const act = activeGet();
+    if(act && act.start_ts){
+      visitState.textContent = `En visita desde ${fmtTime(act.start_ts)} · ${act.city} · ${act.vendor||"—"}`;
+      btnStart.disabled=true; btnEnd.disabled=false;
+      if(visitProtect){ visitProtect.classList.add("active"); }
+      if(visitProtectTitle) visitProtectTitle.textContent = "Visita activa protegida";
+      if(visitProtectText) visitProtectText.textContent = `${act.client || "Cliente"} · iniciada ${fmtTime(act.start_ts)}. Puedes cerrar la app y continuar después.`;
+    }else{
+      visitState.textContent="Sin visita activa";
+      btnStart.disabled=false; btnEnd.disabled=true;
+      if(visitProtect){ visitProtect.classList.remove("active"); }
+      if(visitProtectTitle) visitProtectTitle.textContent = "Registro protegido";
+      if(visitProtectText) visitProtectText.textContent = "El formulario y la visita activa se guardan automáticamente en este dispositivo.";
+    }
+  }
+
+  // ===== Admin Apply (rango) =====
+  function normalizeCity(c){
+    const x = (c||"").toString().trim().toUpperCase();
+    if(x.includes("GUADALAJARA")) return "GDL";
+    if(x.includes("MONTERREY")) return "MTY";
+    if(x.includes("MEXICO") || x.includes("MÉXICO")) return "CDMX";
+    if(x.includes("AGUASCALIENTES")) return "AGS";
+    if(x.includes("PUEBLA")) return "PUE";
+    if(x.includes("QUERETARO") || x.includes("QUERÉTARO")) return "QRO";
+    if(["GDL","MTY","CDMX","AGS","PUE","QRO"].includes(x)) return x;
+    return x;
+  }
+
+  function rangeDays(from, to){
+    const a = new Date(from + "T00:00:00");
+    const b = new Date(to + "T00:00:00");
+    if(isNaN(a)||isNaN(b)) return [];
+    const out=[];
+    const step = (d)=> new Date(d.getTime() + 24*3600*1000);
+    for(let d=a; d<=b; d=step(d)){
+      out.push(d.toISOString().slice(0,10));
+    }
+    return out;
+  }
+
+  function monthBoundsFrom(dayStr){
+    const src = (dayStr || todayISO()) + "T00:00:00";
+    const d = new Date(src);
+    if(isNaN(d)) return {from: todayISO(), to: todayISO()};
+    const y = d.getFullYear();
+    const m = d.getMonth();
+    const start = new Date(y, m, 1);
+    const end = new Date(y, m + 1, 0);
+    const fmt = (x)=> `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}-${String(x.getDate()).padStart(2,"0")}`;
+    return { from: fmt(start), to: fmt(end) };
+  }
+
+  function weekBoundsFrom(dayStr){
+    const src = (dayStr || todayISO()) + "T00:00:00";
+    const d = new Date(src);
+    if(isNaN(d)) return {from: todayISO(), to: todayISO()};
+    const day = d.getDay(); // 0=domingo, 1=lunes
+    const diffToMonday = day === 0 ? -6 : 1 - day;
+    const start = new Date(d);
+    start.setDate(d.getDate() + diffToMonday);
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
+    const fmt = (x)=> `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}-${String(x.getDate()).padStart(2,"0")}`;
+    return { from: fmt(start), to: fmt(end) };
+  }
+
+  async function fetchCloudRange(from, to){
+    const cols = [
+      "id","day","city","vendor","client","type","notes",
+      "start_ts","end_ts","duration_sec",
+      "start_lat","start_lng","end_lat","end_lng",
+      "created_at"
+    ].join(",");
+    const qs = [
+      `select=${cols}`,
+      `day=gte.${from}`,
+      `day=lte.${to}`,
+      "order=start_ts.asc.nullslast",
+      "limit=5000"
+    ].join("&");
+    const path = `/rest/v1/${encodeURIComponent(SUPABASE_TABLE)}?` + qs;
+    const rows = await sbFetch(path);
+    return Array.isArray(rows) ? rows : [];
+  }
+
+  function loadLocalRange(from, to){
+    const days = rangeDays(from, to);
+    const out=[];
+    days.forEach(d=>{
+      out.push(...loadDay(d));
+    });
+    return out;
+  }
+
+  async function applyAdmin(){
+    const from = adminFrom.value || todayISO();
+    const to = adminTo.value || from;
+    const city = adminCity.value || "ALL";
+    const vendor = adminVendor.value || "ALL";
+    const source = adminSource.value || "LOCAL";
+
+    let base=[];
+    let weekBase=[];
+    let monthBase=[];
+    const refDay = to || from || todayISO();
+    const weekRange = weekBoundsFrom(refDay);
+    const monthRange = monthBoundsFrom(refDay);
+
+    if(source==="CLOUD"){
+      if(!cloudConfigured()){
+        toast("Cloud no configurado. Cambiando a Local.");
+        adminSource.value="LOCAL";
+        base = loadLocalRange(from, to);
+        weekBase = loadLocalRange(weekRange.from, weekRange.to);
+        monthBase = loadLocalRange(monthRange.from, monthRange.to);
+      }else{
+        try{
+          base = await fetchCloudRange(from, to);
+          weekBase = await fetchCloudRange(weekRange.from, weekRange.to);
+          monthBase = await fetchCloudRange(monthRange.from, monthRange.to);
+        }catch(e){
+          toast("Cloud falló. Mostrando Local.");
+          adminSource.value="LOCAL";
+          base = loadLocalRange(from, to);
+          weekBase = loadLocalRange(weekRange.from, weekRange.to);
+          monthBase = loadLocalRange(monthRange.from, monthRange.to);
+        }
+      }
+    }else{
+      base = loadLocalRange(from, to);
+      weekBase = loadLocalRange(weekRange.from, weekRange.to);
+      monthBase = loadLocalRange(monthRange.from, monthRange.to);
+    }
+
+    base = base.map(r=>({...r, city: normalizeCity(r.city)}));
+    weekBase = weekBase.map(r=>({...r, city: normalizeCity(r.city)}));
+    monthBase = monthBase.map(r=>({...r, city: normalizeCity(r.city)}));
+    let recs = base.slice();
+
+    if(city!=="ALL") recs = recs.filter(r=>normalizeCity(r.city)===city);
+    if(vendor!=="ALL") recs = recs.filter(r=>(r.vendor||"")===vendor);
+
+    // KPIs
+    adminKpiCount.textContent = recs.length;
+    adminKpiHours.textContent = secToH(recs.reduce((a,r)=>a+(r.duration_sec||0),0));
+    adminKpiClients.textContent = new Set(recs.map(r=>(r.client||"").trim()).filter(Boolean)).size;
+
+    const byCity={GDL:0, MTY:0, CDMX:0, AGS:0};
+    base.forEach(r=>{ const c=normalizeCity(r.city); if(byCity[c]!==undefined) byCity[c]++; });
+    adminKpiGDL.textContent = byCity.GDL;
+    adminKpiMTY.textContent = byCity.MTY;
+    adminKpiCDMX.textContent = byCity.CDMX;
+    if(adminKpiAGS) adminKpiAGS.textContent = byCity.AGS;
+
+    // Badge
+    if(adminSourceLbl && adminDot){
+      const isCloud = (adminSource.value==="CLOUD" && cloudConfigured());
+      adminSourceLbl.textContent = isCloud ? "Admin: Cloud" : "Admin: Local";
+      adminDot.style.background = isCloud ? "var(--good)" : "#3b82f6";
+      adminDot.style.boxShadow = isCloud ? "0 0 0 4px rgba(34,197,94,.18)" : "0 0 0 4px rgba(59,130,246,.18)";
+    }
+
+    // List
+    listAdmin.innerHTML="";
+    if(!recs.length){
+      listAdmin.innerHTML = `<div class="item"><div class="meta">No hay registros con esos filtros.</div></div>`;
+    }else{
+      recs.slice().sort((a,b)=> (a.start_ts||0)-(b.start_ts||0)).forEach(r=>{
+        const el=document.createElement("div");
+        el.className="item";
+        const dur = r.duration_sec ? Math.round(r.duration_sec/60) + " min" : "—";
+        el.innerHTML = `
+          <div class="top">
+            <div>
+              <div class="name">${escapeHtml(r.client||"—")}</div>
+              <div class="meta">${escapeHtml(normalizeCity(r.city))} · ${escapeHtml(r.vendor||"—")} · ${r.day||""} · ${fmtTime(r.start_ts)} - ${fmtTime(r.end_ts)} · ${dur}</div>
+            </div>
+            <span class="chip" title="${escapeHtml(r.type||"—")}">${escapeHtml(r.type||"—")}</span>
+          </div>
+          ${r.notes ? `<div class="meta wrapText" style="margin-top:8px">${escapeHtml(r.notes)}</div>` : ""}`;
+        listAdmin.appendChild(el);
+      });
+    }
+
+    // Map
+    ensureAdminMap();
+    if(hasLeaflet()){
+      const pts = plotRoute(layerAdmin, recs.slice().sort((a,b)=> (a.start_ts||0)-(b.start_ts||0)));
+      fitToPoints(mapAdmin, pts);
+      setTimeout(()=>mapAdmin && mapAdmin.invalidateSize(), 50);
+    }
+
+// Ranking with type breakdown + weekly/monthly goals
+const weekScoped = weekBase.filter(r=>{
+  if(city!=="ALL" && normalizeCity(r.city)!==city) return false;
+  if(vendor!=="ALL" && (r.vendor||"")!==vendor) return false;
+  return true;
+});
+
+const monthScoped = monthBase.filter(r=>{
+  if(city!=="ALL" && normalizeCity(r.city)!==city) return false;
+  if(vendor!=="ALL" && (r.vendor||"")!==vendor) return false;
+  return true;
+});
+
+const weekCounts = {};
+weekScoped.forEach(r=>{
+  const v = (r.vendor||"—");
+  weekCounts[v] = (weekCounts[v]||0) + 1;
+});
+
+const monthCounts = {};
+monthScoped.forEach(r=>{
+  const v = (r.vendor||"—");
+  monthCounts[v] = (monthCounts[v]||0) + 1;
+});
+
+const byVendor = {};
+recs.forEach(r=>{
+  const v = (r.vendor||"—");
+  if(!byVendor[v]) byVendor[v] = {count:0, types:{}, notes:[]};
+  byVendor[v].count++;
+  const t=(r.type||"—");
+  byVendor[v].types[t]=(byVendor[v].types[t]||0)+1;
+  if(r.notes) byVendor[v].notes.push(`• ${r.client||"—"} (${r.day||""}) · ${r.type||"—"} — ${r.notes}`);
+});
+
+[...new Set([...Object.keys(weekCounts), ...Object.keys(monthCounts)])].forEach(v=>{
+  if(!byVendor[v]) byVendor[v] = {count:0, types:{}, notes:[]};
+});
+
+const list = Object.entries(byVendor).sort((a,b)=>{
+  const monthDiff = (monthCounts[b[0]]||0) - (monthCounts[a[0]]||0);
+  if(monthDiff!==0) return monthDiff;
+  const weekDiff = (weekCounts[b[0]]||0) - (weekCounts[a[0]]||0);
+  if(weekDiff!==0) return weekDiff;
+  return (b[1].count||0) - (a[1].count||0);
+});
+
+if(!adminVendorsSummary) return; adminVendorsSummary.innerHTML="";
+if(!list.length){
+  adminVendorsSummary.innerHTML = `<div class="item"><div class="meta">Sin datos.</div></div>`;
+}else{
+  list.forEach(([v,data])=>{
+    const weeklyCount = weekCounts[v] || 0;
+    const monthlyCount = monthCounts[v] || 0;
+    const weekGoal = 25;
+    const monthGoal = 100;
+    const weekPct = Math.round((weeklyCount / weekGoal) * 100);
+    const monthPct = Math.round((monthlyCount / monthGoal) * 100);
+    const weekPctSafe = Math.max(0, Math.min(100, weekPct));
+    const monthPctSafe = Math.max(0, Math.min(100, monthPct));
+    const typesChips = Object.entries(data.types)
+      .sort((a,b)=>b[1]-a[1])
+      .map(([t,c])=> `<span class="chip chipWide" title="${escapeHtml(t)}" style="margin-right:6px;margin-top:6px">${escapeHtml(t)} · ${c}</span>`)
+      .join("");
+    const notesBlock = data.notes.length
+      ? `<div class="meta wrapText" style="margin-top:10px">${escapeHtml(data.notes.join("\n"))}</div>`
+      : `<div class="meta" style="margin-top:10px">Sin comentarios en el filtro actual.</div>`;
+    const semaforoScore = Math.round(((weekPctSafe * 0.45) + (monthPctSafe * 0.55)));
+    let semaforoText = "En riesgo";
+    let semaforoColor = "var(--bad)";
+    if(monthlyCount >= monthGoal || weeklyCount >= weekGoal || semaforoScore >= 80){
+      semaforoText = "En meta";
+      semaforoColor = "var(--good)";
+    }else if(semaforoScore >= 50 || monthlyCount >= 60 || weeklyCount >= 15){
+      semaforoText = "Seguimiento";
+      semaforoColor = "var(--warn)";
+    }
+    const semaforoChip = `<span class="chip" style="background:rgba(255,255,255,.95);color:${semaforoColor};border-color:rgba(15,23,42,.08)">Semáforo · ${semaforoText}</span>`;
+    const progressHtml = `
+      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">${semaforoChip}<span class="chip">Filtro: ${data.count}</span></div>
+      <div style="margin-top:10px">
+        <div class="meta">Semana ${escapeHtml(weekRange.from)} a ${escapeHtml(weekRange.to)}: <b>${weeklyCount}</b> / ${weekGoal} visitas · <b>${weekPct}%</b></div>
+        <div style="margin-top:6px;height:10px;border-radius:999px;background:rgba(15,23,42,.08);overflow:hidden">
+          <div style="height:100%;width:${weekPctSafe}%;background:${weekPct >= 100 ? 'var(--good)' : 'linear-gradient(90deg,#a855f7,#3b82f6)'}"></div>
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <div class="meta">Mes ${escapeHtml(monthRange.from.slice(0,7))}: <b>${monthlyCount}</b> / ${monthGoal} visitas · <b>${monthPct}%</b></div>
+        <div style="margin-top:6px;height:10px;border-radius:999px;background:rgba(15,23,42,.08);overflow:hidden">
+          <div style="height:100%;width:${monthPctSafe}%;background:${monthPct >= 100 ? 'var(--good)' : 'linear-gradient(90deg,#3b82f6,#22c55e)'}"></div>
+        </div>
+      </div>`;
+    const el=document.createElement("div");
+    el.className="item";
+    el.innerHTML = `
+      <div class="top">
+        <div style="width:100%">
+          <div class="name">${escapeHtml(v)}</div>
+          <div class="meta">Tablero ejecutivo por vendedor</div>
+          ${progressHtml}
+          <div style="display:flex;flex-wrap:wrap;margin-top:8px">${typesChips || `<span class="meta">Sin tipos registrados en el filtro actual.</span>`}</div>
+          ${notesBlock}
+        </div>
+        <span class="chip">S ${weeklyCount}/25 · M ${monthlyCount}/100</span>
+      </div>
+    `;
+    adminVendorsSummary.appendChild(el);
+  });
+}
+
+// Keep last applied recs for export
+    window.__ADMIN_LAST_RECS__ = recs;
+    window.__ADMIN_LAST_BASE__ = base;
+    window.__ADMIN_RANGE__ = {from,to};
+  }
+
+  // ===== Exports =====
+  // Descarga local: no depende de SheetJS, CDN ni conexión a internet.
+  function downloadBlob(blob, filename){
+    try{
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.rel = "noopener";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      // En algunos navegadores móviles revocar demasiado pronto cancela la descarga.
+      setTimeout(()=>URL.revokeObjectURL(url), 30000);
+      return true;
+    }catch(e){
+      console.error("No se pudo iniciar la descarga", e);
+      return false;
+    }
+  }
+
+  function exportCsvDay(day){
+    let recs = loadDay(day);
+    const auth = getAuthState();
+    if(auth && auth.role === "seller"){
+      recs = recs.filter(r=> normalizeCity(r.city)===auth.city && (r.vendor||"")===auth.vendor);
+    }
+    const headers = ["id","day","city","vendor","client","type","notes","start_ts","end_ts","duration_sec","start_lat","start_lng","end_lat","end_lng"];
+    const lines = [headers.join(",")];
+    recs.forEach(r=>{
+      const row = headers.map(k=>{
+        const v = (r[k] ?? "");
+        const s = (typeof v === "string") ? v.replaceAll('"','""') : String(v);
+        return `"${s}"`;
+      }).join(",");
+      lines.push(row);
+    });
+    downloadBlob(new Blob([lines.join("\n")], {type:"text/csv;charset=utf-8"}), `visitas_${day}.csv`);
+  }
+
+  function excelXmlEscape(value){
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&apos;");
+  }
+
+  function excelDateText(value){
+    if(!value) return "";
+    const d = new Date(value);
+    if(Number.isNaN(d.getTime())) return String(value);
+    return d.toLocaleString("es-MX", {
+      year:"numeric", month:"2-digit", day:"2-digit",
+      hour:"2-digit", minute:"2-digit", second:"2-digit"
+    });
+  }
+
+  function excelCell(value, type="String", style="Cell"){
+    const safe = type === "Number"
+      ? (Number.isFinite(Number(value)) ? String(Number(value)) : "0")
+      : excelXmlEscape(value);
+    return `<Cell ss:StyleID="${style}"><Data ss:Type="${type}">${safe}</Data></Cell>`;
+  }
+
+  function toExcelXls(rows, filename){
+    // Excel XML 2003: se genera completamente en el dispositivo, sin librerías externas.
+    const data = Array.isArray(rows) ? rows : [];
+    if(!data.length){
+      toast("No hay registros en el filtro para exportar");
+      return;
+    }
+
+    const columns = [
+      ["day", "Fecha", "String"],
+      ["city", "Ciudad", "String"],
+      ["vendor", "Vendedor", "String"],
+      ["client", "Cliente", "String"],
+      ["type", "Tipo de visita", "String"],
+      ["notes", "Comentarios", "String"],
+      ["start_ts", "Inicio", "DateText"],
+      ["end_ts", "Fin", "DateText"],
+      ["duration_sec", "Duración (min)", "Minutes"],
+      ["start_lat", "Latitud inicio", "Number"],
+      ["start_lng", "Longitud inicio", "Number"],
+      ["end_lat", "Latitud fin", "Number"],
+      ["end_lng", "Longitud fin", "Number"],
+      ["id", "ID", "String"]
+    ];
+
+    const vendors = new Set(data.map(r=>r.vendor).filter(Boolean)).size;
+    const clients = new Set(data.map(r=>r.client).filter(Boolean)).size;
+    const totalSec = data.reduce((sum,r)=>sum + (Number(r.duration_sec)||0), 0);
+    const generated = new Date().toLocaleString("es-MX");
+
+    const summaryRows = [
+      ["Reporte", "Visitas de vendedor"],
+      ["Generado", generated],
+      ["Registros", data.length],
+      ["Vendedores", vendors],
+      ["Clientes únicos", clients],
+      ["Horas totales", (totalSec/3600).toFixed(2)]
+    ].map(([label,value])=>
+      `<Row>${excelCell(label,"String","Header")}${excelCell(value, typeof value === "number" ? "Number" : "String")}</Row>`
+    ).join("");
+
+    const headerRow = `<Row>${columns.map(c=>excelCell(c[1],"String","Header")).join("")}</Row>`;
+    const bodyRows = data.map(r=>{
+      return `<Row>${columns.map(([key,_label,type])=>{
+        let value = r[key] ?? "";
+        let cellType = type;
+        if(type === "DateText"){
+          value = excelDateText(value);
+          cellType = "String";
+        }else if(type === "Minutes"){
+          value = ((Number(value)||0)/60).toFixed(2);
+          cellType = "Number";
+        }else if(type === "Number"){
+          value = Number.isFinite(Number(value)) ? Number(value) : 0;
+        }
+        return excelCell(value, cellType === "Number" ? "Number" : "String");
+      }).join("")}</Row>`;
+    }).join("");
+
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Bottom"/><Borders/><Font/><Interior/><NumberFormat/><Protection/>
+  </Style>
+  <Style ss:ID="Cell"><Alignment ss:Vertical="Top" ss:WrapText="1"/></Style>
+  <Style ss:ID="Header">
+   <Alignment ss:Vertical="Center" ss:WrapText="1"/>
+   <Font ss:Bold="1" ss:Color="#FFFFFF"/>
+   <Interior ss:Color="#0B4EA2" ss:Pattern="Solid"/>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="Resumen">
+  <Table>${summaryRows}</Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel"><Selected/></WorksheetOptions>
+ </Worksheet>
+ <Worksheet ss:Name="Registros">
+  <Table>
+   <Column ss:Width="82"/><Column ss:Width="82"/><Column ss:Width="150"/>
+   <Column ss:Width="190"/><Column ss:Width="115"/><Column ss:Width="240"/>
+   <Column ss:Width="135"/><Column ss:Width="135"/><Column ss:Width="90"/>
+   <Column ss:Width="95"/><Column ss:Width="95"/><Column ss:Width="95"/><Column ss:Width="95"/><Column ss:Width="210"/>
+   ${headerRow}${bodyRows}
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <FreezePanes/><FrozenNoSplit/><SplitHorizontal>1</SplitHorizontal><TopRowBottomPane>1</TopRowBottomPane>
+   <AutoFilter x:Range="R1C1:R${data.length+1}C${columns.length}" xmlns="urn:schemas-microsoft-com:office:excel"/>
+  </WorksheetOptions>
+ </Worksheet>
+</Workbook>`;
+
+    const safeName = String(filename || "visitas.xls").replace(/\.xlsx?$/i, ".xls");
+    const blob = new Blob(["\ufeff", xml], {type:"application/vnd.ms-excel;charset=utf-8"});
+    const ok = downloadBlob(blob, safeName);
+    toast(ok ? `Excel generado: ${data.length} registro(s)` : "No se pudo descargar el Excel");
+  }
+
+  // ===== Vendor actions =====
+  async function locate(){
+    try{
+      const pos = await getPos();
+      setLastLoc(pos);
+      toast("Ubicación capturada");
+      ensureCityMap();
+      if(hasLeaflet()){
+        mapCity.setView([pos.coords.latitude, pos.coords.longitude], 16);
+      }
+    }catch(e){
+      toast("No se pudo obtener ubicación");
+    }
+  }
+
+  async function startVisit(){
+    const auth = getAuthState();
+    const city = auth && auth.role === "seller" ? auth.city : citySelect.value;
+    const vendor = auth && auth.role === "seller" ? auth.vendor : vendorSelect.value;
+    const client = (clientInput.value || "").trim();
+    const type = typeSelect.value;
+    const notes = (notesInput.value || "").trim();
+
+    if(!city || !vendor){ toast("Selecciona ciudad y vendedor"); return; }
+    if(!client){ toast("Escribe el cliente"); clientInput.focus(); return; }
+
+    const act = activeGet();
+    if(act && act.start_ts){ toast("Ya hay una visita activa"); return; }
+
+    btnStart.disabled=true;
+    try{
+      const pos = await getPos();
+      setLastLoc(pos);
+      const now = new Date().toISOString();
+      activeSet({
+        city, vendor, client, type, notes,
+        start_ts: now,
+        start_lat: pos.coords.latitude,
+        start_lng: pos.coords.longitude
+      });
+      toast("Visita iniciada");
+      renderCity();
+    }catch(e){
+      toast("Activa permisos de ubicación");
+      btnStart.disabled=false;
+    }
+  }
+
+  async function endVisit(){
+    const act = activeGet();
+    if(!act || !act.start_ts){ toast("No hay visita activa"); return; }
+    btnEnd.disabled=true;
+
+    try{
+      const pos = await getPos();
+      setLastLoc(pos);
+      const endISO = new Date().toISOString();
+      const start = new Date(act.start_ts);
+      const durSec = Math.max(0, Math.floor((Date.now()-start.getTime())/1000));
+
+      const rec = {
+        id: uuid(),
+        day: todayISO(),
+        city: act.city,
+        vendor: act.vendor,
+        client: act.client,
+        type: act.type,
+        notes: act.notes,
+        start_ts: act.start_ts,
+        end_ts: endISO,
+        duration_sec: durSec,
+        start_lat: act.start_lat,
+        start_lng: act.start_lng,
+        end_lat: pos.coords.latitude,
+        end_lng: pos.coords.longitude
+      };
+
+      const day = todayISO();
+      const recs = loadDay(day);
+      recs.push(rec);
+      saveDay(day, recs);
+
+      if(cloudConfigured()){
+        try{
+          await cloudInsertVisit(rec);
+          setCloudIndicator("ok","Cloud: online");
+          toast("Cloud: subido OK");
+        }catch(e){
+          const pendingCount = queueForSync(rec);
+          setCloudIndicator("warn",`Cloud: ${pendingCount} pendiente(s)`);
+          toast("Guardado local · se sincronizará después");
+        }
+      }
+
+      activeClear();
+      saveDraft({
+        city: citySelect.value,
+        vendor: vendorSelect.value,
+        client: "",
+        type: typeSelect.value,
+        notes: ""
+      });
+      clientInput.value = "";
+      notesInput.value = "";
+      if(recentClientSelect) recentClientSelect.value = "";
+      if(assignedClientSelect) assignedClientSelect.value = "";
+      if(clientSearchInput) clientSearchInput.value = "";
+      if(manualClientInput) manualClientInput.value = "";
+      if(manualClientRow) manualClientRow.style.display = "none";
+      updateClientCodeMeta();
+      updateOrderLinkPanel();
+      toast("Visita guardada");
+      fillRecentClients(rec.city, rec.vendor);
+      fillAssignedClients(rec.city, rec.vendor);
+      renderCity();
+      renderClientHistory();
+    }catch(e){
+      toast("No se pudo cerrar (GPS)");
+      btnEnd.disabled=false;
+    }
+  }
+
+  function clearToday(){
+    const day = todayISO();
+    const auth = getAuthState();
+    if(auth && auth.role === "seller"){
+      const filtered = loadDay(day).filter(r=> !(normalizeCity(r.city)===auth.city && (r.vendor||"")===auth.vendor));
+      saveDay(day, filtered);
+    }else{
+      saveDay(day, []);
+    }
+    activeClear();
+    toast("Borrado");
+    renderCity();
+  }
+
+  // ===== Messages (optional) =====
+  async function fetchAnnouncementsRecent(limit=50){
+    const cols = "id,created_at,day,city,vendor,title,body,active";
+    // Intentamos con "active" (si existe en tabla). Si falla, traemos sin filtro.
+    try{
+      const path = `/rest/v1/${encodeURIComponent(ANNOUNCE_TABLE)}?select=${cols}&active=eq.true&order=created_at.desc&limit=${limit}`;
+      const rows = await sbFetch(path);
+      return Array.isArray(rows) ? rows : [];
+    }catch(e){
+      const path = `/rest/v1/${encodeURIComponent(ANNOUNCE_TABLE)}?select=${cols}&order=created_at.desc&limit=${limit}`;
+      const rows = await sbFetch(path);
+      return Array.isArray(rows) ? rows : [];
+    }
+  }
+
+  function getDismissedMsgIds(){
+    try{
+      return new Set(JSON.parse(localStorage.getItem("app_visitas_dismissed_msgs_v1") || "[]"));
+    }catch(e){
+      return new Set();
+    }
+  }
+  function addDismissedMsgId(id){
+    if(!id) return;
+    const set = getDismissedMsgIds();
+    set.add(id);
+    localStorage.setItem("app_visitas_dismissed_msgs_v1", JSON.stringify([...set]));
+  }
+
+
+  // Expand/Collapse del comunicado (por dispositivo)
+  function annKey(id){ return "app_visitas_ann_exp_v1:" + (id||""); }
+  function isAnnExpanded(id){ return localStorage.getItem(annKey(id)) === "1"; }
+  function setAnnExpanded(id, v){ localStorage.setItem(annKey(id), v ? "1" : "0"); }
+
+  async function refreshAnnouncement(){
+    if(!cloudConfigured()){
+      if(announceBox) announceBox.style.display = "none";
+      return;
+    }
+    const city = (citySelect?.value || "ALL").toString().toUpperCase();
+    const vendor = (vendorSelect?.value || "ALL").toString();
+    const dismissed = getDismissedMsgIds();
+
+    try{
+      const rows = await fetchAnnouncementsRecent(50);
+      const pick = rows.find(r=>{
+        if(!r) return false;
+        if(r.id && dismissed.has(r.id)) return false;
+
+        const c = (r.city || "ALL").toString().toUpperCase();
+        const v = (r.vendor || "ALL").toString();
+
+        const cOk = (c==="ALL" || c===city);
+        const vOk = (v==="ALL" || v===vendor);
+
+        const activeOk = (r.active === undefined) ? true : !!r.active;
+        const hasText = !!((r.title||"").trim() || (r.body||"").trim());
+        return activeOk && hasText && cOk && vOk;
+      }) || null;
+
+      if(!pick){
+        announceBox.style.display = "none";
+        return;
+      }
+
+      
+      const msgId = pick.id || "";
+      announceBox.dataset.msgId = msgId;
+
+      announceTitle.textContent = (pick.title || defaultAnnouncementTitle(pick.city || "ALL", pick.vendor || "ALL")).trim();
+      const bodyTxt = (pick.body || "").trim();
+      announceMsg.textContent = bodyTxt;
+
+      // Colapsable (por defecto colapsado). Guarda estado en este dispositivo.
+      const expanded = isAnnExpanded(msgId);
+      if(announceMsg && announceMsg.classList){
+        announceMsg.classList.toggle("collapsed", !expanded);
+      }
+      if(btnToggleAnn){
+        const isShort = bodyTxt.length < 140 && bodyTxt.split("\n").length <= 2;
+        btnToggleAnn.style.display = isShort ? "none" : "";
+        btnToggleAnn.textContent = expanded ? "–" : "+";
+        btnToggleAnn.title = expanded ? "Minimizar" : "Ver más";
+      }
+
+      const when = pick.day || (pick.created_at ? (new Date(pick.created_at)).toISOString().slice(0,10) : "");
+      const metaParts = [];
+      if(when) metaParts.push(when);
+      if(pick.city && pick.city !== "ALL") metaParts.push(pick.city);
+      if(pick.vendor && pick.vendor !== "ALL") metaParts.push(pick.vendor);
+      announceMeta.textContent = metaParts.join(" · ");
+
+      announceBox.style.display = "";
+    }catch(e){
+      announceBox.style.display = "none";
+    }
+  }
+
+  async function publishAnnouncement(){
+    if(!cloudConfigured()){
+      toast("Cloud no configurado");
+      return;
+    }
+    const payload = {
+      id: uuid(),
+      created_at: new Date().toISOString(),
+      day: todayISO(),
+      active: true,
+      city: msgCity.value || "ALL",
+      vendor: msgVendor.value || "ALL",
+      title: (msgTitle.value||"").trim(),
+      body: (msgBody.value||"").trim()
+    };
+    if(!payload.title || !payload.body){
+      toast("Completa título y mensaje");
+      return;
+    }
+    try{
+      await sbFetch(`/rest/v1/${encodeURIComponent(ANNOUNCE_TABLE)}`, {
+        method:"POST",
+        headers:{ "Prefer":"return=minimal" },
+        body: payload
+      });
+      toast("Mensaje publicado");
+      await refreshAnnouncement();
+    }catch(e){
+      toast("No se pudo publicar (tabla announcements?)");
+    }
+  }
+
+  // ====== Admin: listar y eliminar comunicados ======
+  async function fetchAnnouncementsAdmin(limit=80){
+    const cols = "id,created_at,day,city,vendor,title,body,active";
+    const path = `/rest/v1/${encodeURIComponent(ANNOUNCE_TABLE)}?select=${cols}&order=created_at.desc&limit=${limit}`;
+    const rows = await sbFetch(path);
+    return Array.isArray(rows) ? rows : [];
+  }
+
+  async function setAnnouncementActive(id, active){
+    const path = `/rest/v1/${encodeURIComponent(ANNOUNCE_TABLE)}?id=eq.${encodeURIComponent(id)}`;
+    await sbFetch(path, {
+      method:"PATCH",
+      headers:{ "Prefer":"return=minimal" },
+      body:{ active: !!active }
+    });
+  }
+
+  async function deleteAnnouncementById(id){
+    const path = `/rest/v1/${encodeURIComponent(ANNOUNCE_TABLE)}?id=eq.${encodeURIComponent(id)}`;
+    try{
+      await sbFetch(path, {
+        method:"DELETE",
+        headers:{ "Prefer":"return=minimal" }
+      });
+      return true;
+    }catch(e){
+      await setAnnouncementActive(id, false);
+      return false;
+    }
+  }
+
+  function renderAdminAnnouncements(rows){
+    if(!msgList) return;
+    msgList.innerHTML = "";
+    const list = Array.isArray(rows) ? rows : [];
+    if(!list.length){
+      msgList.innerHTML = `<div class="item"><div class="meta">Sin comunicados.</div></div>`;
+      return;
+    }
+
+    list.forEach(r=>{
+      const active = (r.active === undefined) ? true : !!r.active;
+      const when = r.day || (r.created_at ? (new Date(r.created_at)).toISOString().slice(0,10) : "");
+      const meta = [when, cityLabel(r.city||"ALL"), (r.vendor||"ALL")].filter(Boolean).join(" · ");
+      const id = (r.id || "");
+      const expanded = isAnnExpanded(id);
+      const body = (r.body || "").toString().trim();
+      const title = (r.title || defaultAnnouncementTitle(r.city || "ALL", r.vendor || "ALL")).toString().trim();
+
+      const el = document.createElement("div");
+      el.className = "item";
+      el.innerHTML = `
+        <div class="top" style="align-items:flex-start">
+          <div style="min-width:0">
+            <div class="name">${escapeHtml(title)}</div>
+            <div class="meta">${escapeHtml(meta)}${active ? "" : " · (inactivo)"}</div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+            ${body.length > 0 ? `<button class="btn" data-ann-toggle="${escapeHtml(id)}" type="button" style="padding:10px 12px">${expanded ? "Ver menos" : "Ver más"}</button>` : ""}
+            ${active ? `<button class="btn danger" data-ann-del="${escapeHtml(id)}" type="button" style="padding:10px 12px">Eliminar</button>` : ""}
+          </div>
+        </div>
+
+        ${body.length ? `<div class="annBody wrapText ${expanded ? "" : "collapsed"}" data-ann-body="${escapeHtml(id)}" style="margin-top:8px">${escapeHtml(body)}</div>` : ""}
+      `;
+      msgList.appendChild(el);
+    });
+
+    // handlers
+    msgList.querySelectorAll("[data-ann-toggle]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const id = btn.getAttribute("data-ann-toggle");
+        if(!id) return;
+        const now = !isAnnExpanded(id);
+        setAnnExpanded(id, now);
+        btn.textContent = now ? "Ver menos" : "Ver más";
+        const body = Array.from(msgList.querySelectorAll("[data-ann-body]")).find(el=>el.getAttribute("data-ann-body")==id);
+        if(body){
+          body.classList.toggle("collapsed", !now);
+        }
+      });
+    });
+
+    msgList.querySelectorAll("[data-ann-del]").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        const id = btn.getAttribute("data-ann-del");
+        if(!id) return;
+        try{
+          const hardDeleted = await deleteAnnouncementById(id);
+          toast(hardDeleted ? "Mensaje eliminado" : "Mensaje desactivado");
+          await loadAnnouncementsList();
+          await refreshAnnouncement();
+        }catch(e){
+          toast("No se pudo eliminar el mensaje");
+        }
+      });
+    });
+  }
+
+  async function loadAnnouncementsList(){
+    if(!cloudConfigured()){
+      if(msgList) msgList.innerHTML = `<div class="item"><div class="meta">Cloud no configurado.</div></div>`;
+      return;
+    }
+    try{
+      const rows = await fetchAnnouncementsAdmin(80);
+      renderAdminAnnouncements(rows);
+    }catch(e){
+      if(msgList) msgList.innerHTML = `<div class="item"><div class="meta">No se pudo cargar comunicados.</div></div>`;
+    }
+  }
+
+  async function deleteAnnouncementsByDay(day){
+    if(!day){ toast("Selecciona fecha"); return; }
+    if(!cloudConfigured()){ toast("Cloud no configurado"); return; }
+
+    let rows = [];
+    const cols = "id,created_at,day,city,vendor,title,body,active";
+    // Intentamos filtrar por columna day (si existe)
+    try{
+      const path = `/rest/v1/${encodeURIComponent(ANNOUNCE_TABLE)}?select=${cols}&day=eq.${day}&order=created_at.desc&limit=500`;
+      const r = await sbFetch(path);
+      rows = Array.isArray(r) ? r : [];
+    }catch(e){
+      // Fallback: traemos recientes y filtramos por created_at
+      try{
+        rows = await fetchAnnouncementsAdmin(200);
+        rows = rows.filter(x=>{
+          if(!x || !x.created_at) return false;
+          const d = (new Date(x.created_at)).toISOString().slice(0,10);
+          return d === day;
+        });
+      }catch(e2){
+        rows = [];
+      }
+    }
+
+    // Solo activos
+    rows = rows.filter(x=> (x.active === undefined) ? true : !!x.active);
+
+    if(!rows.length){
+      toast("No hay mensajes activos en esa fecha");
+      return;
+    }
+
+    let ok = 0;
+    let soft = 0;
+    for(const r of rows){
+      try{
+        const hardDeleted = await deleteAnnouncementById(r.id);
+        ok++;
+        if(!hardDeleted) soft++;
+      }catch(e){}
+    }
+    toast(soft ? `Mensajes retirados: ${ok} (algunos quedaron inactivos)` : `Mensajes eliminados: ${ok}`);
+    await loadAnnouncementsList();
+    await refreshAnnouncement();
+  }
+
+
+  // ===== Routing / Tabs =====
+  function safeOpenAdmin(){
+    try{
+      ensureAdminMap();
+      setTimeout(()=>{ if(hasLeaflet() && mapAdmin) mapAdmin.invalidateSize(); }, 80);
+      Promise.resolve(applyAdmin()).catch((e)=>{
+        console.error("Admin apply failed", e);
+        if(listAdmin){
+          listAdmin.innerHTML = `<div class="item"><div class="meta">Admin abierto, pero hubo un problema al cargar datos. Revisa Cloud o vuelve a intentar.</div></div>`;
+        }
+        toast("Admin abierto con error de carga");
+      });
+      Promise.resolve(loadAnnouncementsList()).catch(()=>{});
+    }catch(e){
+      console.error("Admin open failed", e);
+      if(listAdmin){
+        listAdmin.innerHTML = `<div class="item"><div class="meta">No se pudo cargar Admin completamente.</div></div>`;
+      }
+      toast("No se pudo cargar Admin");
+    }
+  }
+
+  function setActiveTab(which){
+    const auth = getAuthState();
+    const isAdmin = (which==="admin") && auth && auth.role === "admin";
+    tabCity.classList.toggle("active", !isAdmin);
+    tabAdmin.classList.toggle("active", isAdmin);
+    pageCity.style.display = isAdmin ? "none" : "";
+    pageAdmin.style.display = isAdmin ? "" : "none";
+
+    if(isAdmin){
+      safeOpenAdmin();
+    }else{
+      ensureCityMap();
+      setTimeout(()=>{ if(hasLeaflet() && mapCity) mapCity.invalidateSize(); }, 80);
+      renderCity();
+    }
+  }
+
+  function parseHash(){
+    const h = (location.hash || "#/").replace("#","").trim(); // "/admin" etc
+    return h.startsWith("/") ? h : ("/"+h);
+  }
+
+  function handleRoute(){
+    if(!isAuthenticated()){
+      document.body.classList.add("appLocked");
+      tabCity.classList.remove("active");
+      tabAdmin.classList.remove("active");
+      return;
+    }
+    const auth = getAuthState();
+    const h = parseHash();
+    if(h.startsWith("/admin")){
+      if(!auth || auth.role !== "admin"){
+        location.hash = "#/";
+        toast("Solo Admin puede entrar a esta vista");
+        setActiveTab("city");
+        return;
+      }
+      setActiveTab("admin");
+      return;
+    }
+    // shortcuts: /gdl /mty /cdmx /ags
+    const p = h.replace("/","").toUpperCase();
+    if(["GDL","MTY","CDMX","AGS","PUE","QRO"].includes(p)){
+      if(auth && auth.role === "seller" && auth.city !== p){
+        location.hash = "#/";
+        setActiveTab("city");
+        return;
+      }
+      citySelect.value = p;
+      fillVendors(p);
+      if(auth && auth.role === "seller" && auth.vendor){
+        vendorSelect.value = auth.vendor;
+      }
+      fillRecentClients(citySelect.value, vendorSelect.value);
+      fillAssignedClients(citySelect.value, vendorSelect.value);
+      setActiveTab("city");
+      return;
+    }
+    setActiveTab("city");
+  }
+
+  // ===== Init =====
+  function init(){
+    populateLoginUsers();
+    if(btnLogin) btnLogin.addEventListener("click", doLogin);
+    if(loginPass) loginPass.addEventListener("keydown", (e)=>{ if(e.key === "Enter") doLogin(); });
+    if(btnQuote) btnQuote.addEventListener("click", openQuoteTool);
+    if(btnLogout) btnLogout.addEventListener("click", doLogout);
+    updateSessionUi();
+    if(!isAuthenticated()){ setTimeout(()=> loginUser && loginUser.focus(), 80); }
+
+    buildStamp.textContent = "BUILD v3.4 visitas + cotizador " + new Date().toISOString().slice(0,19).replace("T"," ");
+
+    // City selects
+    fillCity();
+    citySelect.value = "GDL";
+    fillVendors("GDL");
+    fillTypes();
+    renderPromotions();
+    fillRecentClients("GDL", vendorSelect.value);
+    fillAssignedClients("GDL", vendorSelect.value);
+    loadOrderClientIndex();
+
+    // Admin selects
+    refreshAdminCityOptions();
+    refreshAdminVendorOptions();
+
+    // dates
+    const d = todayISO();
+    adminFrom.value = d;
+    adminTo.value = d;
+
+    const draft = loadDraft();
+    if(draft.city && CITY_META.some(c=>c.code===draft.city)){
+      citySelect.value = draft.city;
+      fillVendors(draft.city);
+    }
+    if(draft.vendor && [...vendorSelect.options].some(o=>o.value===draft.vendor)) vendorSelect.value = draft.vendor;
+    if(draft.client) clientInput.value = draft.client;
+    if(draft.type && VISIT_TYPES.includes(draft.type)) typeSelect.value = draft.type;
+    if(draft.notes) notesInput.value = draft.notes;
+    fillRecentClients(citySelect.value, vendorSelect.value);
+    fillAssignedClients(citySelect.value, vendorSelect.value);
+    if(draft.client){
+      const assigned = getAssignedClients(vendorSelect.value).some(x=>x.name===draft.client);
+      if(assigned){
+        assignedClientSelect.value = draft.client;
+      }else{
+        assignedClientSelect.value = "__OTHER__";
+        if(manualClientRow) manualClientRow.style.display = "";
+        if(manualClientInput) manualClientInput.value = draft.client;
+      }
+    }
+    renderClientHistory();
+    enforceCurrentUserContext();
+
+    // cloud indicator
+    if(cloudConfigured()){
+      setCloudIndicator("warn","Cloud: verificando...");
+      cloudTest().then(async()=>{ setCloudIndicator("ok","Cloud: online"); await flushSyncQueue(); })
+        .catch(()=>{ setCloudIndicator("bad","Cloud: error"); });
+      adminSource.value="CLOUD";
+      refreshAnnouncement();
+    }else{
+      setCloudIndicator("warn","Cloud: sin configurar");
+      adminSource.value="LOCAL";
+    }
+
+    // restore active visit buttons
+    const act = activeGet();
+    if(act && act.start_ts){ btnStart.disabled=true; btnEnd.disabled=false; }
+
+    // events
+    citySelect.addEventListener("change", ()=>{
+      if(clientSearchInput) clientSearchInput.value = "";
+      fillVendors(citySelect.value);
+      saveDraft({city: citySelect.value, vendor: vendorSelect.value});
+      fillRecentClients(citySelect.value, vendorSelect.value);
+      fillAssignedClients(citySelect.value, vendorSelect.value);
+      renderClientHistory();
+      renderCity();
+      refreshAnnouncement();
+    });
+    vendorSelect.addEventListener("change", ()=>{
+      if(clientSearchInput) clientSearchInput.value = "";
+      saveDraft({city: citySelect.value, vendor: vendorSelect.value});
+      fillRecentClients(citySelect.value, vendorSelect.value);
+      fillAssignedClients(citySelect.value, vendorSelect.value);
+      renderClientHistory();
+      renderCity();
+      refreshAnnouncement();
+    });
+
+    [clientInput, typeSelect, notesInput].forEach(el=>{
+      el.addEventListener("input", ()=>{
+        updateClientCodeMeta();
+        renderClientHistory();
+        saveDraft({
+          city: citySelect.value,
+          vendor: vendorSelect.value,
+          client: clientInput.value,
+          type: typeSelect.value,
+          notes: notesInput.value
+        });
+        const currentActive = activeGet();
+        if(currentActive){
+          activeSet({...currentActive, client:clientInput.value || currentActive.client, type:typeSelect.value, notes:notesInput.value});
+        }
+      });
+      el.addEventListener("change", ()=>{
+        updateClientCodeMeta();
+        renderClientHistory();
+        saveDraft({
+          city: citySelect.value,
+          vendor: vendorSelect.value,
+          client: clientInput.value,
+          type: typeSelect.value,
+          notes: notesInput.value
+        });
+        const currentActive = activeGet();
+        if(currentActive){
+          activeSet({...currentActive, client:clientInput.value || currentActive.client, type:typeSelect.value, notes:notesInput.value});
+        }
+      });
+    });
+
+    if(recentClientSelect){
+      recentClientSelect.addEventListener("change", ()=>{
+        if(recentClientSelect.value){
+          clientInput.value = recentClientSelect.value;
+          updateClientCodeMeta();
+          renderClientHistory();
+          saveDraft({client: clientInput.value});
+        }
+      });
+    }
+
+    if(clientSearchInput){
+      clientSearchInput.addEventListener("input", ()=> fillAssignedClients(citySelect.value, vendorSelect.value));
+    }
+    if(manualClientInput){
+      manualClientInput.addEventListener("input", ()=>{
+        clientInput.value = manualClientInput.value.trim();
+        updateClientCodeMeta();
+        saveDraft({client:clientInput.value});
+        const act=activeGet();
+        if(act) activeSet({...act, client:clientInput.value, notes:notesInput.value, type:typeSelect.value});
+      });
+    }
+
+    if(assignedClientSelect){
+      assignedClientSelect.addEventListener("change", ()=>{
+        if(assignedClientSelect.value === "__OTHER__"){
+          if(manualClientRow) manualClientRow.style.display = "";
+          clientInput.value = (manualClientInput?.value || "").trim();
+          setTimeout(()=>manualClientInput?.focus(), 0);
+        }else if(assignedClientSelect.value){
+          if(manualClientRow) manualClientRow.style.display = "none";
+          if(manualClientInput) manualClientInput.value = "";
+          clientInput.value = assignedClientSelect.value;
+          updateClientCodeMeta();
+          renderClientHistory();
+          saveDraft({client: clientInput.value});
+        }else{
+          if(manualClientRow) manualClientRow.style.display = "none";
+          clientInput.value = "";
+        }
+      });
+    }
+
+    if(btnOpenOrderLink) btnOpenOrderLink.addEventListener("click", openOrderLink);
+    if(btnShareOrderLink) btnShareOrderLink.addEventListener("click", shareOrderLink);
+    if(btnCopyOrderLink) btnCopyOrderLink.addEventListener("click", copyOrderLink);
+
+    btnLocate.addEventListener("click", locate);
+    btnStart.addEventListener("click", startVisit);
+    btnEnd.addEventListener("click", endVisit);
+
+    btnExportCsv.addEventListener("click", ()=>exportCsvDay(todayISO()));
+    btnClearToday.addEventListener("click", clearToday);
+
+    adminCity.addEventListener("change", ()=>{ refreshAdminVendorOptions(); applyAdmin(); });
+    adminVendor.addEventListener("change", ()=>applyAdmin());
+    if(msgCity) msgCity.addEventListener("change", ()=>{ refreshAdminVendorOptions(); syncAnnouncementTitle(); });
+    if(msgVendor) msgVendor.addEventListener("change", ()=> syncAnnouncementTitle());
+    adminSource.addEventListener("change", ()=>applyAdmin());
+    btnAdminApply.addEventListener("click", ()=>applyAdmin());
+
+    btnAdminTestCloud.addEventListener("click", async ()=>{
+      try{
+        setCloudIndicator("warn","Cloud: verificando...");
+        await cloudTest();
+        setCloudIndicator("ok","Cloud: online");
+        toast("Cloud OK");
+        adminSource.value="CLOUD";
+        applyAdmin();
+        refreshAnnouncement();
+      }catch(e){
+        setCloudIndicator("bad","Cloud: error");
+        toast("Cloud error");
+      }
+    });
+
+    btnAdminExcelFiltered.addEventListener("click", ()=>{
+      const recs = window.__ADMIN_LAST_RECS__ || [];
+      const r = window.__ADMIN_RANGE__ || {from:adminFrom.value,to:adminTo.value};
+      toExcelXls(recs, `admin_visitas_filtros_${r.from}_a_${r.to}.xls`);
+    });
+
+    btnAdminExcelAll.addEventListener("click", ()=>{
+      const base = window.__ADMIN_LAST_BASE__ || [];
+      const r = window.__ADMIN_RANGE__ || {from:adminFrom.value,to:adminTo.value};
+      toExcelXls(base, `admin_visitas_todo_${r.from}_a_${r.to}.xls`);
+    });
+
+    // messages
+    btnRefreshMsg.addEventListener("click", refreshAnnouncement);
+    if(btnListMsgs) btnListMsgs.addEventListener("click", loadAnnouncementsList);
+    if(btnDeleteMsgDay) btnDeleteMsgDay.addEventListener("click", ()=> deleteAnnouncementsByDay(msgDeleteDay.value));
+    if(msgDeleteDay && !msgDeleteDay.value) msgDeleteDay.value = todayISO();
+    syncAnnouncementTitle(true);
+    loadAnnouncementsList();
+
+    if(btnDismissAnn){
+      btnDismissAnn.addEventListener("click", ()=>{
+        const id = (announceBox && announceBox.dataset) ? announceBox.dataset.msgId : "";
+        addDismissedMsgId(id);
+        if(announceBox) announceBox.style.display = "none";
+      });
+    }
+
+
+    if(btnToggleAnn){
+      btnToggleAnn.addEventListener("click", ()=>{
+        const id = (announceBox && announceBox.dataset) ? announceBox.dataset.msgId : "";
+        if(!id) return;
+        const next = !isAnnExpanded(id);
+        setAnnExpanded(id, next);
+        if(announceMsg && announceMsg.classList){
+          announceMsg.classList.toggle("collapsed", !next);
+        }
+        btnToggleAnn.textContent = next ? "–" : "+";
+        btnToggleAnn.title = next ? "Minimizar" : "Ver más";
+      });
+    }
+
+    btnPublishMsg.addEventListener("click", publishAnnouncement);
+
+    // navegación robusta
+    tabCity.addEventListener("click", (e)=>{ e.preventDefault(); location.hash = "#/"; handleRoute(); });
+    tabAdmin.addEventListener("click", (e)=>{ e.preventDefault(); location.hash = "#/admin"; handleRoute(); });
+
+    // floating admin
+    fabAdmin.addEventListener("click", ()=>{ location.hash = "#/admin"; handleRoute(); });
+
+    // Persistencia reforzada para móvil y periodos largos sin usar la app.
+    document.addEventListener("visibilitychange", ()=>{
+      const act=activeGet();
+      if(document.hidden && act){
+        activeSet({...act, client:clientInput.value || act.client, type:typeSelect.value, notes:notesInput.value});
+      }
+    });
+    window.addEventListener("pagehide", ()=>{
+      const act=activeGet();
+      if(act) activeSet({...act, client:clientInput.value || act.client, type:typeSelect.value, notes:notesInput.value});
+    });
+    window.addEventListener("online", ()=> flushSyncQueue());
+
+    // routing
+    window.addEventListener("hashchange", handleRoute);
+    handleRoute();
+
+    // El mapa se carga después del acceso y nunca bloquea la pantalla inicial.
+    if(isAuthenticated()){
+      const schedule = window.requestIdleCallback || ((fn)=>setTimeout(fn,1200));
+      schedule(()=>ensureCityMap());
+    }
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>

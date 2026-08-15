@@ -1,0 +1,13 @@
+APP TOYO FOODS · V4 MÓVIL MODULAR
+
+Sube TODO el contenido de esta carpeta a la raíz del repositorio de GitHub Pages.
+No cambies la estructura de las carpetas assets/ y data/.
+
+Archivos principales:
+- index.html = menú / app shell
+- visitas.html = módulo de visitas
+- cotizador.html = módulo cotizador
+- sw.js = caché móvil
+- manifest.webmanifest = instalación tipo app
+
+La app carga los clientes de Visitas por vendedor y las bases del Cotizador bajo demanda.
