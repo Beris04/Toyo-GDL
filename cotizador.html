@@ -216,7 +216,7 @@ body.embedded .content{padding-top:9px}
       <div class="brandRow">
         <div class="brand">
           <img src="assets/toyo_logo.png" alt="Toyo Foods">
-          <div><b>Cotizador · Precio Bruto</b><small>Toyo Foods · Cotizador móvil · Precio bruto</small></div>
+          <div><b>Cotizador · Precio Bruto</b><small>Toyo Foods · Cotizador móvil · Precio bruto · V6.1</small></div>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
           <button id="backVisits" class="backVisits" type="button" style="display:none">← Visitas</button>
@@ -339,7 +339,7 @@ const PRODUCTS_GZ_URL="data/cotizador/productos_bruto.json.gz";
 let CLIENTS=[];
 const LAUNCH_PARAMS=new URLSearchParams(location.search);
 function sellerSlug(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'')}
-function sessionSeller(){try{const a=JSON.parse(sessionStorage.getItem('app_visitas_auth_v2')||'null');return a&&a.ok&&a.role==='seller'?(a.vendor||a.user||''):''}catch(e){return ''}}
+function sessionSeller(){try{const a=JSON.parse(localStorage.getItem('app_visitas_auth_v2')||sessionStorage.getItem('app_visitas_auth_v2')||'null');return a&&a.ok&&a.role==='seller'?(a.vendor||a.user||''):''}catch(e){return ''}}
 const ACTIVE_SELLER=(LAUNCH_PARAMS.get('seller')||sessionSeller()||'').trim();
 let PRODUCTS_READY=false, CLIENTS_READY=false, CLIENTS_LOADING=null;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];

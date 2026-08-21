@@ -1,0 +1,29 @@
+TOYO FOODS · WEB MÓVIL V6.1 · SESIÓN PERSISTENTE
+
+CAMBIO PRINCIPAL
+- El vendedor inicia sesión una sola vez en ese navegador/dispositivo.
+- Si cierra Safari/Chrome/Google, cambia de pestaña o regresa horas/días después, la sesión permanece.
+- NO se guarda la contraseña. Solo se guarda el perfil de sesión del usuario.
+- El botón "Cerrar sesión" / "Salir" sigue funcionando.
+- Al presionar Cerrar sesión se elimina la sesión persistente y vuelve a pedir usuario + contraseña.
+- La visita activa y los borradores continúan guardándose por separado.
+
+SE MANTIENE
+- Web móvil ultra ligera.
+- Sin Service Worker/PWA.
+- Sin iframe.
+- Cotizador solo con Precio Bruto.
+- Clientes del cotizador por vendedor.
+- Mapas y Cloud bajo demanda.
+
+SUBIR A GITHUB
+1. Reemplaza el contenido del repositorio Toyo-GDL por el contenido de esta carpeta/ZIP.
+2. Commit to main.
+3. Push origin.
+4. Abre una vez:
+   https://beris04.github.io/Toyo-GDL/limpiar.html?v=61
+5. Después usa normalmente:
+   https://beris04.github.io/Toyo-GDL/
+
+NOTA
+Al abrir limpiar.html NO se borra la sesión de usuario; solo se limpian cachés/Service Workers viejos.

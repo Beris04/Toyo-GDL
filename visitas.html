@@ -1177,12 +1177,11 @@
   }
   const USER_ACCOUNTS = buildUserAccounts();
 
-  // La autenticación no se guarda de forma permanente.
-  // Las visitas y borradores sí continúan usando localStorage para no perderse.
-  try{ localStorage.removeItem(AUTH_KEY); }catch(e){}
+  // V6.1: la sesión del usuario se conserva en este dispositivo hasta presionar Salir.
+  // Las visitas y borradores continúan usando almacenamiento persistente.
   function getAuthState(){
     try{
-      const raw = safeJsonParse(sessionStorage.getItem(AUTH_KEY) || "null", null);
+      const raw = safeJsonParse(localStorage.getItem(AUTH_KEY) || sessionStorage.getItem(AUTH_KEY) || "null", null);
       return raw && raw.ok ? raw : null;
     }catch(e){ return null; }
   }
@@ -1251,10 +1250,12 @@
   }
   function setAuth(payload){
     try{
-      localStorage.removeItem(AUTH_KEY);
       if(payload && payload.ok){
-        sessionStorage.setItem(AUTH_KEY, JSON.stringify(payload));
+        const raw = JSON.stringify(payload);
+        localStorage.setItem(AUTH_KEY, raw);
+        sessionStorage.setItem(AUTH_KEY, raw);
       }else{
+        localStorage.removeItem(AUTH_KEY);
         sessionStorage.removeItem(AUTH_KEY);
       }
     }catch(e){}
@@ -3169,7 +3170,7 @@ if(!list.length){
     updateSessionUi();
     if(!isAuthenticated()){ setTimeout(()=> loginUser && loginUser.focus(), 80); }
 
-    buildStamp.textContent = "BUILD v6.0 web móvil ultra ligera " + new Date().toISOString().slice(0,19).replace("T"," ");
+    buildStamp.textContent = "BUILD v6.1 web móvil · sesión persistente " + new Date().toISOString().slice(0,19).replace("T"," ");
 
     // City/clientes: arrancar directamente en el usuario autenticado.
     // Evita descargar primero el padrón del primer vendedor de GDL y luego el padrón real.

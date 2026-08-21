@@ -23,7 +23,7 @@
 </head>
 <body>
 <main class="shell">
-  <div class="brand"><img src="assets/toyo_logo.png" alt="Toyo Foods"><div><b>Toyo Foods</b><span>Comercial · Web móvil V6</span></div></div>
+  <div class="brand"><img src="assets/toyo_logo.png" alt="Toyo Foods"><div><b>Toyo Foods</b><span>Comercial · Web móvil V6.1</span></div></div>
 
   <section class="hero"><small>WEB MÓVIL ULTRA LIGERA</small><h1>Visitas y Cotizaciones</h1><p>La pantalla inicial no carga mapas, Cloud, clientes ni catálogos. Cada módulo descarga únicamente lo que necesita.</p></section>
 
@@ -53,8 +53,20 @@ const AUTH_KEY='app_visitas_auth_v2', PASS='Toyo2026';
 const $=s=>document.querySelector(s);
 function accounts(){const a={Admin:{role:'admin',city:'ALL',vendor:'ALL'}};Object.entries(SELLERS).forEach(([city,vs])=>vs.forEach(v=>a[v]={role:'seller',city,vendor:v}));return a}
 const ACC=accounts();
-function getAuth(){try{const x=JSON.parse(sessionStorage.getItem(AUTH_KEY)||'null');return x&&x.ok?x:null}catch(e){return null}}
-function setAuth(x){try{localStorage.removeItem(AUTH_KEY);if(x)sessionStorage.setItem(AUTH_KEY,JSON.stringify(x));else sessionStorage.removeItem(AUTH_KEY)}catch(e){}draw()}
+function getAuth(){try{const x=JSON.parse(localStorage.getItem(AUTH_KEY)||sessionStorage.getItem(AUTH_KEY)||'null');return x&&x.ok?x:null}catch(e){return null}}
+function setAuth(x){
+  try{
+    if(x){
+      const raw=JSON.stringify(x);
+      localStorage.setItem(AUTH_KEY,raw);
+      sessionStorage.setItem(AUTH_KEY,raw);
+    }else{
+      localStorage.removeItem(AUTH_KEY);
+      sessionStorage.removeItem(AUTH_KEY);
+    }
+  }catch(e){}
+  draw();
+}
 function fill(){const s=$('#user');const adm=document.createElement('option');adm.value='Admin';adm.textContent='Admin';s.appendChild(adm);Object.entries(SELLERS).forEach(([c,vs])=>{const g=document.createElement('optgroup');g.label=CITY_LABELS[c]||c;vs.slice().sort((a,b)=>a.localeCompare(b,'es')).forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;g.appendChild(o)});s.appendChild(g)})}
 function draw(){const a=getAuth();$('#login').classList.toggle('hide',!!a);$('#home').classList.toggle('show',!!a);if(!a)return;$('#who').textContent=a.user;$('#scope').textContent=a.role==='admin'?'Administrador':`${CITY_LABELS[a.city]||a.city} · ${a.vendor}`;$('#admin').style.display=a.role==='admin'?'':'none'}
 function login(){const u=$('#user').value,p=$('#pass').value,pr=ACC[u],ok=!!pr&&p===PASS;$('#err').classList.toggle('show',!ok);if(ok){setAuth({ok:true,user:u,role:pr.role,city:pr.city,vendor:pr.vendor});$('#pass').value=''}}
