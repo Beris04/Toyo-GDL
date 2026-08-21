@@ -557,11 +557,11 @@
         <img class="brandLogo" src="assets/toyo_logo.png" alt="Toyo Foods" />
         <div>
           <h1>Visitas de Vendedor</h1>
-          <div class="sub">Toyo Foods · App interna · GitHub Pages · Cloud (Supabase)</div>
+          <div class="sub">Toyo Foods · Web móvil · Carga por demanda</div>
         </div>
       </div>
       <nav class="tabs" role="tablist" aria-label="Navegación">
-        <a class="tab" id="tabCity" href="#/">Vendedor</a>
+        <a class="tab" id="tabCity" href="#/">Vendedor</a><a class="tab" href="index.html">Inicio</a>
         <button class="tab" id="btnQuote" type="button" title="Abrir cotizador Toyo Foods">Cotizar</button>
         <a class="tab" id="tabAdmin" href="#/admin">Admin (Cloud)</a>
         <button class="logoutBtn" id="btnLogout" type="button">Salir</button>
@@ -1179,7 +1179,7 @@
 
   // La autenticación no se guarda de forma permanente.
   // Las visitas y borradores sí continúan usando localStorage para no perderse.
-  try{ localStorage.removeItem(AUTH_KEY); if(window.top===window.self) sessionStorage.removeItem(AUTH_KEY); }catch(e){}
+  try{ localStorage.removeItem(AUTH_KEY); }catch(e){}
   function getAuthState(){
     try{
       const raw = safeJsonParse(sessionStorage.getItem(AUTH_KEY) || "null", null);
@@ -1272,9 +1272,15 @@
       if(loginUser) loginUser.value = user;
       location.hash = profile.role === "admin" ? "#/admin" : "#/";
       enforceCurrentUserContext();
+      if(profile.role === "seller"){
+        fillRecentClients(profile.city, profile.vendor);
+        fillAssignedClients(profile.city, profile.vendor);
+        renderPromotions();
+        if(cloudConfigured() && navigator.onLine) setTimeout(()=>refreshAnnouncement(), 2800);
+      }else if(profile.role === "admin"){
+        setTimeout(()=>loadAnnouncementsList(), 500);
+      }
       handleRoute();
-      const schedule = window.requestIdleCallback || ((fn)=>setTimeout(fn,800));
-      schedule(()=> profile.role === "admin" ? ensureAdminMap() : ensureCityMap());
       toast("Acceso correcto");
     }
     return ok;
@@ -1616,8 +1622,7 @@
     url.searchParams.set("city", auth.city || "");
     if(rec?.code) url.searchParams.set("clientCode", rec.code);
     if(rec?.name) url.searchParams.set("clientName", rec.name);
-    const opened = window.open(url.href, "_blank");
-    if(!opened) window.location.href = url.href;
+    window.location.href = url.href;
   }
 
   async function openOrderLink(){
@@ -3164,7 +3169,7 @@ if(!list.length){
     updateSessionUi();
     if(!isAuthenticated()){ setTimeout(()=> loginUser && loginUser.focus(), 80); }
 
-    buildStamp.textContent = "BUILD v5.0 móvil universal " + new Date().toISOString().slice(0,19).replace("T"," ");
+    buildStamp.textContent = "BUILD v6.0 web móvil ultra ligera " + new Date().toISOString().slice(0,19).replace("T"," ");
 
     // City/clientes: arrancar directamente en el usuario autenticado.
     // Evita descargar primero el padrón del primer vendedor de GDL y luego el padrón real.
@@ -3175,9 +3180,13 @@ if(!list.length){
     fillVendors(startCity);
     if(startAuth && startAuth.role === "seller" && [...vendorSelect.options].some(o=>o.value===startAuth.vendor)) vendorSelect.value = startAuth.vendor;
     fillTypes();
-    renderPromotions();
-    fillRecentClients(startCity, vendorSelect.value);
-    fillAssignedClients(startCity, vendorSelect.value);
+    if(startAuth){
+      fillRecentClients(startCity, vendorSelect.value);
+      if(startAuth.role === "seller"){
+        fillAssignedClients(startCity, vendorSelect.value);
+        renderPromotions();
+      }
+    }
 
     // Admin selects
     refreshAdminCityOptions();
@@ -3197,9 +3206,11 @@ if(!list.length){
     if(draft.client) clientInput.value = draft.client;
     if(draft.type && VISIT_TYPES.includes(draft.type)) typeSelect.value = draft.type;
     if(draft.notes) notesInput.value = draft.notes;
-    fillRecentClients(citySelect.value, vendorSelect.value);
-    fillAssignedClients(citySelect.value, vendorSelect.value);
-    if(draft.client){
+    if(startAuth){
+      fillRecentClients(citySelect.value, vendorSelect.value);
+      if(startAuth.role === "seller") fillAssignedClients(citySelect.value, vendorSelect.value);
+    }
+    if(startAuth && draft.client){
       const assigned = getAssignedClients(vendorSelect.value).some(x=>x.name===draft.client);
       if(assigned){
         assignedClientSelect.value = draft.client;
@@ -3212,15 +3223,10 @@ if(!list.length){
     renderClientHistory();
     enforceCurrentUserContext();
 
-    // Cloud en segundo plano: primero mostramos la interfaz y el padrón del vendedor.
+    // V6: Cloud no participa en la apertura. Se consulta al usar Admin/sincronizar.
     if(cloudConfigured()){
-      setCloudIndicator("warn","Cloud: conectando...");
+      setCloudIndicator("warn","Cloud: bajo demanda");
       adminSource.value="CLOUD";
-      setTimeout(()=>{
-        cloudTest().then(async()=>{ setCloudIndicator("ok","Cloud: online"); await flushSyncQueue(); })
-          .catch(()=>{ setCloudIndicator("bad","Cloud: error"); });
-        refreshAnnouncement();
-      }, 1400);
     }else{
       setCloudIndicator("warn","Cloud: sin configurar");
       adminSource.value="LOCAL";
@@ -3379,7 +3385,7 @@ if(!list.length){
     if(btnDeleteMsgDay) btnDeleteMsgDay.addEventListener("click", ()=> deleteAnnouncementsByDay(msgDeleteDay.value));
     if(msgDeleteDay && !msgDeleteDay.value) msgDeleteDay.value = todayISO();
     syncAnnouncementTitle(true);
-    loadAnnouncementsList();
+    if(getAuthState()?.role === "admin") setTimeout(()=>loadAnnouncementsList(), 400);
 
     if(btnDismissAnn){
       btnDismissAnn.addEventListener("click", ()=>{
@@ -3430,8 +3436,9 @@ if(!list.length){
     window.addEventListener("hashchange", handleRoute);
     handleRoute();
 
-    // V5 móvil: el mapa se carga únicamente cuando el usuario solicita ubicación.
-    // Esto evita descargar Leaflet y mosaicos en 4G durante la apertura.
+    // V6: mapa únicamente al solicitar ubicación. Sin PWA/Service Worker.
+    if("serviceWorker" in navigator) navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())).catch(()=>{});
+    if("caches" in window) caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))).catch(()=>{});
   }
 
   init();

@@ -216,11 +216,11 @@ body.embedded .content{padding-top:9px}
       <div class="brandRow">
         <div class="brand">
           <img src="assets/toyo_logo.png" alt="Toyo Foods">
-          <div><b>Lista de Precios</b><small>Toyo Foods · Cotizador móvil · Clientes SAP</small></div>
+          <div><b>Cotizador · Precio Bruto</b><small>Toyo Foods · Cotizador móvil · Precio bruto</small></div>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
           <button id="backVisits" class="backVisits" type="button" style="display:none">← Visitas</button>
-          <button id="priceSwitch" class="priceSwitch">Mayoreo ▾</button>
+          <span class="priceSwitch" style="cursor:default">Precio bruto</span>
         </div>
       </div>
       <div class="searchBox">
@@ -236,7 +236,7 @@ body.embedded .content{padding-top:9px}
     </header>
 
     <main class="content">
-      <div class="summary"><b id="resultCount">Cargando productos…</b><span>Lista SAP 10/08/2026</span></div>
+      <div class="summary"><b id="resultCount">Cargando productos…</b><span>Precio bruto · Lista SAP</span></div>
       <section id="products" class="products"></section>
       <button id="more" class="more">Mostrar más</button>
     </main>
@@ -258,7 +258,7 @@ body.embedded .content{padding-top:9px}
         <div class="section">
           <div class="stitle">DATOS DEL CLIENTE</div>
           <button id="chooseClient" class="clientPick">
-            <span>👤 Seleccionar cliente<small>La base de clientes se carga al abrir este buscador</small></span>
+            <span>👤 Seleccionar cliente<small>Solo se carga la cartera del vendedor</small></span>
             <span>›</span>
           </button>
           <div id="selectedClientCard" class="clientSelected empty"></div>
@@ -305,7 +305,7 @@ body.embedded .content{padding-top:9px}
   <header class="clientSearchHead">
     <div class="clientSearchTop">
       <button id="closeClientSearch">←</button>
-      <div><b>Seleccionar cliente</b><small><span class="clientDbCount" id="clientDbCount">—</span> clientes disponibles</small></div>
+      <div><b>Seleccionar cliente</b><small><span class="clientDbCount" id="clientDbCount">—</span> clientes de tu cartera</small></div>
     </div>
     <div class="clientSearchBox">
       <input id="clientSearch" placeholder="Código, cliente, comercial o RFC…" autocomplete="off">
@@ -332,13 +332,15 @@ body.embedded .content{padding-top:9px}
 </div>
 
 <script>
-if(new URLSearchParams(location.search).get("embedded") === "1") document.body.classList.add("embedded");
+// V6 web directa: sin iframe/embedded.
 let PRODUCTS=[];
-const PRODUCTS_URL="data/cotizador/productos.json";
-const PRODUCTS_GZ_URL="data/cotizador/productos.json.gz";
+const PRODUCTS_URL="data/cotizador/productos_bruto.json";
+const PRODUCTS_GZ_URL="data/cotizador/productos_bruto.json.gz";
 let CLIENTS=[];
-const CLIENTS_URL="data/cotizador/clientes.json";
-const CLIENTS_GZ_URL="data/cotizador/clientes.json.gz";
+const LAUNCH_PARAMS=new URLSearchParams(location.search);
+function sellerSlug(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'')}
+function sessionSeller(){try{const a=JSON.parse(sessionStorage.getItem('app_visitas_auth_v2')||'null');return a&&a.ok&&a.role==='seller'?(a.vendor||a.user||''):''}catch(e){return ''}}
+const ACTIVE_SELLER=(LAUNCH_PARAMS.get('seller')||sessionSeller()||'').trim();
 let PRODUCTS_READY=false, CLIENTS_READY=false, CLIENTS_LOADING=null;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const esc=(s='')=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
@@ -347,7 +349,8 @@ const fmt=(n,c='MXP')=>'$'+Number(n||0).toLocaleString('es-MX',{minimumFractionD
 const today=()=>new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric'});
 const quoteNo='COT-'+new Date().toISOString().slice(2,10).replaceAll('-','')+'-'+Math.floor(100+Math.random()*900);
 
-let mode='wholesale', filterMode='all', cart={}, limit=60;
+let filterMode='all', cart={}, limit=60;
+let PRODUCT_BY_CODE=new Map();
 let selectedClient=null, clientSearchTimer=null;
 $('#quoteMeta').textContent=quoteNo+' · '+today();
 
@@ -373,7 +376,9 @@ async function loadProducts(){
   if(PRODUCTS_READY) return PRODUCTS;
   $('#resultCount').textContent='Cargando productos…';
   try{
-    PRODUCTS=await fetchCompressedJson(PRODUCTS_GZ_URL,PRODUCTS_URL);
+    const raw=await fetchCompressedJson(PRODUCTS_GZ_URL,PRODUCTS_URL);
+    PRODUCTS=(Array.isArray(raw)?raw:[]).map(r=>Array.isArray(r)?{code:r[0]||'',name:r[1]||'',gross:Number(r[2])||0,currency:'MXP'}:{code:r.code||'',name:r.name||'',gross:Number(r.gross)||0,currency:'MXP'});
+    PRODUCT_BY_CODE=new Map(PRODUCTS.map(p=>[p.code,p]));
     PRODUCTS_READY=true;
     renderProducts(); renderCart();
   }catch(e){
@@ -387,17 +392,23 @@ async function loadClients(){
   if(CLIENTS_READY) return CLIENTS;
   if(CLIENTS_LOADING) return CLIENTS_LOADING;
   CLIENTS_LOADING=(async()=>{
-    $('#clientResultsHead').textContent='Cargando padrón de clientes…';
-    $('#clientResults').innerHTML='<div class="clientEmpty">Cargando clientes por primera vez…</div>';
-    CLIENTS=await fetchCompressedJson(CLIENTS_GZ_URL,CLIENTS_URL);
+    const seller=ACTIVE_SELLER;
+    if(!seller) throw new Error('Sin vendedor');
+    $('#clientResultsHead').textContent='Cargando cartera del vendedor…';
+    $('#clientResults').innerHTML='<div class="clientEmpty">Cargando clientes asignados…</div>';
+    const url=`data/cotizador/clientes_vendedor/${sellerSlug(seller)}.json`;
+    const r=await fetch(url,{cache:'force-cache'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    CLIENTS=await r.json();
+    if(!Array.isArray(CLIENTS)) CLIENTS=[];
     CLIENTS_READY=true;
     CLIENTS_LOADING=null;
     const c=$('#clientDbCount'); if(c) c.textContent=CLIENTS.length.toLocaleString('es-MX');
     return CLIENTS;
   })().catch(e=>{
     CLIENTS_LOADING=null;
-    $('#clientResultsHead').textContent='No se pudo cargar el padrón de clientes.';
-    $('#clientResults').innerHTML='<div class="clientEmpty">Revisa tu conexión e intenta otra vez.</div>';
+    $('#clientResultsHead').textContent=ACTIVE_SELLER?'No se pudo cargar tu cartera.':'Abre el cotizador desde Inicio o Visitas.';
+    $('#clientResults').innerHTML='<div class="clientEmpty">No se descargó la base nacional. Vuelve a Inicio e ingresa con tu usuario.</div>';
     throw e;
   });
   return CLIENTS_LOADING;
@@ -499,7 +510,7 @@ function runClientSearch(){
 }
 
 
-function pval(p){return mode==='wholesale'?p.wholesale:p.gross}
+function pval(p){return Number(p.gross)||0}
 
 function filtered(){
   const term=norm($('#search').value);
@@ -521,7 +532,6 @@ function renderProducts(){
         <div class="pname">${esc(p.name)}</div>
         <div class="prices">
           <span class="mainPrice">${fmt(pval(p),p.currency)}</span>
-          <span class="altPrice">${mode==='wholesale'?'Bruto: '+fmt(p.gross,p.currency):'Mayoreo: '+fmt(p.wholesale,p.currency)}</span>
         </div>
       </div>
       <button class="addBtn" data-code="${esc(p.code)}">+</button>
@@ -533,7 +543,7 @@ function renderProducts(){
 function totals(){
   let sub=0,pieces=0;
   for(const [c,q] of Object.entries(cart)){
-    const p=PRODUCTS.find(x=>x.code===c); if(!p) continue;
+    const p=PRODUCT_BY_CODE.get(c); if(!p) continue;
     sub+=pval(p)*q; pieces+=q;
   }
   const d=Math.min(100,Math.max(0,Number($('#discount').value)||0));
@@ -544,7 +554,7 @@ function totals(){
 function renderCart(){
   let out='';
   for(const [c,q] of Object.entries(cart)){
-    const p=PRODUCTS.find(x=>x.code===c); if(!p) continue;
+    const p=PRODUCT_BY_CODE.get(c); if(!p) continue;
     out+=`<div class="qitem">
       <div><b>${esc(p.name)}</b><small>${esc(p.code)} · ${fmt(pval(p),p.currency)} c/u</small></div>
       <div class="qtyCtl">
@@ -569,7 +579,7 @@ function sval(id,f='—'){const v=($(id).value||'').trim();return v?esc(v):f}
 function buildPrint(){
   const entries=Object.entries(cart), t=totals();
   const rows=entries.map(([c,q],i)=>{
-    const p=PRODUCTS.find(x=>x.code===c); if(!p) return '';
+    const p=PRODUCT_BY_CODE.get(c); if(!p) return '';
     const st=pval(p)*q;
     return `<tr>
       <td class="n">${i+1}</td>
@@ -616,7 +626,7 @@ function buildPrint(){
             <span class="label">Forma de venta:</span><span class="val">${clientSafe(C_SALE)}</span>
             <span class="label">Moneda:</span><span class="val">MXP</span>
             <span class="label">Vigencia:</span><span class="val">${sval('#valid')}</span>
-            <span class="label">Lista:</span><span class="val">${mode==='wholesale'?'Mayoreo':'Bruto'}</span>
+            <span class="label">Lista:</span><span class="val">Bruto</span>
             <span class="label">Partidas:</span><span class="val">${entries.length}</span>
           </div>
         </div>
@@ -687,7 +697,7 @@ function closePreview(){
 
 function quoteRowsData(){
   return Object.entries(cart).map(([code,qty])=>{
-    const p=PRODUCTS.find(x=>x.code===code);
+    const p=PRODUCT_BY_CODE.get(code);
     if(!p) return null;
     const unit=pval(p);
     return {code:p.code,name:p.name,qty:Number(qty)||0,unit,total:unit*(Number(qty)||0),currency:p.currency||'MXP'};
@@ -849,11 +859,6 @@ function downloadQuotePdf(){const blob=buildPdfBlob();if(blob)downloadBlob(blob,
 
 $('#search').addEventListener('input',()=>{limit=60;renderProducts()});
 $('#more').onclick=()=>{limit+=60;renderProducts()};
-$('#priceSwitch').onclick=()=>{
-  mode=mode==='wholesale'?'gross':'wholesale';
-  $('#priceSwitch').textContent=mode==='wholesale'?'Mayoreo ▾':'Bruto ▾';
-  renderProducts(); renderCart();
-};
 $$('.chip').forEach(b=>b.onclick=()=>{
   filterMode=b.dataset.filter; $$('.chip').forEach(x=>x.classList.toggle('active',x===b)); limit=60; renderProducts();
 });
@@ -883,18 +888,18 @@ $('#clientSearch').addEventListener('input',()=>{
 });
 
 async function applyLaunchContext(){
-  const params=new URLSearchParams(window.location.search);
+  const params=LAUNCH_PARAMS;
   const from=params.get('from')||'';
   const clientCode=(params.get('clientCode')||'').trim();
   const clientName=(params.get('clientName')||'').trim();
-  const seller=(params.get('seller')||'').trim();
+  const seller=ACTIVE_SELLER;
   if(from==='visitas'){
     const b=$('#backVisits');
     if(b){
       b.style.display='';
       b.onclick=()=>{
         if(window.opener && !window.opener.closed){ window.close(); }
-        else if(window.parent!==window){ window.parent.postMessage({type:'toyo-open-module',module:'visitas'},location.origin); } else { window.location.href='index.html'; }
+        else { window.location.href='visitas.html'; }
       };
     }
   }

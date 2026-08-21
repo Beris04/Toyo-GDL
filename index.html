@@ -2,91 +2,73 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b4ea2">
-<title>Toyo Foods · App Comercial</title>
+<title>Toyo Foods · Comercial</title>
 <style>
-:root{--brand:#0b4ea2;--brand2:#073675;--bg:#f2f6fb;--text:#11213b;--muted:#6b7b92;--line:#dce5f0;--safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px)}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;height:100%;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}button,select,input{font:inherit}button{cursor:pointer}
-.app{height:100%;display:flex;flex-direction:column;overflow:hidden}
-.appbar{height:calc(62px + var(--safe-t));padding:var(--safe-t) 12px 0;display:flex;align-items:center;gap:11px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;box-shadow:0 8px 24px rgba(8,54,117,.22);z-index:40;flex:0 0 auto}
-.menuBtn{width:42px;height:42px;border:0;border-radius:13px;background:#ffffff1c;color:#fff;font-size:22px;display:grid;place-items:center}
-.brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1}.brand img{width:38px;height:38px;border-radius:11px;object-fit:contain}.brandText{min-width:0}.brandText b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.brandText small{display:block;font-size:10px;opacity:.78;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
-.statusPill{font-size:9px;font-weight:900;background:#ffffff18;border:1px solid #ffffff2a;padding:6px 8px;border-radius:999px;white-space:nowrap}
-.stage{flex:1;min-height:0;position:relative;overflow:hidden}
-.home{height:100%;overflow:auto;padding:14px 12px 100px;background:radial-gradient(850px 500px at 0 -10%,#dceaff,transparent 55%),var(--bg)}
-.welcome{background:linear-gradient(135deg,#0b4ea2,#092f61);color:#fff;border-radius:22px;padding:20px;box-shadow:0 16px 34px rgba(11,78,162,.21)}.welcome small{opacity:.8;font-size:11px}.welcome h1{font-size:24px;margin:7px 0 4px}.welcome p{font-size:12px;line-height:1.45;margin:0;opacity:.86}
-.sectionTitle{font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.06em;margin:20px 4px 9px}
-.moduleGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.moduleCard{border:1px solid var(--line);background:#fff;border-radius:19px;padding:15px;text-align:left;box-shadow:0 8px 22px rgba(18,48,86,.07);min-height:132px;display:flex;flex-direction:column;justify-content:space-between}.moduleCard .icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:#eaf2ff;font-size:21px}.moduleCard b{font-size:14px}.moduleCard span{display:block;font-size:10px;color:var(--muted);line-height:1.4;margin-top:4px}.moduleCard.primary .icon{background:#e7f7f0}.moduleCard.admin .icon{background:#f3eaff}
-.quickInfo{margin-top:11px;border:1px solid var(--line);background:#fff;border-radius:18px;padding:14px;display:flex;gap:11px;align-items:center}.avatar{width:40px;height:40px;border-radius:13px;background:#eaf2ff;display:grid;place-items:center}.quickInfo b{font-size:12px;display:block}.quickInfo span{font-size:10px;color:var(--muted);display:block;margin-top:2px}
-.frameWrap{position:absolute;inset:0;display:none;background:#fff}.frameWrap.active{display:block}iframe{width:100%;height:100%;border:0;background:#fff}.loader{position:absolute;inset:0;display:grid;place-items:center;background:#f5f8fc;z-index:2}.loaderBox{text-align:center;color:var(--muted);font-size:12px}.spinner{width:30px;height:30px;border:3px solid #dbe6f2;border-top-color:var(--brand);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 9px}@keyframes spin{to{transform:rotate(360deg)}}
-.bottom{height:calc(68px + var(--safe-b));padding:7px 9px var(--safe-b);display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:#fff;border-top:1px solid var(--line);flex:0 0 auto;z-index:42}.navBtn{border:0;background:transparent;color:#718198;border-radius:13px;font-size:10px;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}.navBtn i{font-style:normal;font-size:19px}.navBtn.active{background:#eef5ff;color:var(--brand)}
-.drawerShade{position:fixed;inset:0;background:#08142680;z-index:80;display:none}.drawerShade.open{display:block}.drawer{position:absolute;left:0;top:0;bottom:0;width:min(86vw,340px);background:#fff;box-shadow:18px 0 50px #0002;padding:calc(14px + var(--safe-t)) 12px calc(14px + var(--safe-b));overflow:auto}.drawerHead{display:flex;align-items:center;gap:11px;padding:5px 6px 16px;border-bottom:1px solid var(--line)}.drawerHead img{width:45px;height:45px;border-radius:13px}.drawerHead b{display:block;font-size:14px}.drawerHead small{font-size:10px;color:var(--muted)}details{border-bottom:1px solid #edf2f7}summary{list-style:none;padding:15px 7px;font-size:12px;font-weight:900;cursor:pointer}summary::-webkit-details-marker{display:none}.menuItem{width:100%;border:0;background:transparent;border-radius:12px;padding:11px 10px;text-align:left;font-size:12px;color:#29405d;display:flex;align-items:center;gap:10px}.menuItem:active{background:#eef5ff}.menuItem.danger{color:#b42318}.closeX{margin-left:auto;border:0;background:#eef2f7;width:34px;height:34px;border-radius:10px}
-.login{position:fixed;inset:0;z-index:200;background:radial-gradient(800px 500px at 15% 0%,#dbeaff,transparent 58%),#f2f6fb;display:none;align-items:center;justify-content:center;padding:20px}.login.show{display:flex}.loginCard{width:min(430px,100%);background:#fff;border:1px solid var(--line);border-radius:26px;padding:22px;box-shadow:0 25px 70px rgba(18,48,86,.18)}.loginBrand{display:flex;align-items:center;gap:13px}.loginBrand img{width:60px;height:60px;border-radius:17px}.loginBrand h2{margin:0;font-size:21px}.loginBrand p{margin:4px 0 0;color:var(--muted);font-size:11px}.field{margin-top:14px}.field label{display:block;color:var(--muted);font-size:11px;margin-bottom:6px}.field select,.field input{width:100%;height:49px;border:1px solid #cfdaea;border-radius:14px;padding:0 12px;background:#fff;font-size:14px}.loginBtn{margin-top:14px;width:100%;height:49px;border:0;border-radius:14px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;font-weight:900}.loginErr{font-size:11px;color:#b42318;margin-top:10px;display:none}.loginErr.show{display:block}
-@media(min-width:720px){.home{padding-left:max(18px,calc((100% - 680px)/2));padding-right:max(18px,calc((100% - 680px)/2))}.moduleGrid{grid-template-columns:repeat(3,1fr)}}
+:root{--b:#0b4ea2;--b2:#073675;--bg:#f3f7fc;--tx:#13233d;--mu:#718198;--ln:#dce6f1;--st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--tx)}button,select,input{font:inherit}button{cursor:pointer}
+.shell{max-width:540px;margin:auto;padding:calc(18px + var(--st)) 14px calc(28px + var(--sb))}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:18px}.brand img{width:54px;height:54px;border-radius:15px;object-fit:contain}.brand b{font-size:18px;display:block}.brand span{font-size:11px;color:var(--mu)}
+.hero{background:linear-gradient(135deg,var(--b),var(--b2));color:#fff;border-radius:22px;padding:20px;box-shadow:0 15px 36px #0b4ea22b}.hero small{opacity:.78;font-weight:800}.hero h1{font-size:24px;margin:7px 0 5px}.hero p{font-size:12px;line-height:1.5;margin:0;opacity:.9}
+.card{background:#fff;border:1px solid var(--ln);border-radius:20px;padding:16px;margin-top:12px;box-shadow:0 7px 22px #17324d0d}
+.field{margin-top:12px}label{display:block;font-size:11px;color:var(--mu);font-weight:800;margin-bottom:6px}select,input{width:100%;height:49px;border:1px solid #cfdaea;border-radius:14px;padding:0 12px;background:#fff;font-size:14px}
+.primary{width:100%;height:50px;border:0;border-radius:14px;background:linear-gradient(135deg,var(--b),var(--b2));color:#fff;font-weight:900;margin-top:14px}.err{display:none;color:#b42318;font-size:11px;margin-top:9px}.err.show{display:block}
+.home{display:none}.home.show{display:block}.login.hide{display:none}
+.user{display:flex;align-items:center;gap:10px}.avatar{width:42px;height:42px;border-radius:13px;background:#eaf2ff;display:grid;place-items:center;font-size:20px}.user b{font-size:13px;display:block}.user span{font-size:10px;color:var(--mu);display:block;margin-top:2px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.mod{min-height:132px;border:1px solid var(--ln);background:#fff;border-radius:19px;padding:15px;text-align:left;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 7px 20px #17324d0d}.ico{width:42px;height:42px;border-radius:14px;background:#eaf2ff;display:grid;place-items:center;font-size:21px}.mod b{font-size:14px}.mod span{display:block;color:var(--mu);font-size:10px;line-height:1.4;margin-top:4px}.mod.quote .ico{background:#e9f8f1}.mod.admin .ico{background:#f2eaff}
+.logout{border:0;background:#fff;color:#b42318;font-weight:800;font-size:11px;padding:10px 0;margin-top:14px;width:100%}.status{font-size:10px;color:var(--mu);text-align:center;margin-top:14px}
+@media(max-width:370px){.grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<div class="app">
-  <header class="appbar">
-    <button id="menuBtn" class="menuBtn" aria-label="Menú">☰</button>
-    <div class="brand"><img src="assets/toyo_logo.png" alt="Toyo Foods"><div class="brandText"><b id="screenTitle">App Comercial</b><small id="screenSub">Toyo Foods · Equipo de ventas</small></div></div>
-    <span class="statusPill" id="netPill">● En línea</span>
-  </header>
-  <main class="stage">
-    <section id="home" class="home">
-      <div class="welcome"><small>TOYO FOODS · APP MÓVIL</small><h1 id="welcomeTitle">Hola</h1><p>Modo móvil universal: abre primero la app y carga cada herramienta solo cuando la necesitas.</p></div>
-      <div class="sectionTitle">Módulos</div>
-      <div class="moduleGrid">
-        <button class="moduleCard primary" data-module="visitas"><div class="icon">📍</div><div><b>Visitas</b><span>Registrar, finalizar y consultar visitas.</span></div></button>
-        <button class="moduleCard" data-module="cotizador"><div class="icon">🧾</div><div><b>Cotizador</b><span>Productos, precios, cliente y PDF.</span></div></button>
-        <button class="moduleCard admin" data-module="admin" id="adminCard" style="display:none"><div class="icon">📊</div><div><b>Admin</b><span>Cloud, ranking, reportes y comunicados.</span></div></button>
-      </div>
-      <div class="quickInfo"><div class="avatar">👤</div><div><b id="userName">—</b><span id="userScope">—</span></div></div>
-      <div class="sectionTitle">Carga optimizada</div>
-      <div class="quickInfo"><div class="avatar">⚡</div><div><b>Modo móvil universal</b><span>Compatible con Safari, Chrome y navegadores móviles. Sin cargas pesadas al iniciar.</span></div></div>
-    </section>
-    <div id="frameWrap" class="frameWrap"><div class="loader" id="frameLoader"><div class="loaderBox"><div class="spinner"></div><b>Abriendo módulo…</b><div style="margin-top:4px">La primera carga puede tardar según tu señal.</div></div></div><iframe id="moduleFrame" title="Módulo Toyo" allow="geolocation; clipboard-write; fullscreen"></iframe></div>
-  </main>
-  <nav class="bottom">
-    <button class="navBtn active" data-module="home"><i>⌂</i><span>Inicio</span></button>
-    <button class="navBtn" data-module="visitas"><i>📍</i><span>Visitas</span></button>
-    <button class="navBtn" data-module="cotizador"><i>🧾</i><span>Cotizar</span></button>
-    <button class="navBtn" id="moreBtn"><i>☰</i><span>Menú</span></button>
-  </nav>
-</div>
-<div id="drawerShade" class="drawerShade"><aside class="drawer"><div class="drawerHead"><img src="assets/toyo_logo.png"><div><b>Toyo Foods</b><small id="drawerUser">App Comercial</small></div><button id="closeDrawer" class="closeX">✕</button></div>
-<details open><summary>Operación comercial</summary><button class="menuItem" data-module="home">⌂ Inicio</button><button class="menuItem" data-module="visitas">📍 Visitas</button><button class="menuItem" data-module="cotizador">🧾 Cotizador</button></details>
-<details id="adminMenu" style="display:none"><summary>Administración</summary><button class="menuItem" data-module="admin">📊 Admin / Cloud</button></details>
-<details><summary>Sesión</summary><button class="menuItem danger" id="logoutBtn">↪ Cerrar sesión</button></details>
-</aside></div>
-<div id="login" class="login"><div class="loginCard"><div class="loginBrand"><img src="assets/toyo_logo.png"><div><h2>App Comercial</h2><p>Un solo acceso para Visitas y Cotizador.</p></div></div><div class="field"><label>Usuario</label><select id="loginUser"><option value="">Selecciona usuario</option></select></div><div class="field"><label>Contraseña</label><input id="loginPass" type="password" placeholder="Contraseña"></div><button id="loginBtn" class="loginBtn">Entrar</button><div id="loginErr" class="loginErr">Usuario o contraseña incorrectos.</div></div></div>
+<main class="shell">
+  <div class="brand"><img src="assets/toyo_logo.png" alt="Toyo Foods"><div><b>Toyo Foods</b><span>Comercial · Web móvil V6</span></div></div>
+
+  <section class="hero"><small>WEB MÓVIL ULTRA LIGERA</small><h1>Visitas y Cotizaciones</h1><p>La pantalla inicial no carga mapas, Cloud, clientes ni catálogos. Cada módulo descarga únicamente lo que necesita.</p></section>
+
+  <section id="login" class="card login">
+    <b>Iniciar sesión</b>
+    <div class="field"><label>Usuario</label><select id="user"><option value="">Selecciona usuario</option></select></div>
+    <div class="field"><label>Contraseña</label><input id="pass" type="password" placeholder="Contraseña" autocomplete="current-password"></div>
+    <button id="enter" class="primary">Entrar</button>
+    <div id="err" class="err">Usuario o contraseña incorrectos.</div>
+  </section>
+
+  <section id="home" class="home">
+    <div class="card user"><div class="avatar">👤</div><div><b id="who">—</b><span id="scope">—</span></div></div>
+    <div class="grid">
+      <button class="mod" id="visitas"><div class="ico">📍</div><div><b>Visitas</b><span>Registro, GPS y seguimiento.</span></div></button>
+      <button class="mod quote" id="cotizar"><div class="ico">🧾</div><div><b>Cotizar</b><span>Solo precio bruto. Carga la cartera del vendedor.</span></div></button>
+      <button class="mod admin" id="admin" style="display:none"><div class="ico">📊</div><div><b>Admin</b><span>Cloud, reportes y exportación.</span></div></button>
+    </div>
+    <button id="logout" class="logout">Cerrar sesión</button>
+  </section>
+  <div id="net" class="status"></div>
+</main>
 <script>
 const SELLERS={"CDMX":["David Adrian Hernández Guzmán","Javier Espinosa Olivares","Ricardo Gutierrez Bandera","Abraham Rene Valdes Gonzales","Jesus Antonio Ramirez Rivera","Sergio Servin Rivera","Eduardo Faustino Hernandez Sanchez","Khiroyuki Sakurai","Andres Fierro Ibañez","Jonathan Ramirez","Tohru Kurasawa","Tanno Nobuko"],"MTY":["Jessica Palomo","Luis Heredia","Carla Hernández","Salomé Barron"],"GDL":["Aguilar Neri Daniel","De la Cruz Ponce Julio Cesar","Garibay Ortiz Sergio Joel","Sierra de Anda Aldo","Perez Mar Alan Roberto","Reynoso Aguilar Maricela","Sandra Navarro Navarro","Aguirre Ojeda Arcenio","Velez Castellanos Antonio","Yepez Mora Oscar Alberto","Sanchez Esmeralda","Reynaga Valeria","González Guzmán Cristian Eduardo"],"AGS":["Hernandez Gonzalez Angel Miguel"],"PUE":["Victor Mendez","Yael Mojica"],"QRO":["Roberto Lopez"]};
 const CITY_LABELS={"GDL":"Guadalajara","MTY":"Monterrey","CDMX":"México","AGS":"Aguascalientes","PUE":"Puebla","QRO":"Querétaro"};
-const AUTH_KEY='app_visitas_auth_v2', AUTH_PASS='Toyo2026';
-// La sesión vive solo mientras esta pestaña/app está abierta.
-// Borra credenciales persistentes de builds anteriores para volver a pedir contraseña al reabrir.
-try{ localStorage.removeItem(AUTH_KEY); sessionStorage.removeItem(AUTH_KEY); }catch(e){}
-const MODULES={visitas:{title:'Visitas',sub:'Registro y seguimiento',src:'visitas.html?v=50&embedded=1'},cotizador:{title:'Cotizador',sub:'Precios y cotizaciones',src:'cotizador.html?v=50&embedded=1'},admin:{title:'Admin',sub:'Cloud y reportes',src:'visitas.html?v=50&embedded=1#/admin'}};
-const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-function accounts(){const a={Admin:{role:'admin',city:'ALL',vendor:'ALL'}};Object.entries(SELLERS).forEach(([city,vs])=>vs.forEach(v=>a[v]={role:'seller',city,vendor:v}));return a}const ACC=accounts();
-function auth(){try{const x=JSON.parse(sessionStorage.getItem(AUTH_KEY)||'null');return x&&x.ok?x:null}catch{return null}}
-function saveAuth(x){try{if(x)sessionStorage.setItem(AUTH_KEY,JSON.stringify(x));else sessionStorage.removeItem(AUTH_KEY)}catch(e){}}
-function fillUsers(){const s=$('#loginUser');Object.entries(SELLERS).forEach(([city,vs])=>{const g=document.createElement('optgroup');g.label=CITY_LABELS[city]||city;vs.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;g.appendChild(o)});s.appendChild(g)});const o=document.createElement('option');o.value='Admin';o.textContent='Admin';s.appendChild(o)}
-function syncUserUI(){const a=auth();const logged=!!a;$('#login').classList.toggle('show',!logged);if(!logged)return;$('#welcomeTitle').textContent=a.role==='admin'?'Hola, Admin':`Hola, ${(a.user||'').split(' ')[0]}`;$('#userName').textContent=a.user;$('#userScope').textContent=a.role==='admin'?'Administrador · Todas las ciudades':`${CITY_LABELS[a.city]||a.city} · Vendedor`;$('#drawerUser').textContent=a.user;$('#adminCard').style.display=a.role==='admin'?'flex':'none';$('#adminMenu').style.display=a.role==='admin'?'block':'none'}
-function doLogin(){const user=$('#loginUser').value,pass=$('#loginPass').value,p=ACC[user];if(!p||pass!==AUTH_PASS){$('#loginErr').classList.add('show');return}saveAuth({ok:true,user,role:p.role,city:p.city,vendor:p.vendor});$('#loginPass').value='';$('#loginErr').classList.remove('show');syncUserUI()}
-function openDrawer(on=true){$('#drawerShade').classList.toggle('open',on)}
-let current='home';
-function openModule(name, customUrl=''){const a=auth();if(!a)return syncUserUI();if(name==='admin'&&a.role!=='admin')return;openDrawer(false);$$('.navBtn[data-module]').forEach(b=>b.classList.toggle('active',b.dataset.module===name));if(name==='home'){current='home';$('#home').style.display='block';$('#frameWrap').classList.remove('active');$('#screenTitle').textContent='App Comercial';$('#screenSub').textContent='Toyo Foods · Equipo de ventas';return}const m=MODULES[name];if(!m)return;current=name;$('#home').style.display='none';$('#frameWrap').classList.add('active');$('#frameLoader').style.display='grid';$('#screenTitle').textContent=m.title;$('#screenSub').textContent=m.sub;const f=$('#moduleFrame');let src=customUrl||m.src;if(customUrl&&name==='cotizador'){const u=new URL(customUrl,location.href);u.searchParams.set('embedded','1');src=u.href}if(f.dataset.src!==src){f.dataset.src=src;f.src=src}else $('#frameLoader').style.display='none'}
-$('#moduleFrame').addEventListener('load',()=>$('#frameLoader').style.display='none');
-window.addEventListener('message',e=>{if(e.origin!==location.origin||!e.data)return;if(e.data.type==='toyo-open-module')openModule(e.data.module,e.data.url||'')});
-$$('[data-module]').forEach(b=>b.addEventListener('click',()=>openModule(b.dataset.module)));$('#menuBtn').onclick=()=>openDrawer(true);$('#moreBtn').onclick=()=>openDrawer(true);$('#closeDrawer').onclick=()=>openDrawer(false);$('#drawerShade').addEventListener('click',e=>{if(e.target===$('#drawerShade'))openDrawer(false)});$('#logoutBtn').onclick=()=>{saveAuth(null);sessionStorage.removeItem(AUTH_KEY);$('#moduleFrame').src='about:blank';$('#moduleFrame').dataset.src='';openModule('home');openDrawer(false);syncUserUI()};$('#loginBtn').onclick=doLogin;$('#loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
-function net(){const on=navigator.onLine;$('#netPill').textContent=on?'● En línea':'● Sin conexión';$('#netPill').style.opacity=on?'1':'.75'}window.addEventListener('online',net);window.addEventListener('offline',net);
-fillUsers();syncUserUI();net();
-window.addEventListener('pagehide',()=>{try{sessionStorage.removeItem(AUTH_KEY)}catch(e){}});
-// V5 universal: no dependemos de Service Worker para abrir. Safari/Chrome cargan el HTML directo.
-if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())).catch(()=>{});}
-if('caches' in window){caches.keys().then(keys=>Promise.all(keys.filter(k=>/^toyo-comercial-/i.test(k)).map(k=>caches.delete(k)))).catch(()=>{});}
+const AUTH_KEY='app_visitas_auth_v2', PASS='Toyo2026';
+const $=s=>document.querySelector(s);
+function accounts(){const a={Admin:{role:'admin',city:'ALL',vendor:'ALL'}};Object.entries(SELLERS).forEach(([city,vs])=>vs.forEach(v=>a[v]={role:'seller',city,vendor:v}));return a}
+const ACC=accounts();
+function getAuth(){try{const x=JSON.parse(sessionStorage.getItem(AUTH_KEY)||'null');return x&&x.ok?x:null}catch(e){return null}}
+function setAuth(x){try{localStorage.removeItem(AUTH_KEY);if(x)sessionStorage.setItem(AUTH_KEY,JSON.stringify(x));else sessionStorage.removeItem(AUTH_KEY)}catch(e){}draw()}
+function fill(){const s=$('#user');const adm=document.createElement('option');adm.value='Admin';adm.textContent='Admin';s.appendChild(adm);Object.entries(SELLERS).forEach(([c,vs])=>{const g=document.createElement('optgroup');g.label=CITY_LABELS[c]||c;vs.slice().sort((a,b)=>a.localeCompare(b,'es')).forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;g.appendChild(o)});s.appendChild(g)})}
+function draw(){const a=getAuth();$('#login').classList.toggle('hide',!!a);$('#home').classList.toggle('show',!!a);if(!a)return;$('#who').textContent=a.user;$('#scope').textContent=a.role==='admin'?'Administrador':`${CITY_LABELS[a.city]||a.city} · ${a.vendor}`;$('#admin').style.display=a.role==='admin'?'':'none'}
+function login(){const u=$('#user').value,p=$('#pass').value,pr=ACC[u],ok=!!pr&&p===PASS;$('#err').classList.toggle('show',!ok);if(ok){setAuth({ok:true,user:u,role:pr.role,city:pr.city,vendor:pr.vendor});$('#pass').value=''}}
+function sellerSlug(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'')}
+$('#enter').onclick=login;$('#pass').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
+$('#logout').onclick=()=>setAuth(null);
+$('#visitas').onclick=()=>location.href='visitas.html';
+$('#admin').onclick=()=>location.href='visitas.html#/admin';
+$('#cotizar').onclick=()=>{const a=getAuth();if(!a||a.role!=='seller')return;const u=new URL('cotizador.html',location.href);u.searchParams.set('from','home');u.searchParams.set('seller',a.vendor);u.searchParams.set('city',a.city);location.href=u.href};
+function net(){$('#net').textContent=navigator.onLine?'● En línea':'● Sin conexión'}window.addEventListener('online',net);window.addEventListener('offline',net);
+fill();draw();net();
+// Retira Service Workers/cachés de versiones anteriores sin registrar uno nuevo.
+if('serviceWorker' in navigator)navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())).catch(()=>{});
+if('caches' in window)caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))).catch(()=>{});
 </script>
-</body></html>
+</body>
+</html>
