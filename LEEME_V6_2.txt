@@ -1,0 +1,27 @@
+TOYO FOODS · WEB MÓVIL V6.2
+
+NOVEDAD COTIZADOR
+- Cotización rediseñada en formato HORIZONTAL.
+- Diseño más limpio y ejecutivo: fondo blanco, grises suaves y líneas delgadas.
+- Se redujo el uso de colores.
+- La imagen y el PDF ahora usan EL MISMO RENDER.
+- Por eso la cotización en PDF se ve igual a la imagen compartida.
+- PDF en hoja Letter horizontal.
+- Imagen horizontal en alta resolución.
+- Se mantiene únicamente PRECIO BRUTO.
+- Se mantienen datos de cliente, vendedor, pago, forma de venta, vigencia, notas, subtotal, descuento y total.
+
+SE MANTIENE
+- Sesión persistente hasta presionar Cerrar sesión.
+- Clientes por vendedor.
+- Web móvil ultra ligera.
+- Sin Service Worker / PWA.
+- Sin iframe.
+- Visitas, GPS, Admin y Cloud bajo demanda.
+
+SUBIR A GITHUB
+1. Reemplaza TODO el contenido del repositorio Toyo-GDL por el contenido de este ZIP.
+2. Commit to main.
+3. Push origin.
+4. Abre una vez: https://beris04.github.io/Toyo-GDL/limpiar.html?v=62
+5. Después usa normalmente: https://beris04.github.io/Toyo-GDL/
