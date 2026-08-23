@@ -1,0 +1,39 @@
+TOYO FOODS · WEB MÓVIL V6.3 · PRECIO LISTA 4
+
+COTIZADOR
+- Botón Precio Bruto.
+- Botón Precio Lista 4.
+- Al elegir Lista 4, búsqueda, filtros, carrito, subtotal, total, imagen y PDF usan exclusivamente Precio Lista 4.
+- El PDF/imagen indica claramente si la cotización fue Bruto o Lista 4.
+- El nombre del archivo también indica L4 o Bruto.
+- Si se cambia de lista y un producto del carrito no existe en la nueva lista, el sistema avisa antes de eliminarlo.
+
+CATÁLOGOS
+- Precio Bruto: 8,759 productos del catálogo actual.
+- Precio Lista 4: 5,586 códigos únicos de PRECIOS L4.xlsx.
+- Coincidencias entre ambos catálogos: 3,829.
+- Productos exclusivos de Lista 4 agregados al buscador: 1,757.
+- Catálogo combinado: 10,516 códigos.
+
+VALIDACIÓN
+- 8 códigos del Excel tenían más de un precio.
+- Se tomó el precio que más se repite.
+- Revisa REVISION_PRECIOS_L4.txt para ver esos códigos.
+
+SE MANTIENE
+- Diseño horizontal limpio de cotización.
+- PDF e imagen con el mismo diseño.
+- Sesión persistente hasta Cerrar sesión.
+- Clientes por vendedor.
+- Web móvil ligera.
+- Sin Service Worker/PWA.
+- Sin iframe.
+
+SUBIR A GITHUB
+1. Reemplaza TODO el contenido de Toyo-GDL con este ZIP.
+2. Commit to main.
+3. Push origin.
+4. Abre una vez:
+   https://beris04.github.io/Toyo-GDL/limpiar.html?v=63
+5. Después:
+   https://beris04.github.io/Toyo-GDL/

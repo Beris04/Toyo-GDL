@@ -1,0 +1,15 @@
+VALIDACION PRECIOS LISTA 4
+
+El archivo PRECIOS L4.xlsx contiene 5,586 códigos únicos.
+Se detectaron 8 códigos repetidos con más de un precio.
+Para integrar sin detener el cotizador se tomó el precio que más se repite en el archivo.
+
+CODIGO | PRECIO USADO | PRECIOS ENCONTRADOS (frecuencia)
+SE-BEB153-10006 | $50.72 | $50.72 x 258, $67.27 x 257
+SE-BEB153-10007 | $63.00 | $42.00 x 169, $47.50 x 4, $63.00 x 342
+SE-BEB153-10008 | $63.00 | $42.00 x 169, $63.00 x 338
+SE-BEB153-11094 | $44.49 | $44.49 x 254, $59.00 x 253
+SE-SFP603-0137 | $25.50 | $12.75 x 499, $25.50 x 500
+SE-SFP603-0139 | $25.50 | $12.75 x 499, $25.50 x 500
+SE-SYE554-11689 | $216.31 | $196.65 x 21, $216.31 x 23
+SE-SYE599-6765 | $221.37 | $221.37 x 19, $243.50 x 18

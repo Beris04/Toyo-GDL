@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b2b52">
-<title>Toyo Foods · Cotizador móvil</title>
+<title>Toyo Foods · Cotizador V6.3</title>
 <style>
 :root {
   --navy:#0b2b52; --navy2:#123f71; --blue:#1f6feb; --bg:#f3f6fa; --card:#fff;
@@ -27,6 +27,12 @@ button{cursor:pointer}
 .brand img{width:42px;height:42px;border-radius:11px;object-fit:contain;background:#fff;padding:2px}
 .brand b{display:block;font-size:16px} .brand small{display:block;font-size:10px;opacity:.78;margin-top:2px}
 .priceSwitch{border:1px solid #ffffff55;background:#ffffff16;color:#fff;border-radius:11px;padding:8px 9px;font-size:11px;font-weight:800}
+.priceModeRow{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
+.priceModeBtn{border:1px solid #ffffff55;background:#ffffff12;color:#fff;border-radius:11px;padding:9px 8px;font-size:11px;font-weight:900}
+.priceModeBtn.active{background:#fff;color:var(--navy);box-shadow:0 4px 12px #001d3d22}
+.priceModeBtn small{display:block;font-size:8px;font-weight:700;opacity:.72;margin-top:2px}
+.priceModeBtn.active small{color:#6f7c8b}
+
 .backVisits{border:1px solid #ffffff55;background:#ffffff16;color:#fff;border-radius:11px;padding:8px 9px;font-size:11px;font-weight:800}
 .searchBox{position:relative;margin-top:12px}
 .searchBox input{width:100%;border:0;outline:0;border-radius:14px;background:#fff;color:#172536;padding:13px 44px 13px 14px;font-size:15px;box-shadow:0 6px 16px #001d3d1c}
@@ -219,16 +225,20 @@ body.embedded .content{padding-top:9px}
       <div class="brandRow">
         <div class="brand">
           <img src="assets/toyo_logo.png" alt="Toyo Foods">
-          <div><b>Cotizador · Precio Bruto</b><small>Toyo Foods · Cotizador móvil · Precio bruto · V6.2</small></div>
+          <div><b>Cotizador</b><small>Toyo Foods · Precio Bruto / Lista 4 · V6.3</small></div>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
           <button id="backVisits" class="backVisits" type="button" style="display:none">← Visitas</button>
-          <span class="priceSwitch" style="cursor:default">Precio bruto</span>
+          <span id="activePricePill" class="priceSwitch" style="cursor:default">Precio Bruto</span>
         </div>
       </div>
       <div class="searchBox">
         <input id="search" placeholder="Buscar producto o código…" autocomplete="off">
         <span class="ico">⌕</span>
+      </div>
+      <div class="priceModeRow">
+        <button id="priceGross" class="priceModeBtn active" type="button">Precio Bruto<small>Lista actual</small></button>
+        <button id="priceL4" class="priceModeBtn" type="button">Precio Lista 4<small>PRECIOS L4</small></button>
       </div>
       <div class="quickRow">
         <button class="chip active" data-filter="all">Todos</button>
@@ -239,7 +249,7 @@ body.embedded .content{padding-top:9px}
     </header>
 
     <main class="content">
-      <div class="summary"><b id="resultCount">Cargando productos…</b><span>Precio bruto · Lista SAP</span></div>
+      <div class="summary"><b id="resultCount">Cargando productos…</b><span id="priceSummary">Precio Bruto · Lista SAP</span></div>
       <section id="products" class="products"></section>
       <button id="more" class="more">Mostrar más</button>
     </main>
@@ -337,8 +347,8 @@ body.embedded .content{padding-top:9px}
 <script>
 // V6 web directa: sin iframe/embedded.
 let PRODUCTS=[];
-const PRODUCTS_URL="data/cotizador/productos_bruto.json";
-const PRODUCTS_GZ_URL="data/cotizador/productos_bruto.json.gz";
+const PRODUCTS_URL="data/cotizador/productos_precios.json";
+const PRODUCTS_GZ_URL="data/cotizador/productos_precios.json.gz";
 let CLIENTS=[];
 const LAUNCH_PARAMS=new URLSearchParams(location.search);
 function sellerSlug(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'')}
@@ -352,7 +362,7 @@ const fmt=(n,c='MXP')=>'$'+Number(n||0).toLocaleString('es-MX',{minimumFractionD
 const today=()=>new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric'});
 const quoteNo='COT-'+new Date().toISOString().slice(2,10).replaceAll('-','')+'-'+Math.floor(100+Math.random()*900);
 
-let filterMode='all', cart={}, limit=60;
+let filterMode='all', priceMode='gross', cart={}, limit=60;
 let PRODUCT_BY_CODE=new Map();
 let selectedClient=null, clientSearchTimer=null;
 $('#quoteMeta').textContent=quoteNo+' · '+today();
@@ -380,7 +390,17 @@ async function loadProducts(){
   $('#resultCount').textContent='Cargando productos…';
   try{
     const raw=await fetchCompressedJson(PRODUCTS_GZ_URL,PRODUCTS_URL);
-    PRODUCTS=(Array.isArray(raw)?raw:[]).map(r=>Array.isArray(r)?{code:r[0]||'',name:r[1]||'',gross:Number(r[2])||0,currency:'MXP'}:{code:r.code||'',name:r.name||'',gross:Number(r.gross)||0,currency:'MXP'});
+    PRODUCTS=(Array.isArray(raw)?raw:[]).map(r=>Array.isArray(r)?{
+      code:r[0]||'',name:r[1]||'',
+      gross:(r[2]===null||r[2]===''?null:Number(r[2])),
+      l4:(r[3]===null||r[3]===''?null:Number(r[3])),
+      currency:'MXP'
+    }:{
+      code:r.code||'',name:r.name||'',
+      gross:(r.gross===null||r.gross===''?null:Number(r.gross)),
+      l4:(r.l4===null||r.l4===''?null:Number(r.l4)),
+      currency:'MXP'
+    });
     PRODUCT_BY_CODE=new Map(PRODUCTS.map(p=>[p.code,p]));
     PRODUCTS_READY=true;
     renderProducts(); renderCart();
@@ -513,12 +533,44 @@ function runClientSearch(){
 }
 
 
-function pval(p){return Number(p.gross)||0}
+function pval(p){
+  const v=priceMode==='l4'?p.l4:p.gross;
+  return (v===null||v===undefined||!Number.isFinite(Number(v))) ? null : Number(v);
+}
+function priceModeName(){return priceMode==='l4'?'Precio Lista 4':'Precio Bruto'}
+function priceModeShort(){return priceMode==='l4'?'Lista 4':'Bruto'}
+function updatePriceModeUi(){
+  $('#priceGross').classList.toggle('active',priceMode==='gross');
+  $('#priceL4').classList.toggle('active',priceMode==='l4');
+  $('#activePricePill').textContent=priceModeName();
+  $('#priceSummary').textContent=priceMode==='l4'?'Precio Lista 4 · PRECIOS L4':'Precio Bruto · Lista SAP';
+  $('#quoteMeta').textContent=`${quoteNo} · ${today()} · ${priceModeShort()}`;
+}
+function setPriceMode(next){
+  if(next===priceMode) return;
+  const unavailable=Object.keys(cart).filter(code=>{
+    const p=PRODUCT_BY_CODE.get(code);
+    if(!p) return true;
+    const v=next==='l4'?p.l4:p.gross;
+    return v===null||v===undefined||!Number.isFinite(Number(v));
+  });
+  if(unavailable.length){
+    const ok=confirm(`${unavailable.length} producto(s) de tu cotización no tienen ${next==='l4'?'Precio Lista 4':'Precio Bruto'} y se eliminarán. ¿Continuar?`);
+    if(!ok) return;
+    unavailable.forEach(code=>delete cart[code]);
+  }
+  priceMode=next;
+  limit=60;
+  updatePriceModeUi();
+  renderProducts();
+  renderCart();
+}
 
 function filtered(){
   const term=norm($('#search').value);
   return PRODUCTS.filter(p=>{
     const v=pval(p);
+    if(v===null) return false;
     const text=!term || norm(p.code+' '+p.name).includes(term);
     const f=filterMode==='all'||(filterMode==='under100'&&v<100)||(filterMode==='100to500'&&v>=100&&v<=500)||(filterMode==='over500'&&v>500);
     return text&&f;
@@ -527,7 +579,7 @@ function filtered(){
 
 function renderProducts(){
   const arr=filtered();
-  $('#resultCount').textContent=arr.length.toLocaleString('es-MX')+' productos';
+  $('#resultCount').textContent=arr.length.toLocaleString('es-MX')+' productos · '+priceModeShort();
   $('#products').innerHTML=arr.slice(0,limit).map(p=>`
     <article class="product">
       <div>
@@ -600,7 +652,7 @@ function buildPrint(){
         <div class="printLogo"><img src="assets/toyo_logo.png" alt="Toyo Foods"></div>
         <div>
           <div class="companyName">COMERCIAL TOYO S.A. DE C.V.</div>
-          <div class="companySub">Cotización comercial · Precio bruto · Moneda MXP</div>
+          <div class="companySub">Cotización comercial · ${priceModeName()} · Moneda MXP</div>
         </div>
         <div class="docTitle">
           <h1>COTIZACIÓN</h1>
@@ -707,7 +759,7 @@ function safeFilePart(v){
   return String(v||'cliente').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9_-]+/g,'_').replace(/^_+|_+$/g,'').slice(0,52)||'cliente';
 }
 function quoteFileBase(){
-  return `Cotizacion_${safeFilePart(clientValue(C_CODE,clientValue(C_COMM,clientValue(C_NAME,'cliente'))))}_${new Date().toISOString().slice(0,10)}`;
+  return `Cotizacion_${priceMode==='l4'?'L4':'Bruto'}_${safeFilePart(clientValue(C_CODE,clientValue(C_COMM,clientValue(C_NAME,'cliente'))))}_${new Date().toISOString().slice(0,10)}`;
 }
 function downloadBlob(blob,filename){
   const a=document.createElement('a');
@@ -746,7 +798,7 @@ async function buildQuoteCanvas(){
 
   ctx.fillStyle=ink;ctx.textAlign='left';
   ctx.font='700 30px Arial';ctx.fillText('COMERCIAL TOYO S.A. DE C.V.',M+120,88);
-  ctx.fillStyle=muted;ctx.font='18px Arial';ctx.fillText('Cotización comercial · Precio bruto · MXP',M+120,120);
+  ctx.fillStyle=muted;ctx.font='18px Arial';ctx.fillText(`Cotización comercial · ${priceModeName()} · MXP`,M+120,120);
 
   ctx.textAlign='right';ctx.fillStyle=ink;ctx.font='700 38px Arial';ctx.fillText('COTIZACIÓN',W-M,88);
   ctx.fillStyle=muted;ctx.font='17px Arial';ctx.fillText(`${quoteNo} · ${today()}`,W-M,120);
@@ -921,6 +973,8 @@ async function downloadQuotePdf(){
 }
 
 
+$('#priceGross').onclick=()=>setPriceMode('gross');
+$('#priceL4').onclick=()=>setPriceMode('l4');
 $('#search').addEventListener('input',()=>{limit=60;renderProducts()});
 $('#more').onclick=()=>{limit+=60;renderProducts()};
 $$('.chip').forEach(b=>b.onclick=()=>{
@@ -940,7 +994,7 @@ $('#newQuote').onclick=()=>{
   cart={};
   selectedClient=null; renderSelectedClient();
   ['#contact','#address','#phone','#notes'].forEach(id=>$(id).value='');
-  $('#discount').value=0; renderCart();
+  $('#discount').value=0; updatePriceModeUi(); renderCart();
 };
 window.addEventListener('resize',scalePreview);
 
@@ -973,13 +1027,14 @@ async function applyLaunchContext(){
   if(clientCode || clientName){
     selectedClient=[clientCode||'', clientName||'Cliente', '', '', seller||'', '', ''];
     renderSelectedClient();
-    if(seller) $('#quoteMeta').textContent=`Desde Visitas · ${seller}`;
+    if(seller) $('#quoteMeta').textContent=`Desde Visitas · ${seller} · ${priceModeShort()}`;
   }else if(seller){
-    $('#quoteMeta').textContent=`Vendedor: ${seller}`;
+    $('#quoteMeta').textContent=`Vendedor: ${seller} · ${priceModeShort()}`;
   }
 }
 
 renderSelectedClient();
+updatePriceModeUi();
 (async()=>{
   await loadProducts();
   await applyLaunchContext();
