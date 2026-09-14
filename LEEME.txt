@@ -1,50 +1,32 @@
-TOYO FOODS · APP VISITAS MÓVIL V1
+TOYO FOODS · APP VISITAS MÓVIL V2
 
-OBJETIVO
-App reconstruida desde cero para ser muy ligera en Safari, Chrome y navegadores móviles.
+NUEVO DISEÑO
+- Dashboard diario con visitas, meta 5, faltantes y minutos en campo.
+- Barra visual de avance.
+- Botón rápido Nueva visita.
+- Último cliente visitado.
+- Interfaz móvil mejorada y más ejecutiva.
 
-INCLUYE
-- Login persistente: el vendedor permanece conectado hasta pulsar Cerrar sesión.
-- Cada vendedor carga únicamente sus clientes asignados.
-- Registro de visitas con:
-  cliente, tipo, comentarios, hora inicial/final y GPS.
-- Visita activa persistente aunque salga del navegador.
-- Guardado local y sincronización con Supabase.
-- Admin puede consultar visitas y exportar CSV.
-- Botón externo Cotizador:
-  https://beris04.github.io/Cotizador/
-- Botón externo Pedidos:
-  https://beris04.github.io/Toyo-MX/
-- Zona de Promociones.
-- Solo Admin puede crear, editar, activar/desactivar y eliminar promociones.
-- Promoción permite: tema/título, comentarios, imagen, fecha desde y fecha hasta.
-- Las imágenes se comprimen antes de guardarse.
+VISITAS
+- Mapa bajo demanda: solo carga al entrar a Visitas.
+- Ubicación actual.
+- Inicio y fin de visitas del día.
+- Clientes asignados por vendedor.
+- Tipo de visita, comentarios, GPS y duración.
+- Próxima acción: seguimiento, muestra, cotización, cobranza, volver a visitar, etc.
+- Botón “No pude visitar” con motivos:
+  cliente cerrado, no estaba el encargado, reagendar, cliente no disponible.
+- Actividad del día con próxima acción.
 
-NO INCLUYE
-- Catálogo del cotizador.
-- Base del portal de pedidos.
-- Mapas Leaflet.
-- Service Worker/PWA.
-- iframes.
-- Librerías externas.
+SE MANTIENE
+- Sesión persistente hasta Cerrar sesión.
+- Cotizador externo: https://beris04.github.io/Cotizador/
+- Pedidos externo: https://beris04.github.io/Toyo-MX/
+- Promociones administrables solo por Admin.
+- App ligera: sin cotizador/pedidos internos, sin iframe y sin PWA pesada.
 
-ARCHIVOS
-index.html
-assets/toyo_logo.png
-data/visitas/*.json
-
-PUBLICACIÓN EN GITHUB
-1. Reemplaza el contenido del repositorio Toyo-GDL por el contenido de este ZIP.
-2. Elimina archivos viejos que ya no aparecen aquí (cotizador.html, sw.js, manifest, data/cotizador, etc.).
-3. Commit to main.
-4. Push origin.
-5. Abre:
-   https://beris04.github.io/Toyo-GDL/
-
-NOTA SOBRE PROMOCIONES
-La app reutiliza la tabla Supabase "announcements" que ya utilizaba el proyecto.
-Las promociones se identifican internamente con city = PROMO.
-La foto se comprime en el celular y se guarda dentro del registro de la promoción.
-
-CREDENCIAL ACTUAL
-Contraseña compartida: Toyo2026
+PUBLICACIÓN
+1. Reemplaza TODO el contenido actual de Toyo-GDL por este ZIP.
+2. Commit to main.
+3. Push origin.
+4. Abre https://beris04.github.io/Toyo-GDL/

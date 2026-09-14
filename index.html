@@ -7,7 +7,7 @@
 <title>Toyo Foods · Visitas</title>
 <style>
 :root{
-  --blue:#0b4ea2;--blue2:#073675;--ink:#14233a;--muted:#6e7e94;--bg:#f3f6fa;
+  --blue:#0b4ea2;--blue2:#062f69;--cyan:#17a2ff;--ink:#10243e;--muted:#6f7f95;--bg:#eef3f8;
   --card:#fff;--line:#dce5ef;--good:#179c63;--warn:#df8d16;--bad:#d92d20;
   --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px)
 }
@@ -50,21 +50,97 @@ main{max-width:720px;margin:auto;padding:14px 12px 24px}
 .adminList{display:grid;gap:8px}.adminRow{background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px}.adminRow .top{display:flex;justify-content:space-between;gap:10px}.adminRow b{font-size:11px}.adminRow span{font-size:9px;color:var(--muted)}.adminRow p{font-size:10px;color:#53677f;margin:6px 0 0}.miniBtns{display:flex;gap:6px;margin-top:8px}.miniBtns button{border:1px solid var(--line);background:#f8fafc;border-radius:9px;padding:7px 9px;font-size:9px;font-weight:900}
 .preview{margin-top:10px;display:none}.preview img{max-width:100%;max-height:220px;border-radius:14px;object-fit:contain;border:1px solid var(--line)}
 .toast{position:fixed;left:50%;bottom:calc(82px + var(--safe-b));transform:translateX(-50%);background:#14233a;color:#fff;padding:10px 13px;border-radius:12px;font-size:10px;font-weight:800;z-index:200;opacity:0;pointer-events:none;transition:.2s}.toast.show{opacity:1}
-@media(max-width:390px){.grid2,.promoList,.row{grid-template-columns:1fr}}
+
+/* V2 UI */
+.topbar{backdrop-filter:saturate(140%) blur(10px)}
+.toprow{height:54px}
+.logo{width:42px;height:42px;border-radius:14px;box-shadow:0 5px 16px #001b3b2b}
+.brand b{font-size:16px;letter-spacing:.1px}
+main{padding-top:12px}
+.hero{position:relative;overflow:hidden;background:
+ radial-gradient(240px 150px at 90% -20%,#33b9ff55,transparent 60%),
+ linear-gradient(140deg,#0b4ea2 0%,#073675 58%,#05254f 100%);
+ box-shadow:0 18px 44px #0b4ea22b}
+.hero:after{content:"";position:absolute;width:160px;height:160px;border-radius:50%;right:-70px;bottom:-95px;background:#ffffff12}
+.hero h1{font-size:27px;letter-spacing:-.4px}
+.hero p{max-width:500px}
+.kpiGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:17px;padding:11px 10px;box-shadow:0 8px 20px #17324d0b;min-height:82px}
+.kpi .num{font-size:23px;font-weight:950;line-height:1;color:#10243e}
+.kpi .lab{font-size:9px;color:var(--muted);font-weight:800;margin-top:7px;line-height:1.25}
+.kpi.good .num{color:#15945d}.kpi.warn .num{color:#d17a0c}.kpi.bad .num{color:#c9332b}
+.progressCard{margin-top:10px;padding:13px 14px}
+.progressTop{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.progressTop b{font-size:12px}.progressTop span{font-size:10px;color:var(--muted)}
+.progressTrack{height:9px;background:#e9eef5;border-radius:999px;overflow:hidden;margin-top:10px}
+.progressFill{height:100%;width:0;background:linear-gradient(90deg,#0b4ea2,#17a2ff);border-radius:999px;transition:.25s}
+.quickStrip{display:grid;grid-template-columns:1.3fr 1fr;gap:10px;margin-top:10px}
+.quickVisit{border:0;border-radius:17px;padding:14px;text-align:left;background:linear-gradient(135deg,#102d57,#0b4ea2);color:#fff;box-shadow:0 12px 26px #0b4ea224}
+.quickVisit b{font-size:13px}.quickVisit span{display:block;font-size:9px;opacity:.8;margin-top:3px}
+.lastClient{border:1px solid var(--line);background:#fff;border-radius:17px;padding:13px;box-shadow:0 8px 20px #17324d0a}
+.lastClient b{font-size:10px;display:block}.lastClient span{font-size:9px;color:var(--muted);display:block;margin-top:4px}
+.actionCard{transition:transform .12s ease,box-shadow .12s ease}.actionCard:active{transform:scale(.985)}
+.actionCard .ic{box-shadow:inset 0 0 0 1px #ffffff80}
+.card{box-shadow:0 10px 26px #17324d0b}
+.visitActive{background:linear-gradient(180deg,#f4fcf7,#fff)}
+.sectionTitle{margin-top:18px}
+.field input,.field select,.field textarea{box-shadow:inset 0 1px 2px #1d35570a}
+.btn{box-shadow:0 8px 18px #0b4ea21b}
+.btn.secondary{box-shadow:none}
+.reasonGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.reasonBtn{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px;text-align:left;font-size:10px;font-weight:850;color:#28445f}
+.reasonBtn.active{border-color:#0b4ea2;background:#edf5ff;color:#0b4ea2}
+.nextActionBox{background:#f8fbff;border:1px solid #d9e6f4;border-radius:14px;padding:11px;margin-top:10px}
+.nextActionBox b{font-size:10px;display:block;margin-bottom:7px}
+.historyHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.historyHead span{font-size:9px;color:var(--muted)}
+.bottom{box-shadow:0 -8px 24px #15324e0b}
+.nav{transition:.15s}.nav.active{background:linear-gradient(180deg,#f2f7ff,#e9f2ff)}
+.nav i{font-size:20px}
+.mapCard{padding:0;overflow:hidden}
+.mapHead{display:flex;align-items:center;justify-content:space-between;padding:11px 12px;border-bottom:1px solid var(--line)}
+.mapHead b{font-size:11px}.mapHead span{font-size:9px;color:var(--muted)}
+.mapWrap{position:relative;height:250px;background:#eef3f7}
+#visitMap{width:100%;height:100%}
+.mapLoading{position:absolute;inset:0;display:grid;place-items:center;background:#f7f9fc;color:var(--muted);font-size:10px;z-index:2}
+.mapLegend{display:flex;gap:10px;flex-wrap:wrap;padding:8px 12px;border-top:1px solid var(--line);font-size:9px;color:var(--muted)}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}
+.dot.blue{background:#0b4ea2}.dot.green{background:#179c63}.dot.red{background:#d92d20}
+@media(max-width:520px){.kpiGrid{grid-template-columns:repeat(2,1fr)}.quickStrip{grid-template-columns:1fr}}
+
+@media(max-width:390px){.grid2,.promoList,.row,.reasonGrid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <header class="topbar">
   <div class="toprow">
     <img class="logo" src="assets/toyo_logo.png" alt="Toyo Foods">
-    <div class="brand"><b id="topTitle">App Visitas</b><span id="topSub">Toyo Foods · Equipo comercial</span></div>
+    <div class="brand"><b id="topTitle">App Visitas</b><span id="topSub">Toyo Foods · Visitas móvil V2</span></div>
     <span id="net" class="net">●</span>
   </div>
 </header>
 
 <main>
   <section id="home" class="screen active">
-    <div class="hero"><small>TOYO FOODS · MÓVIL</small><h1 id="hello">Hola</h1><p>Registra visitas y abre Cotizador o Pedidos como herramientas externas, sin cargar catálogos dentro de esta app.</p></div>
+    <div class="hero"><small>TOYO FOODS · MÓVIL</small><h1 id="hello">Hola</h1><p>Tu jornada comercial en una sola vista. Registra visitas, revisa avance y abre herramientas externas sin hacer pesada la app.</p></div>
+
+    <div id="sellerDashboard">
+      <div class="kpiGrid">
+        <div class="kpi"><div id="kpiVisits" class="num">0</div><div class="lab">VISITAS HOY</div></div>
+        <div class="kpi good"><div id="kpiGoal" class="num">0/5</div><div class="lab">META DIARIA</div></div>
+        <div class="kpi warn"><div id="kpiPending" class="num">5</div><div class="lab">FALTAN</div></div>
+        <div class="kpi"><div id="kpiMinutes" class="num">0</div><div class="lab">MIN. EN CAMPO</div></div>
+      </div>
+      <div class="card progressCard">
+        <div class="progressTop"><b>Avance diario</b><span id="progressText">0 de 5 visitas</span></div>
+        <div class="progressTrack"><div id="progressFill" class="progressFill"></div></div>
+      </div>
+      <div class="quickStrip">
+        <button id="quickNewVisit" class="quickVisit"><b>＋ Nueva visita</b><span>Ir directo al registro de cliente</span></button>
+        <div class="lastClient"><b>ÚLTIMO CLIENTE</b><span id="lastClient">Sin visitas hoy</span></div>
+      </div>
+    </div>
+
     <div class="sectionTitle">Tu sesión</div>
     <div class="card userCard"><div class="avatar">👤</div><div><b id="userName">—</b><span id="userScope">—</span></div></div>
     <div class="sectionTitle">Herramientas</div>
@@ -81,7 +157,13 @@ main{max-width:720px;margin:auto;padding:14px 12px 24px}
   </section>
 
   <section id="visits" class="screen">
-    <div class="sectionTitle" style="margin-top:3px">Registrar visita</div>
+    <div class="sectionTitle" style="margin-top:3px">Mapa de visitas</div>
+    <div class="card mapCard">
+      <div class="mapHead"><div><b>Ubicación y visitas del día</b><span id="mapStatus"> · se carga solo al entrar a Visitas</span></div><button id="centerMap" class="btn secondary" style="padding:7px 9px">Centrar</button></div>
+      <div class="mapWrap"><div id="mapLoading" class="mapLoading">Cargando mapa…</div><div id="visitMap"></div></div>
+      <div class="mapLegend"><span><i class="dot blue"></i>Tu ubicación</span><span><i class="dot green"></i>Inicio</span><span><i class="dot red"></i>Fin</span></div>
+    </div>
+    <div class="sectionTitle">Registrar visita</div>
     <div id="activeBox" class="card visitActive" style="display:none"></div>
     <div class="card" id="visitForm">
       <div class="field"><label>CLIENTE ASIGNADO</label><select id="clientSelect"><option value="">Selecciona cliente</option></select></div>
@@ -94,10 +176,28 @@ main{max-width:720px;margin:auto;padding:14px 12px 24px}
         </select>
       </div>
       <div class="field"><label>COMENTARIOS</label><textarea id="visitNotes" placeholder="Acuerdos, productos revisados, pendientes…"></textarea></div>
+      <div class="nextActionBox">
+        <b>PRÓXIMA ACCIÓN</b>
+        <select id="nextAction">
+          <option value="">Sin acción definida</option>
+          <option>Dar seguimiento</option><option>Enviar muestra</option><option>Enviar cotización</option>
+          <option>Cobranza</option><option>Volver a visitar</option><option>Enviar información de producto</option>
+        </select>
+      </div>
       <div class="btnbar"><button id="startVisit" class="btn good">Iniciar visita</button><button id="endVisit" class="btn bad" disabled>Finalizar</button></div>
+      <div class="btnbar"><button id="cantVisit" class="btn secondary">No pude visitar</button></div>
+      <div id="cantVisitBox" class="nextActionBox" style="display:none">
+        <b>MOTIVO</b>
+        <div class="reasonGrid">
+          <button class="reasonBtn" data-reason="Cliente cerrado">Cliente cerrado</button>
+          <button class="reasonBtn" data-reason="No estaba el encargado">No estaba el encargado</button>
+          <button class="reasonBtn" data-reason="Reagendar">Reagendar</button>
+          <button class="reasonBtn" data-reason="Cliente no disponible">Cliente no disponible</button>
+        </div>
+        <div class="btnbar"><button id="saveCantVisit" class="btn secondary">Guardar intento</button></div>
+      </div>
     </div>
-    <div class="sectionTitle">Visitas de hoy</div>
-    <div id="todayVisits" class="visitList"></div>
+    <div class="sectionTitle">Actividad de hoy</div><div class="historyHead"><span id="todaySummary">0 registros</span></div><div id="todayVisits" class="visitList"></div>
   </section>
 
   <section id="promos" class="screen">
@@ -172,6 +272,7 @@ const ORDERS_URL='https://beris04.github.io/Toyo-MX/';
 
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 let CLIENTS=[], CURRENT_PROMO_IMAGE='', ADMIN_VISITS_CACHE=[], ADMIN_PROMOS_CACHE=[];
+let MAP=null, MAP_READY=false, MAP_LOADING_PROMISE=null, MAP_CURRENT=null, MAP_LAYER=null, CANT_VISIT_REASON='';
 
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),2200)}
 function norm(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()}
@@ -200,7 +301,7 @@ function syncSession(){
   $('#hello').textContent=`Hola, ${a.role==='admin'?'Admin':a.user.split(' ')[0]}`;
   $('#adminQuickWrap').style.display=a.role==='admin'?'':'none';
   if(a.role==='seller') loadSellerClients();
-  renderVisitState();
+  renderVisitState();updateDashboard();
 }
 function fillUsers(){
   const s=$('#loginUser');
@@ -225,16 +326,111 @@ function go(name){
   if(name==='admin'&&a.role!=='admin')return;
   $$('.screen').forEach(x=>x.classList.toggle('active',x.id===name));
   $$('.nav').forEach(x=>x.classList.toggle('active',x.dataset.go===name));
-  const titles={home:['App Visitas','Toyo Foods · Equipo comercial'],visits:['Visitas','Clientes asignados y registro'],promos:['Promociones','Material comercial vigente'],admin:['Admin','Visitas y promociones'],more:['Más','Herramientas y sesión']};
+  const titles={home:['App Visitas','Toyo Foods · Visitas móvil V2'],visits:['Visitas','Clientes asignados y registro'],promos:['Promociones','Material comercial vigente'],admin:['Admin','Visitas y promociones'],more:['Más','Herramientas y sesión']};
   const t=titles[name]||titles.home;$('#topTitle').textContent=t[0];$('#topSub').textContent=t[1];
-  if(name==='visits'){renderVisitState();renderToday()}
+  if(name==='visits'){renderVisitState();renderToday();setTimeout(ensureVisitMap,60)}
   if(name==='promos')loadPromos();
   if(name==='admin'){updateQueueStat();loadAdminPromos()}
+  if(name==='home')updateDashboard();
 }
 
 function openExternal(url){
   const w=window.open(url,'_blank','noopener');
   if(!w) location.href=url;
+}
+
+
+function updateDashboard(){
+  const a=getAuth(), all=getLocalVisits(), rows=all.filter(r=>r.day===today()&&(a?.role==='admin'||r.vendor===a?.vendor));
+  const completed=rows.filter(r=>!r.missed);
+  const count=completed.length, goal=5, pending=Math.max(0,goal-count);
+  const mins=Math.round(completed.reduce((s,r)=>s+(Number(r.duration_sec)||0),0)/60);
+  if($('#kpiVisits'))$('#kpiVisits').textContent=count;
+  if($('#kpiGoal'))$('#kpiGoal').textContent=`${count}/${goal}`;
+  if($('#kpiPending'))$('#kpiPending').textContent=pending;
+  if($('#kpiMinutes'))$('#kpiMinutes').textContent=mins;
+  if($('#progressText'))$('#progressText').textContent=`${count} de ${goal} visitas`;
+  if($('#progressFill'))$('#progressFill').style.width=Math.min(100,(count/goal)*100)+'%';
+  const last=completed.slice().sort((x,y)=>String(y.end_ts||'').localeCompare(String(x.end_ts||'')))[0];
+  if($('#lastClient'))$('#lastClient').textContent=last?last.client:'Sin visitas hoy';
+  if($('#sellerDashboard'))$('#sellerDashboard').style.display=a?.role==='seller'?'':'none';
+}
+function loadCss(href){
+  return new Promise((resolve,reject)=>{
+    if([...document.styleSheets].some(s=>s.href===href))return resolve();
+    const l=document.createElement('link');l.rel='stylesheet';l.href=href;l.onload=resolve;l.onerror=reject;document.head.appendChild(l);
+  });
+}
+function loadJs(src){
+  return new Promise((resolve,reject)=>{
+    if(window.L)return resolve();
+    const s=document.createElement('script');s.src=src;s.async=true;s.onload=resolve;s.onerror=reject;document.head.appendChild(s);
+  });
+}
+async function ensureLeaflet(){
+  if(window.L)return;
+  if(MAP_LOADING_PROMISE)return MAP_LOADING_PROMISE;
+  MAP_LOADING_PROMISE=(async()=>{
+    try{
+      await loadCss('https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css');
+      await loadJs('https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js');
+    }catch(e){
+      await loadCss('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+      await loadJs('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js');
+    }
+  })();
+  return MAP_LOADING_PROMISE;
+}
+async function ensureVisitMap(){
+  try{
+    $('#mapLoading').style.display='grid';
+    await ensureLeaflet();
+    if(!MAP){
+      MAP=L.map('visitMap',{zoomControl:true,attributionControl:true}).setView([20.6736,-103.344],11);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,updateWhenIdle:true,keepBuffer:1,attribution:'&copy; OpenStreetMap'}).addTo(MAP);
+      MAP_LAYER=L.layerGroup().addTo(MAP);
+    }
+    MAP_READY=true;$('#mapLoading').style.display='none';
+    setTimeout(()=>MAP.invalidateSize(),100);
+    await centerOnCurrentLocation(false);renderVisitMapMarkers();
+  }catch(e){
+    $('#mapLoading').textContent='No se pudo cargar el mapa. GPS y visitas siguen funcionando.';
+    $('#mapStatus').textContent=' · mapa no disponible';
+  }
+}
+async function centerOnCurrentLocation(force=true){
+  try{
+    const pos=await getPos(),lat=pos.coords.latitude,lng=pos.coords.longitude;
+    if(MAP_READY){
+      if(MAP_CURRENT)MAP.removeLayer(MAP_CURRENT);
+      MAP_CURRENT=L.circleMarker([lat,lng],{radius:8,weight:3,color:'#fff',fillColor:'#0b4ea2',fillOpacity:1}).addTo(MAP);
+      MAP_CURRENT.bindPopup('Tu ubicación actual');
+      if(force||MAP.getZoom()<13)MAP.setView([lat,lng],15);
+      $('#mapStatus').textContent=' · ubicación actualizada';
+    }
+  }catch(e){$('#mapStatus').textContent=' · activa permiso de ubicación'}
+}
+function renderVisitMapMarkers(){
+  if(!MAP_READY||!MAP_LAYER)return;
+  MAP_LAYER.clearLayers();
+  const a=getAuth(),rows=getLocalVisits().filter(r=>r.day===today()&&(a?.role==='admin'||r.vendor===a?.vendor)&&!r.missed);
+  const bounds=[];
+  rows.forEach(r=>{
+    if(Number.isFinite(Number(r.start_lat))&&Number.isFinite(Number(r.start_lng))){
+      const m=L.circleMarker([+r.start_lat,+r.start_lng],{radius:7,color:'#fff',weight:2,fillColor:'#179c63',fillOpacity:1}).addTo(MAP_LAYER);
+      m.bindPopup(`<b>${esc(r.client)}</b><br>Inicio ${fmtTime(r.start_ts)}`);bounds.push([+r.start_lat,+r.start_lng]);
+    }
+    if(Number.isFinite(Number(r.end_lat))&&Number.isFinite(Number(r.end_lng))){
+      const m=L.circleMarker([+r.end_lat,+r.end_lng],{radius:7,color:'#fff',weight:2,fillColor:'#d92d20',fillOpacity:1}).addTo(MAP_LAYER);
+      m.bindPopup(`<b>${esc(r.client)}</b><br>Fin ${fmtTime(r.end_ts)}`);bounds.push([+r.end_lat,+r.end_lng]);
+    }
+  });
+  const act=getActive();
+  if(act&&Number.isFinite(Number(act.start_lat))&&Number.isFinite(Number(act.start_lng))){
+    const m=L.circleMarker([+act.start_lat,+act.start_lng],{radius:8,color:'#fff',weight:2,fillColor:'#179c63',fillOpacity:1}).addTo(MAP_LAYER);
+    m.bindPopup(`<b>${esc(act.client)}</b><br>Visita activa`);bounds.push([+act.start_lat,+act.start_lng]);
+  }
+  if(bounds.length>1){try{MAP.fitBounds(bounds,{padding:[30,30],maxZoom:15})}catch(e){}}
 }
 
 async function loadSellerClients(){
@@ -279,7 +475,7 @@ async function startVisit(){
   try{
     const pos=await getPos(), now=new Date().toISOString();
     setActive({city:a.city,vendor:a.vendor,client:`${c.code} · ${c.name}`,client_code:c.code,client_name:c.name,type:$('#visitType').value,notes:$('#visitNotes').value.trim(),start_ts:now,start_lat:pos.coords.latitude,start_lng:pos.coords.longitude});
-    renderVisitState();toast('Visita iniciada');
+    renderVisitState();renderVisitMapMarkers();toast('Visita iniciada');
   }catch(e){toast('Activa permiso de ubicación')}finally{$('#startVisit').disabled=false}
 }
 async function endVisit(){
@@ -287,13 +483,34 @@ async function endVisit(){
   $('#endVisit').disabled=true;
   try{
     const pos=await getPos(),end=new Date().toISOString(),dur=Math.max(0,Math.floor((Date.now()-new Date(act.start_ts).getTime())/1000));
-    const rec={id:uuid(),day:today(),city:act.city,vendor:act.vendor,client:act.client,type:act.type,notes:act.notes,start_ts:act.start_ts,end_ts:end,duration_sec:dur,start_lat:act.start_lat,start_lng:act.start_lng,end_lat:pos.coords.latitude,end_lng:pos.coords.longitude};
+    const rec={id:uuid(),day:today(),city:act.city,vendor:act.vendor,client:act.client,type:act.type,notes:act.notes,next_action:$('#nextAction').value,start_ts:act.start_ts,end_ts:end,duration_sec:dur,start_lat:act.start_lat,start_lng:act.start_lng,end_lat:pos.coords.latitude,end_lng:pos.coords.longitude};
     const rows=getLocalVisits();rows.push(rec);setLocalVisits(rows);setActive(null);
-    $('#visitNotes').value='';$('#clientSearch').value='';fillClientOptions(CLIENTS);
+    $('#visitNotes').value='';$('#nextAction').value='';$('#clientSearch').value='';fillClientOptions(CLIENTS);
     try{await cloudInsertVisit(rec)}catch(e){const q=getQueue();q.push(rec);setQueue(q)}
-    renderVisitState();renderToday();toast('Visita finalizada');
+    renderVisitState();renderToday();renderVisitMapMarkers();updateDashboard();toast('Visita finalizada');
   }catch(e){toast('No se pudo obtener ubicación')}finally{$('#endVisit').disabled=false}
 }
+
+function toggleCantVisit(){
+  const box=$('#cantVisitBox');box.style.display=box.style.display==='none'?'block':'none';
+}
+function chooseReason(reason){
+  CANT_VISIT_REASON=reason;
+  $$('[data-reason]').forEach(b=>b.classList.toggle('active',b.dataset.reason===reason));
+}
+async function saveCantVisit(){
+  const a=getAuth(),c=selectedClient();if(!a||a.role!=='seller')return;if(!c)return toast('Selecciona un cliente');
+  if(!CANT_VISIT_REASON)return toast('Selecciona el motivo');
+  let lat=null,lng=null;
+  try{const p=await getPos();lat=p.coords.latitude;lng=p.coords.longitude}catch(e){}
+  const now=new Date().toISOString();
+  const rec={id:uuid(),day:today(),city:a.city,vendor:a.vendor,client:`${c.code} · ${c.name}`,type:'No pude visitar',notes:CANT_VISIT_REASON,next_action:$('#nextAction').value||'Volver a visitar',missed:true,start_ts:now,end_ts:now,duration_sec:0,start_lat:lat,start_lng:lng,end_lat:lat,end_lng:lng};
+  const rows=getLocalVisits();rows.push(rec);setLocalVisits(rows);
+  try{await cloudInsertVisit(rec)}catch(e){const q=getQueue();q.push(rec);setQueue(q)}
+  $('#cantVisitBox').style.display='none';CANT_VISIT_REASON='';$$('[data-reason]').forEach(b=>b.classList.remove('active'));
+  renderToday();updateDashboard();toast('Intento registrado');
+}
+
 function renderVisitState(){
   const act=getActive(),box=$('#activeBox');
   $('#startVisit').disabled=!!act;$('#endVisit').disabled=!act;
@@ -303,7 +520,8 @@ function renderVisitState(){
 }
 function renderToday(){
   const a=getAuth(),rows=getLocalVisits().filter(r=>r.day===today()&&(a?.role==='admin'||r.vendor===a?.vendor)).slice().reverse();
-  $('#todayVisits').innerHTML=rows.length?rows.map(r=>`<div class="visitItem"><b>${esc(r.client)}</b><span>${esc(r.type)} · ${fmtTime(r.start_ts)}–${fmtTime(r.end_ts)} · ${durationText(r.duration_sec)}</span></div>`).join(''):'<div class="empty">Sin visitas registradas hoy.</div>';
+  if($('#todaySummary'))$('#todaySummary').textContent=`${rows.length} registro${rows.length===1?'':'s'}`;
+  $('#todayVisits').innerHTML=rows.length?rows.map(r=>`<div class="visitItem"><b>${r.missed?'⚠️ ':''}${esc(r.client)}</b><span>${esc(r.type)} · ${r.missed?esc(r.notes):`${fmtTime(r.start_ts)}–${fmtTime(r.end_ts)} · ${durationText(r.duration_sec)}`}</span>${r.next_action?`<span>Próxima acción: ${esc(r.next_action)}</span>`:''}</div>`).join(''):'<div class="empty">Sin actividad registrada hoy.</div>';
 }
 
 function sbUrl(path){return SUPABASE_URL.replace(/\/$/,'')+path}
@@ -426,13 +644,18 @@ function exportAdminCsv(){
 
 function updateNet(){const on=navigator.onLine;$('#net').textContent=on?'● En línea':'● Sin conexión';$('#net').style.opacity=on?'1':'.72'}
 
-fillUsers();syncSession();updateNet();renderToday();updateQueueStat();
+fillUsers();syncSession();updateNet();renderToday();updateQueueStat();updateDashboard();
 window.addEventListener('online',()=>{updateNet();setTimeout(flushQueue,600)});window.addEventListener('offline',updateNet);
 $('#loginBtn').onclick=login;$('#loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')login()});$('#logout').onclick=logout;
 $$('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
 $('#openQuote').onclick=$('#moreQuote').onclick=()=>openExternal(QUOTE_URL);
 $('#openOrders').onclick=$('#moreOrders').onclick=()=>openExternal(ORDERS_URL);
 $('#clientSearch').addEventListener('input',filterClients);$('#startVisit').onclick=startVisit;$('#endVisit').onclick=endVisit;
+$('#centerMap').onclick=()=>centerOnCurrentLocation(true);
+$('#quickNewVisit').onclick=()=>go('visits');
+$('#cantVisit').onclick=toggleCantVisit;
+$$('[data-reason]').forEach(b=>b.onclick=()=>chooseReason(b.dataset.reason));
+$('#saveCantVisit').onclick=saveCantVisit;
 $('#refreshPromos').onclick=loadPromos;$('#promoImage').addEventListener('change',previewPromoImage);$('#savePromo').onclick=savePromo;$('#cancelPromoEdit').onclick=resetPromoForm;$('#loadAdminPromos').onclick=loadAdminPromos;
 $('#loadAdminVisits').onclick=loadAdminVisits;$('#syncNow').onclick=flushQueue;$('#exportCsv').onclick=exportAdminCsv;
 resetPromoForm();
