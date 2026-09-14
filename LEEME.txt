@@ -1,21 +1,26 @@
-TOYO FOODS · APP VISITAS MÓVIL V2.1
+TOYO FOODS · APP VISITAS MÓVIL V3
 
-CORRECCIONES
-- Promociones ahora se guardan primero en el dispositivo del Admin y además intentan sincronizar con Supabase.
-- Si Supabase falla, la promoción NO se pierde y sí aparece en la app del mismo dispositivo.
-- Admin puede editar, activar/desactivar y eliminar promociones.
-- Historial del vendedor: cada vendedor ve solamente SUS visitas.
-- Admin: registro consolidado de visitas de todos los vendedores.
-- Admin: filtro por vendedor y fecha.
-- Pedidos abre siempre en una pestaña nueva del navegador.
-- Cotizador sigue como enlace externo.
+Se respetó el mismo diseño visual de la V2.
 
-IMPORTANTE SOBRE PROMOCIONES
-Para que las promociones publicadas por Admin aparezcan también en OTROS dispositivos, Supabase debe permitir escritura/lectura en la tabla announcements.
-Esta versión evita que el Admin pierda el registro si Supabase falla, pero la sincronización entre teléfonos depende de Supabase.
+NUEVO
+- Prospectos como módulo independiente.
+- Historial Cloud por vendedor: este mes, mes anterior, mes elegido y rango de fechas.
+- Admin con filtros por vendedor, ciudad, mes y rango.
+- Resumen por vendedor: visitas, prospectos, no visitados y duración promedio.
+- Clientes sin visita reciente: 15 / 30 / 45+ días.
+- Próxima acción + fecha de seguimiento.
+- Pendientes de hoy en Inicio.
+- Cumplimiento mensual.
+- Estado de prospecto, incluyendo Convertido a cliente.
+- Indicador de sincronización.
+- Visitas fallidas separadas de efectivas.
+- Pedidos y Cotizador continúan externos.
+
+IMPORTANTE
+Los datos nuevos se guardan dentro del campo notes en JSON para no exigir cambios en la estructura actual de Supabase.
 
 PUBLICACIÓN
-1. Reemplaza el contenido actual de Toyo-GDL por este ZIP.
+1. Reemplaza todo el contenido actual de Toyo-GDL con este ZIP.
 2. Commit to main.
 3. Push origin.
 4. Abre https://beris04.github.io/Toyo-GDL/

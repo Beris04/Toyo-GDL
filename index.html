@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b4ea2">
-<title>Toyo Foods · Visitas</title>
+<title>Toyo Foods · Visitas V3</title>
 <style>
 :root{
   --blue:#0b4ea2;--blue2:#062f69;--cyan:#17a2ff;--ink:#10243e;--muted:#6f7f95;--bg:#eef3f8;
@@ -44,7 +44,7 @@ main{max-width:720px;margin:auto;padding:14px 12px 24px}
 .visitList{display:grid;gap:8px}.visitItem{border:1px solid var(--line);background:#fff;border-radius:14px;padding:11px}.visitItem b{font-size:12px;display:block}.visitItem span{font-size:10px;color:var(--muted);display:block;margin-top:3px}
 .promoList{display:grid;grid-template-columns:1fr 1fr;gap:10px}.promoCard{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 7px 20px #17324d0c}.promoCard img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;background:#f0f2f5}.promoBody{padding:11px}.promoBody b{font-size:12px;display:block}.promoBody p{font-size:10px;color:#52657b;line-height:1.45;margin:5px 0 0;white-space:pre-wrap}.promoMeta{font-size:9px;color:#8793a3;margin-top:7px}
 .empty{padding:24px 14px;text-align:center;color:var(--muted);font-size:11px;border:1px dashed #cbd7e4;border-radius:16px;background:#fafcff}
-.bottom{position:fixed;left:0;right:0;bottom:0;height:calc(68px + var(--safe-b));padding:7px 8px var(--safe-b);background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);z-index:40}
+.bottom{position:fixed;left:0;right:0;bottom:0;height:calc(68px + var(--safe-b));padding:7px 8px var(--safe-b);background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);z-index:40}
 .nav{border:0;background:transparent;border-radius:12px;color:#718198;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:9px;font-weight:900}.nav i{font-style:normal;font-size:19px}.nav.active{background:#eef5ff;color:var(--blue)}
 .login{position:fixed;inset:0;z-index:100;background:radial-gradient(800px 500px at 15% 0,#dbeaff,transparent 60%),#f3f6fa;display:flex;align-items:center;justify-content:center;padding:20px}.login.hide{display:none}.loginBox{width:min(430px,100%);background:#fff;border:1px solid var(--line);border-radius:25px;padding:22px;box-shadow:0 24px 70px #17324d26}.loginHead{display:flex;gap:12px;align-items:center}.loginHead img{width:58px;height:58px;border-radius:16px}.loginHead h2{margin:0;font-size:20px}.loginHead p{margin:4px 0 0;color:var(--muted);font-size:10px}.loginErr{display:none;color:var(--bad);font-size:10px;margin-top:9px}.loginErr.show{display:block}
 .adminList{display:grid;gap:8px}.adminRow{background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px}.adminRow .top{display:flex;justify-content:space-between;gap:10px}.adminRow b{font-size:11px}.adminRow span{font-size:9px;color:var(--muted)}.adminRow p{font-size:10px;color:#53677f;margin:6px 0 0}.miniBtns{display:flex;gap:6px;margin-top:8px}.miniBtns button{border:1px solid var(--line);background:#f8fafc;border-radius:9px;padding:7px 9px;font-size:9px;font-weight:900}
@@ -115,7 +115,7 @@ main{padding-top:12px}
 <header class="topbar">
   <div class="toprow">
     <img class="logo" src="assets/toyo_logo.png" alt="Toyo Foods">
-    <div class="brand"><b id="topTitle">App Visitas</b><span id="topSub">Toyo Foods · Visitas móvil V2.1</span></div>
+    <div class="brand"><b id="topTitle">App Visitas</b><span id="topSub">Toyo Foods · Visitas móvil V3</span></div>
     <span id="net" class="net">●</span>
   </div>
 </header>
@@ -139,10 +139,17 @@ main{padding-top:12px}
         <button id="quickNewVisit" class="quickVisit"><b>＋ Nueva visita</b><span>Ir directo al registro de cliente</span></button>
         <div class="lastClient"><b>ÚLTIMO CLIENTE</b><span id="lastClient">Sin visitas hoy</span></div>
       </div>
+      <div class="sectionTitle">Pendientes de hoy</div>
+      <div id="todayFollowups" class="visitList"><div class="empty">Sin pendientes para hoy.</div></div>
+      <div class="sectionTitle">Resumen del mes</div>
+      <div class="grid2">
+        <div class="card"><b style="font-size:11px">Cumplimiento mensual</b><div id="monthlyProgress" style="font-size:24px;font-weight:950;margin-top:7px">0%</div><span style="font-size:9px;color:var(--muted)">sobre meta diaria acumulada</span></div>
+        <div class="card"><b style="font-size:11px">Prospectos</b><div id="monthlyProspects" style="font-size:24px;font-weight:950;margin-top:7px">0</div><span style="font-size:9px;color:var(--muted)">registrados este mes</span></div>
+      </div>
     </div>
 
     <div class="sectionTitle">Tu sesión</div>
-    <div class="card userCard"><div class="avatar">👤</div><div><b id="userName">—</b><span id="userScope">—</span></div></div>
+    <div class="card userCard"><div class="avatar">👤</div><div style="flex:1"><b id="userName">—</b><span id="userScope">—</span></div><span id="sellerSyncStatus" class="pill">✓ Sincronizado</span></div>
     <div class="sectionTitle">Herramientas</div>
     <div class="grid2">
       <button class="actionCard" data-go="visits"><div class="ic">📍</div><div><b>Visitas</b><span>Selecciona cliente, inicia y finaliza con ubicación.</span></div></button>
@@ -183,6 +190,7 @@ main{padding-top:12px}
           <option>Dar seguimiento</option><option>Enviar muestra</option><option>Enviar cotización</option>
           <option>Cobranza</option><option>Volver a visitar</option><option>Enviar información de producto</option>
         </select>
+        <div class="field"><label>FECHA DE SEGUIMIENTO</label><input id="followupDate" type="date"></div>
       </div>
       <div class="btnbar"><button id="startVisit" class="btn good">Iniciar visita</button><button id="endVisit" class="btn bad" disabled>Finalizar</button></div>
       <div class="btnbar"><button id="cantVisit" class="btn secondary">No pude visitar</button></div>
@@ -198,16 +206,37 @@ main{padding-top:12px}
       </div>
     </div>
     <div class="sectionTitle">Actividad de hoy</div><div class="historyHead"><span id="todaySummary">0 registros</span></div><div id="todayVisits" class="visitList"></div>
-    <div class="sectionTitle">Mi historial</div>
+    <div class="sectionTitle">Mi historial Cloud</div>
     <div class="card">
-      <div class="row">
-        <div class="field"><label>DESDE</label><input id="sellerHistFrom" type="date"></div>
-        <div class="field"><label>HASTA</label><input id="sellerHistTo" type="date"></div>
-      </div>
-      <div class="btnbar"><button id="loadSellerHistory" class="btn secondary">Actualizar historial</button></div>
+      <div class="btnbar" style="margin-top:0"><button id="histThisMonth" class="btn secondary">Este mes</button><button id="histPrevMonth" class="btn secondary">Mes anterior</button></div>
+      <div class="field"><label>MES</label><input id="sellerHistMonth" type="month"></div>
+      <div class="row"><div class="field"><label>DESDE</label><input id="sellerHistFrom" type="date"></div><div class="field"><label>HASTA</label><input id="sellerHistTo" type="date"></div></div>
+      <div class="btnbar"><button id="loadSellerHistory" class="btn secondary">Cargar desde Cloud</button></div>
       <div id="sellerHistory" class="adminList" style="margin-top:10px"></div>
     </div>
 
+  </section>
+
+
+  <section id="prospects" class="screen">
+    <div class="sectionTitle" style="margin-top:3px">Nuevo prospecto</div>
+    <div class="card">
+      <div class="field"><label>NOMBRE DEL NEGOCIO</label><input id="prosName" placeholder="Nombre comercial"></div>
+      <div class="row">
+        <div class="field"><label>CONTACTO</label><input id="prosContact" placeholder="Nombre de contacto"></div>
+        <div class="field"><label>TELÉFONO</label><input id="prosPhone" type="tel" placeholder="Teléfono"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>GIRO</label><select id="prosType"><option>Restaurante</option><option>Hotel</option><option>Cafetería</option><option>Comedor</option><option>Supermercado</option><option>Mayorista</option><option>Otro</option></select></div>
+        <div class="field"><label>ESTADO</label><select id="prosStatus"><option>Nuevo</option><option>En seguimiento</option><option>Muestra entregada</option><option>Cotización enviada</option><option>Convertido a cliente</option><option>No interesado</option></select></div>
+      </div>
+      <div class="field"><label>DIRECCIÓN</label><input id="prosAddress" placeholder="Dirección o referencia"></div>
+      <div class="field"><label>COMENTARIOS</label><textarea id="prosComments" placeholder="Necesidad, productos de interés, acuerdos…"></textarea></div>
+      <div class="nextActionBox"><b>PRÓXIMA ACCIÓN</b><select id="prosNextAction"><option>Dar seguimiento</option><option>Enviar muestra</option><option>Enviar cotización</option><option>Volver a visitar</option><option>Enviar información de producto</option></select><div class="field"><label>FECHA DE SEGUIMIENTO</label><input id="prosFollowup" type="date"></div></div>
+      <div class="btnbar"><button id="saveProspect" class="btn good">Guardar prospecto con GPS</button></div>
+    </div>
+    <div class="sectionTitle">Mis prospectos</div>
+    <div class="card"><div class="btnbar" style="margin-top:0"><button id="refreshProspects" class="btn secondary">Actualizar desde Cloud</button></div><div id="prospectList" class="adminList" style="margin-top:10px"></div></div>
   </section>
 
   <section id="promos" class="screen">
@@ -219,17 +248,25 @@ main{padding-top:12px}
   <section id="admin" class="screen">
     <div class="sectionTitle" style="margin-top:3px">Administración</div>
     <div class="grid2">
-      <div class="card"><b style="font-size:12px">Visitas Cloud</b><div id="adminVisitStats" style="font-size:24px;font-weight:900;margin-top:7px">—</div><span style="font-size:9px;color:var(--muted)">últimos 30 días</span></div>
-      <div class="card"><b style="font-size:12px">Sincronización</b><div id="queueStats" style="font-size:24px;font-weight:900;margin-top:7px">0</div><span style="font-size:9px;color:var(--muted)">pendientes locales</span></div>
+      <div class="card"><b style="font-size:12px">Visitas Cloud</b><div id="adminVisitStats" style="font-size:24px;font-weight:900;margin-top:7px">—</div><span style="font-size:9px;color:var(--muted)">según filtros</span></div>
+      <div class="card"><b style="font-size:12px">Sincronización</b><div id="queueStats" style="font-size:24px;font-weight:900;margin-top:7px">0</div><span id="syncLabel" style="font-size:9px;color:var(--muted)">Todo sincronizado</span></div>
+      <div class="card"><b style="font-size:12px">Prospectos</b><div id="adminProspectStats" style="font-size:24px;font-weight:900;margin-top:7px">—</div><span style="font-size:9px;color:var(--muted)">según filtros</span></div>
+      <div class="card"><b style="font-size:12px">No visitados</b><div id="adminMissedStats" style="font-size:24px;font-weight:900;margin-top:7px">—</div><span style="font-size:9px;color:var(--muted)">intentos fallidos</span></div>
     </div>
     <div class="card" style="margin-top:12px">
       <div class="row">
         <div class="field"><label>VENDEDOR</label><select id="adminVendorFilter"><option value="">Todos</option></select></div>
-        <div class="field"><label>FECHA</label><input id="adminDateFilter" type="date"></div>
+        <div class="field"><label>CIUDAD</label><select id="adminCityFilter"><option value="">Todas</option></select></div>
       </div>
+      <div class="field"><label>MES</label><input id="adminMonthFilter" type="month"></div>
+      <div class="row"><div class="field"><label>DESDE</label><input id="adminFromFilter" type="date"></div><div class="field"><label>HASTA</label><input id="adminToFilter" type="date"></div></div>
     </div>
     <div class="btnbar"><button id="loadAdminVisits" class="btn secondary">Cargar visitas</button><button id="syncNow" class="btn secondary">Sincronizar</button><button id="exportCsv" class="btn secondary">CSV</button></div>
     <div id="adminVisits" class="adminList" style="margin-top:12px"></div>
+    <div class="sectionTitle">Resumen por vendedor</div>
+    <div id="adminSellerSummary" class="adminList"></div>
+    <div class="sectionTitle">Clientes sin visitar recientemente</div>
+    <div class="card"><div class="btnbar" style="margin-top:0"><button class="btn secondary" data-aging="15">15 días</button><button class="btn secondary" data-aging="30">30 días</button><button class="btn secondary" data-aging="45">45+ días</button></div><div id="agingClients" class="adminList" style="margin-top:10px"></div></div>
 
     <div class="sectionTitle">Nueva / editar promoción</div>
     <div class="card">
@@ -252,7 +289,7 @@ main{padding-top:12px}
   <section id="more" class="screen">
     <div class="sectionTitle" style="margin-top:3px">Más</div>
     <div class="card userCard"><div class="avatar">👤</div><div><b id="moreUser">—</b><span id="moreScope">—</span></div></div>
-    <div class="btnbar"><button id="moreQuote" class="btn secondary">🧾 Cotizador</button><button id="moreOrders" class="btn secondary">🛒 Pedidos</button></div>
+    <div class="btnbar"><button id="moreHistory" class="btn secondary">📚 Mi historial</button></div><div class="btnbar"><button id="moreQuote" class="btn secondary">🧾 Cotizador</button><button id="moreOrders" class="btn secondary">🛒 Pedidos</button></div>
     <div class="btnbar"><button id="logout" class="btn bad">Cerrar sesión</button></div>
   </section>
 </main>
@@ -260,6 +297,7 @@ main{padding-top:12px}
 <nav class="bottom">
   <button class="nav active" data-go="home"><i>⌂</i><span>Inicio</span></button>
   <button class="nav" data-go="visits"><i>📍</i><span>Visitas</span></button>
+  <button class="nav" data-go="prospects"><i>🎯</i><span>Prospectos</span></button>
   <button class="nav" data-go="promos"><i>🏷️</i><span>Promos</span></button>
   <button class="nav" data-go="more"><i>☰</i><span>Más</span></button>
 </nav>
@@ -342,10 +380,11 @@ function go(name){
   if(name==='admin'&&a.role!=='admin')return;
   $$('.screen').forEach(x=>x.classList.toggle('active',x.id===name));
   $$('.nav').forEach(x=>x.classList.toggle('active',x.dataset.go===name));
-  const titles={home:['App Visitas','Toyo Foods · Visitas móvil V2.1'],visits:['Visitas','Clientes asignados y registro'],promos:['Promociones','Material comercial vigente'],admin:['Admin','Visitas y promociones'],more:['Más','Herramientas y sesión']};
+  const titles={home:['App Visitas','Toyo Foods · Visitas móvil V3'],visits:['Visitas','Clientes asignados y registro'],promos:['Promociones','Material comercial vigente'],admin:['Admin','Visitas y promociones'],more:['Más','Herramientas y sesión']};
   const t=titles[name]||titles.home;$('#topTitle').textContent=t[0];$('#topSub').textContent=t[1];
   if(name==='visits'){renderVisitState();renderToday();setTimeout(ensureVisitMap,60);if(getAuth()?.role==='seller')setTimeout(loadSellerHistory,100)}
   if(name==='promos')loadPromos();
+  if(name==='prospects')loadMyProspects();
   if(name==='admin'){updateQueueStat();loadAdminPromos()}
   if(name==='home')updateDashboard();
 }
@@ -358,10 +397,9 @@ function openExternal(url){
 
 
 function updateDashboard(){
-  const a=getAuth(), all=getLocalVisits(), rows=all.filter(r=>r.day===today()&&(a?.role==='admin'||r.vendor===a?.vendor));
-  const completed=rows.filter(r=>!r.missed);
-  const count=completed.length, goal=5, pending=Math.max(0,goal-count);
-  const mins=Math.round(completed.reduce((s,r)=>s+(Number(r.duration_sec)||0),0)/60);
+  const a=getAuth(),all=getLocalVisits(),rows=all.filter(r=>r.day===today()&&(a?.role==='admin'||r.vendor===a?.vendor));
+  const completed=rows.filter(r=>{const m=visitMeta(r);return !m.missed&&!m.prospect});
+  const count=completed.length,goal=5,pending=Math.max(0,goal-count),mins=Math.round(completed.reduce((s,r)=>s+(Number(r.duration_sec)||0),0)/60);
   if($('#kpiVisits'))$('#kpiVisits').textContent=count;
   if($('#kpiGoal'))$('#kpiGoal').textContent=`${count}/${goal}`;
   if($('#kpiPending'))$('#kpiPending').textContent=pending;
@@ -371,6 +409,16 @@ function updateDashboard(){
   const last=completed.slice().sort((x,y)=>String(y.end_ts||'').localeCompare(String(x.end_ts||'')))[0];
   if($('#lastClient'))$('#lastClient').textContent=last?last.client:'Sin visitas hoy';
   if($('#sellerDashboard'))$('#sellerDashboard').style.display=a?.role==='seller'?'':'none';
+  if(a?.role==='seller'){
+    const now=new Date(),month=now.toISOString().slice(0,7),todayStr=today(),mine=all.filter(r=>r.vendor===a.vendor),monthRows=mine.filter(r=>String(r.day||'').startsWith(month));
+    const eff=monthRows.filter(r=>{const m=visitMeta(r);return !m.prospect&&!m.missed});
+    const prospects=monthRows.filter(r=>visitMeta(r).prospect).length;
+    const workDays=Math.max(1,[...new Set(eff.map(r=>r.day))].length);
+    if($('#monthlyProgress'))$('#monthlyProgress').textContent=Math.min(100,Math.round((eff.length/(workDays*5))*100))+'%';
+    if($('#monthlyProspects'))$('#monthlyProspects').textContent=prospects;
+    const follow=mine.filter(r=>{const m=visitMeta(r);return m.followup_date===todayStr&&m.next_action});
+    const box=$('#todayFollowups');if(box)box.innerHTML=follow.length?follow.map(r=>{const m=visitMeta(r);return `<div class="visitItem"><b>${esc(r.client)}</b><span>${esc(m.next_action)}</span></div>`}).join(''):'<div class="empty">Sin pendientes para hoy.</div>';
+  }
 }
 function loadCss(href){
   return new Promise((resolve,reject)=>{
@@ -470,6 +518,45 @@ function filterClients(){
   fillClientOptions(CLIENTS.filter(c=>norm(c.code+' '+c.name).includes(q)).slice(0,250));
 }
 
+
+function packNotes(text,meta={}){
+  return JSON.stringify({v:3,text:text||'',...meta});
+}
+function unpackNotes(v){
+  try{
+    const o=JSON.parse(v||'{}');
+    if(o&&o.v===3)return o;
+  }catch(e){}
+  return {v:0,text:v||''};
+}
+function visitMeta(r){
+  const m=unpackNotes(r.notes);
+  return {
+    text:m.text||'',
+    next_action:r.next_action||m.next_action||'',
+    followup_date:r.followup_date||m.followup_date||'',
+    missed:r.missed===true||m.missed===true,
+    prospect:m.prospect===true||String(r.type||'').toUpperCase()==='PROSPECTO',
+    prospect_status:m.prospect_status||'',
+    prospect_contact:m.prospect_contact||'',
+    prospect_phone:m.prospect_phone||'',
+    prospect_giro:m.prospect_giro||'',
+    prospect_address:m.prospect_address||''
+  };
+}
+function monthRange(value){
+  if(!value)return {from:'',to:''};
+  const [y,m]=value.split('-').map(Number),last=new Date(y,m,0).getDate();
+  return {from:`${y}-${String(m).padStart(2,'0')}-01`,to:`${y}-${String(m).padStart(2,'0')}-${String(last).padStart(2,'0')}`};
+}
+function setSellerHistoryMonth(value){
+  const r=monthRange(value);
+  $('#sellerHistMonth').value=value;
+  $('#sellerHistFrom').value=r.from;
+  $('#sellerHistTo').value=r.to;
+  loadSellerHistory();
+}
+
 function getLocalVisits(){try{return JSON.parse(localStorage.getItem(VISITS_KEY)||'[]')}catch{return []}}
 function setLocalVisits(v){localStorage.setItem(VISITS_KEY,JSON.stringify(v))}
 function getQueue(){try{return JSON.parse(localStorage.getItem(QUEUE_KEY)||'[]')}catch{return []}}
@@ -500,9 +587,10 @@ async function endVisit(){
   $('#endVisit').disabled=true;
   try{
     const pos=await getPos(),end=new Date().toISOString(),dur=Math.max(0,Math.floor((Date.now()-new Date(act.start_ts).getTime())/1000));
-    const rec={id:uuid(),day:today(),city:act.city,vendor:act.vendor,client:act.client,type:act.type,notes:act.notes,next_action:$('#nextAction').value,start_ts:act.start_ts,end_ts:end,duration_sec:dur,start_lat:act.start_lat,start_lng:act.start_lng,end_lat:pos.coords.latitude,end_lng:pos.coords.longitude};
+    const nextAction=$('#nextAction').value,followup=$('#followupDate').value;
+    const rec={id:uuid(),day:today(),city:act.city,vendor:act.vendor,client:act.client,type:act.type,notes:packNotes(act.notes,{next_action:nextAction,followup_date:followup}),next_action:nextAction,followup_date:followup,start_ts:act.start_ts,end_ts:end,duration_sec:dur,start_lat:act.start_lat,start_lng:act.start_lng,end_lat:pos.coords.latitude,end_lng:pos.coords.longitude};
     const rows=getLocalVisits();rows.push(rec);setLocalVisits(rows);setActive(null);
-    $('#visitNotes').value='';$('#nextAction').value='';$('#clientSearch').value='';fillClientOptions(CLIENTS);
+    $('#visitNotes').value='';$('#nextAction').value='';$('#followupDate').value='';$('#clientSearch').value='';fillClientOptions(CLIENTS);
     try{await cloudInsertVisit(rec)}catch(e){const q=getQueue();q.push(rec);setQueue(q)}
     renderVisitState();renderToday();renderVisitMapMarkers();updateDashboard();toast('Visita finalizada');
   }catch(e){toast('No se pudo obtener ubicación')}finally{$('#endVisit').disabled=false}
@@ -521,11 +609,42 @@ async function saveCantVisit(){
   let lat=null,lng=null;
   try{const p=await getPos();lat=p.coords.latitude;lng=p.coords.longitude}catch(e){}
   const now=new Date().toISOString();
-  const rec={id:uuid(),day:today(),city:a.city,vendor:a.vendor,client:`${c.code} · ${c.name}`,type:'No pude visitar',notes:CANT_VISIT_REASON,next_action:$('#nextAction').value||'Volver a visitar',missed:true,start_ts:now,end_ts:now,duration_sec:0,start_lat:lat,start_lng:lng,end_lat:lat,end_lng:lng};
+  const nextAction=$('#nextAction').value||'Volver a visitar',followup=$('#followupDate').value;
+  const rec={id:uuid(),day:today(),city:a.city,vendor:a.vendor,client:`${c.code} · ${c.name}`,type:'No pude visitar',notes:packNotes(CANT_VISIT_REASON,{missed:true,next_action:nextAction,followup_date:followup}),next_action:nextAction,followup_date:followup,missed:true,start_ts:now,end_ts:now,duration_sec:0,start_lat:lat,start_lng:lng,end_lat:lat,end_lng:lng};
   const rows=getLocalVisits();rows.push(rec);setLocalVisits(rows);
   try{await cloudInsertVisit(rec)}catch(e){const q=getQueue();q.push(rec);setQueue(q)}
   $('#cantVisitBox').style.display='none';CANT_VISIT_REASON='';$$('[data-reason]').forEach(b=>b.classList.remove('active'));
   renderToday();updateDashboard();toast('Intento registrado');
+}
+
+
+async function saveProspect(){
+  const a=getAuth();if(!a||a.role!=='seller')return;
+  const name=$('#prosName').value.trim();if(!name)return toast('Escribe el nombre del negocio');
+  $('#saveProspect').disabled=true;
+  try{
+    let lat=null,lng=null;try{const p=await getPos();lat=p.coords.latitude;lng=p.coords.longitude}catch(e){}
+    const now=new Date().toISOString(),comments=$('#prosComments').value.trim(),status=$('#prosStatus').value,next=$('#prosNextAction').value,follow=$('#prosFollowup').value;
+    const meta={prospect:true,prospect_status:status,prospect_contact:$('#prosContact').value.trim(),prospect_phone:$('#prosPhone').value.trim(),prospect_giro:$('#prosType').value,prospect_address:$('#prosAddress').value.trim(),next_action:next,followup_date:follow};
+    const rec={id:uuid(),day:today(),city:a.city,vendor:a.vendor,client:name,type:'PROSPECTO',notes:packNotes(comments,meta),start_ts:now,end_ts:now,duration_sec:0,start_lat:lat,start_lng:lng,end_lat:lat,end_lng:lng};
+    const rows=getLocalVisits();rows.push({...rec,next_action:next,followup_date:follow,prospect:true,prospect_status:status});setLocalVisits(rows);
+    try{await cloudInsertVisit(rec)}catch(e){const q=getQueue();q.push(rec);setQueue(q)}
+    ['#prosName','#prosContact','#prosPhone','#prosAddress','#prosComments','#prosFollowup'].forEach(s=>$(s).value='');
+    $('#prosStatus').value='Nuevo';updateDashboard();await loadMyProspects();toast('Prospecto guardado');
+  }finally{$('#saveProspect').disabled=false}
+}
+async function loadMyProspects(){
+  const a=getAuth();if(!a||a.role!=='seller')return;
+  const box=$('#prospectList');box.innerHTML='<div class="empty">Cargando prospectos…</div>';
+  let rows=getLocalVisits().filter(r=>r.vendor===a.vendor&&visitMeta(r).prospect);
+  try{
+    const cols='id,day,city,vendor,client,type,notes,start_ts,end_ts,duration_sec';
+    const cloud=await sbFetch(`/rest/v1/${VISITS_TABLE}?select=${cols}&vendor=eq.${encodeURIComponent(a.vendor)}&type=eq.PROSPECTO&order=start_ts.desc&limit=500`);
+    if(Array.isArray(cloud))rows=[...cloud,...rows];
+  }catch(e){}
+  const map=new Map();rows.forEach(r=>map.set(String(r.id||[r.day,r.vendor,r.client,r.start_ts].join('|')),r));
+  rows=[...map.values()].sort((a,b)=>String(b.start_ts||'').localeCompare(String(a.start_ts||'')));
+  box.innerHTML=rows.length?rows.map(r=>{const m=visitMeta(r);return `<div class="adminRow"><div class="top"><b>${esc(r.client)}</b><span>${esc(m.prospect_status||'Nuevo')}</span></div><p>${esc(m.prospect_giro||'')} · ${esc(m.prospect_contact||'')} ${m.prospect_phone?'· '+esc(m.prospect_phone):''}</p>${m.text?`<p>${esc(m.text)}</p>`:''}${m.next_action?`<p>Próxima acción: ${esc(m.next_action)} ${m.followup_date?'· '+esc(m.followup_date):''}</p>`:''}</div>`}).join(''):'<div class="empty">Sin prospectos registrados.</div>';
 }
 
 function renderVisitState(){
@@ -538,7 +657,7 @@ function renderVisitState(){
 function renderToday(){
   const a=getAuth(),rows=getLocalVisits().filter(r=>r.day===today()&&(a?.role==='admin'||r.vendor===a?.vendor)).slice().reverse();
   if($('#todaySummary'))$('#todaySummary').textContent=`${rows.length} registro${rows.length===1?'':'s'}`;
-  $('#todayVisits').innerHTML=rows.length?rows.map(r=>`<div class="visitItem"><b>${r.missed?'⚠️ ':''}${esc(r.client)}</b><span>${esc(r.type)} · ${r.missed?esc(r.notes):`${fmtTime(r.start_ts)}–${fmtTime(r.end_ts)} · ${durationText(r.duration_sec)}`}</span>${r.next_action?`<span>Próxima acción: ${esc(r.next_action)}</span>`:''}</div>`).join(''):'<div class="empty">Sin actividad registrada hoy.</div>';
+  $('#todayVisits').innerHTML=rows.length?rows.map(r=>{const m=visitMeta(r);return `<div class="visitItem"><b>${m.prospect?'🎯 ':m.missed?'⚠️ ':''}${esc(r.client)}</b><span>${esc(r.type)} · ${m.missed?'No efectiva':m.prospect?'Prospecto':`${fmtTime(r.start_ts)}–${fmtTime(r.end_ts)} · ${durationText(r.duration_sec)}`}</span>${m.next_action?`<span>Próxima acción: ${esc(m.next_action)} ${m.followup_date?'· '+esc(m.followup_date):''}</span>`:''}</div>`}).join(''):'<div class="empty">Sin actividad registrada hoy.</div>';
 }
 
 
@@ -559,7 +678,12 @@ async function sbFetch(path,{method='GET',body=null,headers={}}={}){
   if(!txt.trim())return null;try{return JSON.parse(txt)}catch{return txt}
 }
 async function cloudInsertVisit(rec){
-  await sbFetch(`/rest/v1/${VISITS_TABLE}`,{method:'POST',headers:{Prefer:'return=minimal'},body:rec});
+  const body={
+    id:rec.id,day:rec.day,city:rec.city,vendor:rec.vendor,client:rec.client,type:rec.type,notes:rec.notes||'',
+    start_ts:rec.start_ts,end_ts:rec.end_ts,duration_sec:Number(rec.duration_sec)||0,
+    start_lat:rec.start_lat??null,start_lng:rec.start_lng??null,end_lat:rec.end_lat??null,end_lng:rec.end_lng??null
+  };
+  await sbFetch(`/rest/v1/${VISITS_TABLE}`,{method:'POST',headers:{Prefer:'return=minimal'},body});
 }
 async function flushQueue(){
   const q=getQueue();if(!q.length){updateQueueStat();return 0}
@@ -567,7 +691,66 @@ async function flushQueue(){
   for(const r of q){try{await cloudInsertVisit(r);sent++}catch(e){pending.push(r)}}
   setQueue(pending);if(sent)toast(`Sincronizadas: ${sent}`);return sent;
 }
-function updateQueueStat(){$('#queueStats').textContent=getQueue().length}
+function updateQueueStat(){
+  const n=getQueue().length;
+  $('#queueStats').textContent=n;
+  const s=$('#syncLabel'); if(s)s.textContent=n?`${n} pendiente${n===1?'':'s'}`:'Todo sincronizado';
+  const p=$('#sellerSyncStatus'); if(p)p.textContent=n?`${n} pendiente${n===1?'':'s'}`:'✓ Sincronizado';
+}
+
+
+function promoEventBody(p){
+  return JSON.stringify({
+    v:2,
+    promo_id:p.promo_id,
+    title:p.title||'',
+    comments:p.comments||'',
+    image:p.image||'',
+    start:p.start||'',
+    end:p.end||'',
+    active:p.active!==false,
+    updated_at:p.updated_at||new Date().toISOString()
+  });
+}
+function parsePromoEvent(r){
+  try{
+    const b=JSON.parse(r.notes||'{}');
+    if(!b || b.v!==2 || !b.promo_id) return null;
+    return {
+      id:String(b.promo_id),
+      promo_id:String(b.promo_id),
+      title:b.title||r.client||'Promoción',
+      comments:b.comments||'',
+      image:b.image||'',
+      start:b.start||'',
+      end:b.end||'',
+      active:b.active!==false,
+      created_at:b.updated_at||r.start_ts||r.day||'',
+      updated_at:b.updated_at||r.start_ts||''
+    };
+  }catch(e){ return null; }
+}
+async function cloudPromoRevision(p){
+  const now=new Date().toISOString();
+  const rec={
+    id:uuid(),
+    day:today(),
+    city:'PROMO',
+    vendor:'ADMIN',
+    client:p.title||'Promoción',
+    type:'PROMOTION',
+    notes:promoEventBody({...p,updated_at:now}),
+    start_ts:now,
+    end_ts:now,
+    duration_sec:0,
+    start_lat:null,start_lng:null,end_lat:null,end_lng:null
+  };
+  await sbFetch(`/rest/v1/${VISITS_TABLE}`,{
+    method:'POST',
+    headers:{Prefer:'return=minimal'},
+    body:rec
+  });
+}
 
 function promoPayloadBody({comments,image,start,end}){return JSON.stringify({v:1,comments,image,start,end})}
 function parsePromo(r){
@@ -578,23 +761,28 @@ function promoIsCurrent(p){
 }
 async function fetchPromos(activeOnly=false){
   const local=getLocalPromos();
-  let cloud=[];
+  let shared=[];
   try{
-    let path=`/rest/v1/${PROMO_TABLE}?select=id,created_at,day,city,vendor,title,body,active&city=eq.PROMO&order=created_at.desc&limit=80`;
-    if(activeOnly)path+=`&active=eq.true`;
-    const rows=await sbFetch(path);
-    cloud=(Array.isArray(rows)?rows:[]).map(parsePromo);
+    const cols='id,day,city,vendor,client,type,notes,start_ts';
+    const rows=await sbFetch(`/rest/v1/${VISITS_TABLE}?select=${cols}&city=eq.PROMO&type=eq.PROMOTION&order=start_ts.desc&limit=250`);
+    const parsed=(Array.isArray(rows)?rows:[]).map(parsePromoEvent).filter(Boolean);
+    const latest=new Map();
+    parsed.forEach(p=>{
+      const prev=latest.get(p.promo_id);
+      if(!prev || String(p.updated_at||'')>String(prev.updated_at||'')) latest.set(p.promo_id,p);
+    });
+    shared=[...latest.values()];
   }catch(e){
-    cloud=[];
+    shared=[];
   }
-  const merged=mergePromos(local,cloud);
+  const merged=mergePromos(local,shared);
   return activeOnly?merged.filter(p=>p.active!==false):merged;
 }
 async function loadPromos(){
   const box=$('#promoList');box.innerHTML='<div class="empty">Cargando promociones…</div>';
   try{
     const rows=(await fetchPromos(true)).filter(promoIsCurrent);
-    if(!rows.length){box.innerHTML='<div class="empty">No hay promociones vigentes.</div>';return}
+    if(!rows.length){box.innerHTML='<div class="empty">No hay promociones vigentes publicadas.</div>';return}
     box.innerHTML=rows.map(p=>`<article class="promoCard">${p.image?`<img src="${p.image}" alt="">`:''}<div class="promoBody"><b>${esc(p.title)}</b><p>${esc(p.comments)}</p><div class="promoMeta">${p.start||'—'} → ${p.end||'—'}</div></div></article>`).join('');
   }catch(e){box.innerHTML='<div class="empty">No se pudieron cargar promociones. Revisa tu conexión.</div>'}
 }
@@ -621,31 +809,27 @@ async function savePromo(){
   try{
     const file=$('#promoImage').files[0];
     const image=file?await imageToData(file):CURRENT_PROMO_IMAGE;
-    const body=promoPayloadBody({comments,image,start,end});
-    const editId=$('#promoEditId').value;
+    const promoId=$('#promoEditId').value||uuid();
     const now=new Date().toISOString();
-    const id=editId||uuid();
-    const promo={id,created_at:now,day:today(),active:true,city:'PROMO',vendor:'ALL',title,body,comments,image,start,end};
+    const promo={
+      id:promoId,promo_id:promoId,title,comments,image,start,end,
+      active:true,created_at:now,updated_at:now
+    };
 
+    // Respaldo local del dispositivo Admin.
     let locals=getLocalPromos();
-    const idx=locals.findIndex(x=>String(x.id)===String(id));
+    const idx=locals.findIndex(x=>String(x.id)===String(promoId));
     if(idx>=0) locals[idx]=promo; else locals.unshift(promo);
     setLocalPromos(locals);
 
-    // Intento de sincronización Cloud, pero la app funciona aunque Supabase rechace la escritura.
-    try{
-      if(editId){
-        await sbFetch(`/rest/v1/${PROMO_TABLE}?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:{title,body,day:today(),active:true,city:'PROMO',vendor:'ALL'}});
-      }else{
-        await sbFetch(`/rest/v1/${PROMO_TABLE}`,{method:'POST',headers:{Prefer:'return=minimal'},body:{id,created_at:now,day:today(),active:true,city:'PROMO',vendor:'ALL',title,body}});
-      }
-    }catch(e){ /* guardado local ya realizado */ }
+    // Publicación compartida usando la misma tabla Cloud que ya funciona para visitas.
+    await cloudPromoRevision(promo);
 
     resetPromoForm();
     await loadAdminPromos();
-    toast('Promoción guardada');
+    toast('Promoción publicada para vendedores');
   }catch(e){
-    toast('No se pudo procesar la imagen');
+    toast('No se pudo publicar. Revisa conexión o Cloud.');
   }finally{
     $('#savePromo').disabled=false;
   }
@@ -670,16 +854,32 @@ function editPromo(id){
 }
 async function togglePromo(id){
   const p=ADMIN_PROMOS_CACHE.find(x=>String(x.id)===String(id));if(!p)return;
-  const locals=getLocalPromos();const i=locals.findIndex(x=>String(x.id)===String(id));
-  if(i>=0){locals[i].active=!p.active;setLocalPromos(locals)}
-  try{await sbFetch(`/rest/v1/${PROMO_TABLE}?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:{active:!p.active}})}catch(e){}
-  await loadAdminPromos();
+  const updated={...p,promo_id:String(id),active:!p.active,updated_at:new Date().toISOString()};
+  let locals=getLocalPromos();
+  const i=locals.findIndex(x=>String(x.id)===String(id));
+  if(i>=0) locals[i]=updated; else locals.unshift(updated);
+  setLocalPromos(locals);
+  try{
+    await cloudPromoRevision(updated);
+    await loadAdminPromos();
+    toast(updated.active?'Promoción activada':'Promoción desactivada');
+  }catch(e){
+    await loadAdminPromos();
+    toast('Cambio guardado localmente; falta sincronizar Cloud');
+  }
 }
 async function deletePromo(id){
   if(!confirm('¿Eliminar esta promoción?'))return;
+  const p=ADMIN_PROMOS_CACHE.find(x=>String(x.id)===String(id));if(!p)return;
+  const tomb={...p,promo_id:String(id),active:false,title:p.title||'Promoción eliminada',updated_at:new Date().toISOString()};
   setLocalPromos(getLocalPromos().filter(x=>String(x.id)!==String(id)));
-  try{await sbFetch(`/rest/v1/${PROMO_TABLE}?id=eq.${encodeURIComponent(id)}`,{method:'DELETE',headers:{Prefer:'return=minimal'}})}catch(e){}
-  await loadAdminPromos();toast('Promoción eliminada');
+  try{
+    await cloudPromoRevision(tomb);
+    toast('Promoción eliminada');
+  }catch(e){
+    toast('Eliminada localmente; falta sincronizar Cloud');
+  }
+  await loadAdminPromos();
 }
 
 
@@ -694,54 +894,73 @@ function localSellerVisits(vendor,from,to){
 async function loadSellerHistory(){
   const a=getAuth();if(!a||a.role!=='seller')return;
   const from=$('#sellerHistFrom').value,to=$('#sellerHistTo').value;
-  let rows=localSellerVisits(a.vendor,from,to);
+  const box=$('#sellerHistory');box.innerHTML='<div class="empty">Cargando desde Cloud…</div>';
+  let rows=[];
   try{
-    let path=`/rest/v1/${VISITS_TABLE}?select=id,day,city,vendor,client,type,notes,next_action,start_ts,end_ts,duration_sec&vendor=eq.${encodeURIComponent(a.vendor)}&order=start_ts.desc&limit=500`;
-    if(from)path+=`&day=gte.${from}`;
-    if(to)path+=`&day=lte.${to}`;
-    const cloud=await sbFetch(path);
-    const all=[...(Array.isArray(cloud)?cloud:[]),...rows];
-    const m=new Map();all.forEach(r=>m.set(String(r.id||[r.day,r.vendor,r.client,r.start_ts].join('|')),r));
-    rows=[...m.values()];
-  }catch(e){}
-  rows.sort((x,y)=>String(y.start_ts||'').localeCompare(String(x.start_ts||'')));
-  const box=$('#sellerHistory');
-  box.innerHTML=rows.length?rows.map(r=>`<div class="adminRow"><div class="top"><b>${esc(r.client)}</b><span>${esc(r.day)}</span></div><p>${esc(r.type)} · ${fmtTime(r.start_ts)}–${fmtTime(r.end_ts)} · ${durationText(r.duration_sec)}</p>${r.next_action?`<p>Próxima acción: ${esc(r.next_action)}</p>`:''}${r.notes?`<p>${esc(r.notes)}</p>`:''}</div>`).join(''):'<div class="empty">Sin visitas en el periodo.</div>';
+    const cols='id,day,city,vendor,client,type,notes,start_ts,end_ts,duration_sec';
+    let path=`/rest/v1/${VISITS_TABLE}?select=${cols}&vendor=eq.${encodeURIComponent(a.vendor)}&order=start_ts.desc&limit=2000`;
+    if(from)path+=`&day=gte.${from}`;if(to)path+=`&day=lte.${to}`;
+    const cloud=await sbFetch(path);rows=Array.isArray(cloud)?cloud:[];
+  }catch(e){rows=localSellerVisits(a.vendor,from,to)}
+  rows=rows.filter(r=>String(r.type).toUpperCase()!=='PROMOTION');
+  box.innerHTML=rows.length?rows.map(r=>{const m=visitMeta(r);return `<div class="adminRow"><div class="top"><b>${m.prospect?'🎯 ':m.missed?'⚠️ ':''}${esc(r.client)}</b><span>${esc(r.day)}</span></div><p>${esc(r.type)} · ${m.missed?'No efectiva':m.prospect?'Prospecto':`${fmtTime(r.start_ts)}–${fmtTime(r.end_ts)} · ${durationText(r.duration_sec)}`}</p>${m.next_action?`<p>Próxima acción: ${esc(m.next_action)} ${m.followup_date?'· '+esc(m.followup_date):''}</p>`:''}${m.text?`<p>${esc(m.text)}</p>`:''}</div>`}).join(''):'<div class="empty">Sin registros en el periodo.</div>';
 }
 function fillAdminVendorFilter(){
-  const s=$('#adminVendorFilter'); if(!s)return;
+  const s=$('#adminVendorFilter');if(!s)return;
   const vals=[...new Set(Object.values(SELLERS).flat())].sort((a,b)=>a.localeCompare(b,'es'));
   s.innerHTML='<option value="">Todos</option>'+vals.map(v=>`<option>${esc(v)}</option>`).join('');
+  const c=$('#adminCityFilter');if(c)c.innerHTML='<option value="">Todas</option>'+Object.keys(SELLERS).map(x=>`<option value="${esc(x)}">${esc(CITY_LABELS[x]||x)}</option>`).join('');
 }
 
 async function loadAdminVisits(){
   if(getAuth()?.role!=='admin')return;
-  const selectedVendor=$('#adminVendorFilter')?.value||'';
-  const selectedDate=$('#adminDateFilter')?.value||'';
-  const box=$('#adminVisits');box.innerHTML='<div class="empty">Cargando visitas…</div>';
-
-  let rows=[...getLocalVisits()];
+  const vendor=$('#adminVendorFilter')?.value||'',city=$('#adminCityFilter')?.value||'';
+  let from=$('#adminFromFilter')?.value||'',to=$('#adminToFilter')?.value||'';
+  const month=$('#adminMonthFilter')?.value||'';if(month){const r=monthRange(month);from=r.from;to=r.to}
+  const box=$('#adminVisits');box.innerHTML='<div class="empty">Cargando historial Cloud…</div>';
+  let rows=[];
   try{
-    const cols='id,day,city,vendor,client,type,notes,next_action,start_ts,end_ts,duration_sec';
-    let path=`/rest/v1/${VISITS_TABLE}?select=${cols}&order=start_ts.desc&limit=2000`;
-    if(selectedVendor)path+=`&vendor=eq.${encodeURIComponent(selectedVendor)}`;
-    if(selectedDate)path+=`&day=eq.${selectedDate}`;
-    const cloud=await sbFetch(path);
-    if(Array.isArray(cloud)) rows=[...cloud,...rows];
-  }catch(e){}
-
-  const m=new Map();
-  rows.forEach(r=>m.set(String(r.id||[r.day,r.vendor,r.client,r.start_ts].join('|')),r));
-  rows=[...m.values()].filter(r=>{
-    if(selectedVendor&&String(r.vendor)!==selectedVendor)return false;
-    if(selectedDate&&String(r.day)!==selectedDate)return false;
-    return true;
-  }).sort((x,y)=>String(y.start_ts||'').localeCompare(String(x.start_ts||'')));
-
+    const cols='id,day,city,vendor,client,type,notes,start_ts,end_ts,duration_sec,start_lat,start_lng,end_lat,end_lng';
+    let path=`/rest/v1/${VISITS_TABLE}?select=${cols}&order=start_ts.desc&limit=4000`;
+    if(vendor)path+=`&vendor=eq.${encodeURIComponent(vendor)}`;if(city)path+=`&city=eq.${encodeURIComponent(city)}`;if(from)path+=`&day=gte.${from}`;if(to)path+=`&day=lte.${to}`;
+    const cloud=await sbFetch(path);rows=Array.isArray(cloud)?cloud:[];
+  }catch(e){rows=getLocalVisits()}
+  rows=rows.filter(r=>String(r.type).toUpperCase()!=='PROMOTION'&&String(r.city).toUpperCase()!=='PROMO');
   ADMIN_VISITS_CACHE=rows;
-  $('#adminVisitStats').textContent=rows.length;
-  box.innerHTML=rows.length?rows.map(r=>`<div class="adminRow"><div class="top"><b>${esc(r.vendor)} · ${esc(r.client)}</b><span>${esc(r.day)}</span></div><p>${esc(r.type)} · ${fmtTime(r.start_ts)}–${fmtTime(r.end_ts)} · ${durationText(r.duration_sec)}</p>${r.next_action?`<p>Próxima acción: ${esc(r.next_action)}</p>`:''}${r.notes?`<p>${esc(r.notes)}</p>`:''}</div>`).join(''):'<div class="empty">Sin visitas para el filtro seleccionado.</div>';
+  const prospects=rows.filter(r=>visitMeta(r).prospect),missed=rows.filter(r=>visitMeta(r).missed),effective=rows.filter(r=>!visitMeta(r).prospect&&!visitMeta(r).missed);
+  $('#adminVisitStats').textContent=effective.length;$('#adminProspectStats').textContent=prospects.length;$('#adminMissedStats').textContent=missed.length;
+  box.innerHTML=rows.length?rows.slice(0,800).map(r=>{const m=visitMeta(r);return `<div class="adminRow"><div class="top"><b>${esc(r.vendor)} · ${m.prospect?'🎯 ':m.missed?'⚠️ ':''}${esc(r.client)}</b><span>${esc(r.day)}</span></div><p>${esc(r.type)} · ${m.missed?'No efectiva':m.prospect?'Prospecto':`${fmtTime(r.start_ts)}–${fmtTime(r.end_ts)} · ${durationText(r.duration_sec)}`}</p>${m.next_action?`<p>Próxima acción: ${esc(m.next_action)} ${m.followup_date?'· '+esc(m.followup_date):''}</p>`:''}</div>`}).join(''):'<div class="empty">Sin registros para los filtros seleccionados.</div>';
+  renderAdminSellerSummary(rows);
 }
+
+function renderAdminSellerSummary(rows){
+  const map=new Map();
+  rows.forEach(r=>{
+    if(!r.vendor||r.vendor==='ADMIN')return;
+    if(!map.has(r.vendor))map.set(r.vendor,{visits:0,prospects:0,missed:0,dur:0});
+    const x=map.get(r.vendor),m=visitMeta(r);
+    if(m.prospect)x.prospects++; else if(m.missed)x.missed++; else{x.visits++;x.dur+=Number(r.duration_sec)||0}
+  });
+  const box=$('#adminSellerSummary');
+  box.innerHTML=[...map.entries()].sort((a,b)=>b[1].visits-a[1].visits).map(([v,x])=>`<div class="adminRow"><div class="top"><b>${esc(v)}</b><span>${x.visits} visitas</span></div><p>Prospectos ${x.prospects} · No visitados ${x.missed} · Duración prom. ${x.visits?Math.round((x.dur/x.visits)/60):0} min</p></div>`).join('')||'<div class="empty">Sin información.</div>';
+}
+async function loadAgingClients(days){
+  const box=$('#agingClients');box.innerHTML='<div class="empty">Analizando clientes…</div>';
+  const cutoff=new Date(Date.now()-Number(days)*864e5).toISOString().slice(0,10);
+  let rows=[];
+  try{
+    const cols='day,vendor,client,type,notes,start_ts';
+    const cloud=await sbFetch(`/rest/v1/${VISITS_TABLE}?select=${cols}&day=gte.${new Date(Date.now()-180*864e5).toISOString().slice(0,10)}&order=start_ts.desc&limit=5000`);
+    rows=Array.isArray(cloud)?cloud:[];
+  }catch(e){}
+  const last=new Map();
+  rows.filter(r=>!visitMeta(r).prospect&&!visitMeta(r).missed&&String(r.type).toUpperCase()!=='PROMOTION').forEach(r=>{
+    const k=`${r.vendor}|${r.client}`;if(!last.has(k)||String(r.day)>String(last.get(k).day))last.set(k,r)
+  });
+  const old=[...last.values()].filter(r=>String(r.day)<=cutoff).sort((a,b)=>String(a.day).localeCompare(String(b.day))).slice(0,200);
+  box.innerHTML=old.length?old.map(r=>`<div class="adminRow"><div class="top"><b>${esc(r.vendor)} · ${esc(r.client)}</b><span>${esc(r.day)}</span></div><p>Sin visita efectiva en ${days}+ días.</p></div>`).join(''):'<div class="empty">Sin clientes en este rango.</div>';
+}
+
 function csv(v){return '"'+String(v??'').replaceAll('"','""')+'"'}
 function exportAdminCsv(){
   if(!ADMIN_VISITS_CACHE.length)return toast('Primero carga visitas');
@@ -756,6 +975,9 @@ fillUsers();syncSession();updateNet();renderToday();updateQueueStat();updateDash
 const d=new Date(), d30=new Date(Date.now()-29*864e5);
 if($('#sellerHistFrom'))$('#sellerHistFrom').value=d30.toISOString().slice(0,10);
 if($('#sellerHistTo'))$('#sellerHistTo').value=d.toISOString().slice(0,10);
+if($('#sellerHistMonth'))$('#sellerHistMonth').value=d.toISOString().slice(0,7);
+if($('#adminMonthFilter'))$('#adminMonthFilter').value=d.toISOString().slice(0,7);
+if($('#prosFollowup'))$('#prosFollowup').value=d.toISOString().slice(0,10);
 window.addEventListener('online',()=>{updateNet();setTimeout(flushQueue,600)});window.addEventListener('offline',updateNet);
 $('#loginBtn').onclick=login;$('#loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')login()});$('#logout').onclick=logout;
 $$('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
@@ -768,7 +990,13 @@ $('#cantVisit').onclick=toggleCantVisit;
 $$('[data-reason]').forEach(b=>b.onclick=()=>chooseReason(b.dataset.reason));
 $('#saveCantVisit').onclick=saveCantVisit;
 $('#refreshPromos').onclick=loadPromos;$('#promoImage').addEventListener('change',previewPromoImage);$('#savePromo').onclick=savePromo;$('#cancelPromoEdit').onclick=resetPromoForm;$('#loadAdminPromos').onclick=loadAdminPromos;
-$('#loadAdminVisits').onclick=loadAdminVisits;$('#syncNow').onclick=flushQueue;$('#exportCsv').onclick=exportAdminCsv;$('#loadSellerHistory').onclick=loadSellerHistory;
+$('#loadAdminVisits').onclick=loadAdminVisits;$('#syncNow').onclick=flushQueue;$('#exportCsv').onclick=exportAdminCsv;
+$('#saveProspect').onclick=saveProspect;$('#refreshProspects').onclick=loadMyProspects;
+$('#moreHistory').onclick=()=>go('visits');
+$('#histThisMonth').onclick=()=>setSellerHistoryMonth(new Date().toISOString().slice(0,7));
+$('#histPrevMonth').onclick=()=>{const d=new Date();d.setMonth(d.getMonth()-1);setSellerHistoryMonth(d.toISOString().slice(0,7))};
+$('#sellerHistMonth').addEventListener('change',e=>setSellerHistoryMonth(e.target.value));
+$$('[data-aging]').forEach(b=>b.onclick=()=>loadAgingClients(b.dataset.aging));$('#loadSellerHistory').onclick=loadSellerHistory;
 resetPromoForm();
 if(getAuth()&&navigator.onLine)setTimeout(flushQueue,2200);
 </script>
