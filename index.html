@@ -4,83 +4,439 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b4ea2">
-<title>Toyo Foods · Comercial</title>
+<title>Toyo Foods · Visitas</title>
 <style>
-:root{--b:#0b4ea2;--b2:#073675;--bg:#f3f7fc;--tx:#13233d;--mu:#718198;--ln:#dce6f1;--st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px)}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--tx)}button,select,input{font:inherit}button{cursor:pointer}
-.shell{max-width:540px;margin:auto;padding:calc(18px + var(--st)) 14px calc(28px + var(--sb))}
-.brand{display:flex;align-items:center;gap:12px;margin-bottom:18px}.brand img{width:54px;height:54px;border-radius:15px;object-fit:contain}.brand b{font-size:18px;display:block}.brand span{font-size:11px;color:var(--mu)}
-.hero{background:linear-gradient(135deg,var(--b),var(--b2));color:#fff;border-radius:22px;padding:20px;box-shadow:0 15px 36px #0b4ea22b}.hero small{opacity:.78;font-weight:800}.hero h1{font-size:24px;margin:7px 0 5px}.hero p{font-size:12px;line-height:1.5;margin:0;opacity:.9}
-.card{background:#fff;border:1px solid var(--ln);border-radius:20px;padding:16px;margin-top:12px;box-shadow:0 7px 22px #17324d0d}
-.field{margin-top:12px}label{display:block;font-size:11px;color:var(--mu);font-weight:800;margin-bottom:6px}select,input{width:100%;height:49px;border:1px solid #cfdaea;border-radius:14px;padding:0 12px;background:#fff;font-size:14px}
-.primary{width:100%;height:50px;border:0;border-radius:14px;background:linear-gradient(135deg,var(--b),var(--b2));color:#fff;font-weight:900;margin-top:14px}.err{display:none;color:#b42318;font-size:11px;margin-top:9px}.err.show{display:block}
-.home{display:none}.home.show{display:block}.login.hide{display:none}
-.user{display:flex;align-items:center;gap:10px}.avatar{width:42px;height:42px;border-radius:13px;background:#eaf2ff;display:grid;place-items:center;font-size:20px}.user b{font-size:13px;display:block}.user span{font-size:10px;color:var(--mu);display:block;margin-top:2px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.mod{min-height:132px;border:1px solid var(--ln);background:#fff;border-radius:19px;padding:15px;text-align:left;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 7px 20px #17324d0d}.ico{width:42px;height:42px;border-radius:14px;background:#eaf2ff;display:grid;place-items:center;font-size:21px}.mod b{font-size:14px}.mod span{display:block;color:var(--mu);font-size:10px;line-height:1.4;margin-top:4px}.mod.quote .ico{background:#e9f8f1}.mod.admin .ico{background:#f2eaff}
-.logout{border:0;background:#fff;color:#b42318;font-weight:800;font-size:11px;padding:10px 0;margin-top:14px;width:100%}.status{font-size:10px;color:var(--mu);text-align:center;margin-top:14px}
-@media(max-width:370px){.grid{grid-template-columns:1fr}}
+:root{
+  --blue:#0b4ea2;--blue2:#073675;--ink:#14233a;--muted:#6e7e94;--bg:#f3f6fa;
+  --card:#fff;--line:#dce5ef;--good:#179c63;--warn:#df8d16;--bad:#d92d20;
+  --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px)
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+body{padding-bottom:calc(78px + var(--safe-b))}
+.topbar{position:sticky;top:0;z-index:30;padding:calc(8px + var(--safe-t)) 12px 8px;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;box-shadow:0 8px 24px #07367524}
+.toprow{height:48px;display:flex;align-items:center;gap:10px;max-width:720px;margin:auto}
+.logo{width:38px;height:38px;border-radius:11px;background:#fff;object-fit:contain}
+.brand{min-width:0;flex:1}.brand b{display:block;font-size:15px}.brand span{display:block;font-size:10px;opacity:.76;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.net{font-size:9px;font-weight:900;padding:5px 8px;border-radius:999px;background:#ffffff17;border:1px solid #ffffff26}
+main{max-width:720px;margin:auto;padding:14px 12px 24px}
+.screen{display:none}.screen.active{display:block}
+.hero{background:linear-gradient(135deg,#0b4ea2,#082f64);color:#fff;border-radius:22px;padding:20px;box-shadow:0 16px 34px #0b4ea228}
+.hero small{font-size:10px;font-weight:900;opacity:.72;letter-spacing:.05em}.hero h1{font-size:25px;margin:6px 0 4px}.hero p{font-size:12px;line-height:1.5;margin:0;opacity:.88}
+.sectionTitle{margin:20px 4px 8px;color:var(--muted);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.06em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:19px;padding:15px;box-shadow:0 7px 22px #17324d0d}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.actionCard{min-height:125px;border:1px solid var(--line);background:#fff;border-radius:19px;padding:15px;text-align:left;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 7px 20px #17324d0d}
+.actionCard .ic{width:42px;height:42px;border-radius:14px;background:#eaf2ff;display:grid;place-items:center;font-size:20px}
+.actionCard b{font-size:14px}.actionCard span{display:block;color:var(--muted);font-size:10px;line-height:1.4;margin-top:4px}
+.actionCard.green .ic{background:#e7f8ef}.actionCard.orange .ic{background:#fff3df}.actionCard.purple .ic{background:#f1eafe}
+.userCard{display:flex;align-items:center;gap:11px}.avatar{width:42px;height:42px;border-radius:13px;background:#eaf2ff;display:grid;place-items:center;font-size:20px}.userCard b{display:block;font-size:13px}.userCard span{display:block;font-size:10px;color:var(--muted);margin-top:2px}
+.field{margin-top:12px}.field label{display:block;font-size:10px;color:var(--muted);font-weight:900;margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;border:1px solid #ced9e8;background:#fff;border-radius:13px;padding:11px 12px;color:var(--ink)}
+.field input,.field select{height:47px}.field textarea{min-height:88px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.btn{border:0;border-radius:13px;padding:12px 14px;font-weight:900;background:var(--blue);color:#fff}
+.btn.secondary{background:#edf3fb;color:#24405e;border:1px solid #d5e0ed}.btn.good{background:var(--good)}.btn.bad{background:var(--bad)}.btn:disabled{opacity:.5}
+.btnbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.btnbar .btn{flex:1;min-width:120px}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;background:#edf3fb;padding:6px 9px;font-size:10px;font-weight:900;color:#3c536e}
+.visitActive{border:1px solid #b9d8c8;background:#f2fbf6}.visitActive h3{margin:0 0 6px;font-size:15px}.visitActive p{margin:3px 0;font-size:11px;color:#53677f}
+.visitList{display:grid;gap:8px}.visitItem{border:1px solid var(--line);background:#fff;border-radius:14px;padding:11px}.visitItem b{font-size:12px;display:block}.visitItem span{font-size:10px;color:var(--muted);display:block;margin-top:3px}
+.promoList{display:grid;grid-template-columns:1fr 1fr;gap:10px}.promoCard{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 7px 20px #17324d0c}.promoCard img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;background:#f0f2f5}.promoBody{padding:11px}.promoBody b{font-size:12px;display:block}.promoBody p{font-size:10px;color:#52657b;line-height:1.45;margin:5px 0 0;white-space:pre-wrap}.promoMeta{font-size:9px;color:#8793a3;margin-top:7px}
+.empty{padding:24px 14px;text-align:center;color:var(--muted);font-size:11px;border:1px dashed #cbd7e4;border-radius:16px;background:#fafcff}
+.bottom{position:fixed;left:0;right:0;bottom:0;height:calc(68px + var(--safe-b));padding:7px 8px var(--safe-b);background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);z-index:40}
+.nav{border:0;background:transparent;border-radius:12px;color:#718198;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:9px;font-weight:900}.nav i{font-style:normal;font-size:19px}.nav.active{background:#eef5ff;color:var(--blue)}
+.login{position:fixed;inset:0;z-index:100;background:radial-gradient(800px 500px at 15% 0,#dbeaff,transparent 60%),#f3f6fa;display:flex;align-items:center;justify-content:center;padding:20px}.login.hide{display:none}.loginBox{width:min(430px,100%);background:#fff;border:1px solid var(--line);border-radius:25px;padding:22px;box-shadow:0 24px 70px #17324d26}.loginHead{display:flex;gap:12px;align-items:center}.loginHead img{width:58px;height:58px;border-radius:16px}.loginHead h2{margin:0;font-size:20px}.loginHead p{margin:4px 0 0;color:var(--muted);font-size:10px}.loginErr{display:none;color:var(--bad);font-size:10px;margin-top:9px}.loginErr.show{display:block}
+.adminList{display:grid;gap:8px}.adminRow{background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px}.adminRow .top{display:flex;justify-content:space-between;gap:10px}.adminRow b{font-size:11px}.adminRow span{font-size:9px;color:var(--muted)}.adminRow p{font-size:10px;color:#53677f;margin:6px 0 0}.miniBtns{display:flex;gap:6px;margin-top:8px}.miniBtns button{border:1px solid var(--line);background:#f8fafc;border-radius:9px;padding:7px 9px;font-size:9px;font-weight:900}
+.preview{margin-top:10px;display:none}.preview img{max-width:100%;max-height:220px;border-radius:14px;object-fit:contain;border:1px solid var(--line)}
+.toast{position:fixed;left:50%;bottom:calc(82px + var(--safe-b));transform:translateX(-50%);background:#14233a;color:#fff;padding:10px 13px;border-radius:12px;font-size:10px;font-weight:800;z-index:200;opacity:0;pointer-events:none;transition:.2s}.toast.show{opacity:1}
+@media(max-width:390px){.grid2,.promoList,.row{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<main class="shell">
-  <div class="brand"><img src="assets/toyo_logo.png" alt="Toyo Foods"><div><b>Toyo Foods</b><span>Comercial · Web móvil V6.2</span></div></div>
+<header class="topbar">
+  <div class="toprow">
+    <img class="logo" src="assets/toyo_logo.png" alt="Toyo Foods">
+    <div class="brand"><b id="topTitle">App Visitas</b><span id="topSub">Toyo Foods · Equipo comercial</span></div>
+    <span id="net" class="net">●</span>
+  </div>
+</header>
 
-  <section class="hero"><small>WEB MÓVIL ULTRA LIGERA</small><h1>Visitas y Cotizaciones</h1><p>La pantalla inicial no carga mapas, Cloud, clientes ni catálogos. Cada módulo descarga únicamente lo que necesita.</p></section>
-
-  <section id="login" class="card login">
-    <b>Iniciar sesión</b>
-    <div class="field"><label>Usuario</label><select id="user"><option value="">Selecciona usuario</option></select></div>
-    <div class="field"><label>Contraseña</label><input id="pass" type="password" placeholder="Contraseña" autocomplete="current-password"></div>
-    <button id="enter" class="primary">Entrar</button>
-    <div id="err" class="err">Usuario o contraseña incorrectos.</div>
-  </section>
-
-  <section id="home" class="home">
-    <div class="card user"><div class="avatar">👤</div><div><b id="who">—</b><span id="scope">—</span></div></div>
-    <div class="grid">
-      <button class="mod" id="visitas"><div class="ico">📍</div><div><b>Visitas</b><span>Registro, GPS y seguimiento.</span></div></button>
-      <button class="mod quote" id="cotizar"><div class="ico">🧾</div><div><b>Cotizar</b><span>Precio Bruto o Precio Lista 4. Carga la cartera del vendedor.</span></div></button>
-      <button class="mod admin" id="admin" style="display:none"><div class="ico">📊</div><div><b>Admin</b><span>Cloud, reportes y exportación.</span></div></button>
+<main>
+  <section id="home" class="screen active">
+    <div class="hero"><small>TOYO FOODS · MÓVIL</small><h1 id="hello">Hola</h1><p>Registra visitas y abre Cotizador o Pedidos como herramientas externas, sin cargar catálogos dentro de esta app.</p></div>
+    <div class="sectionTitle">Tu sesión</div>
+    <div class="card userCard"><div class="avatar">👤</div><div><b id="userName">—</b><span id="userScope">—</span></div></div>
+    <div class="sectionTitle">Herramientas</div>
+    <div class="grid2">
+      <button class="actionCard" data-go="visits"><div class="ic">📍</div><div><b>Visitas</b><span>Selecciona cliente, inicia y finaliza con ubicación.</span></div></button>
+      <button class="actionCard orange" data-go="promos"><div class="ic">🏷️</div><div><b>Promociones</b><span>Consulta imágenes, temas y comentarios vigentes.</span></div></button>
+      <button class="actionCard green" id="openQuote"><div class="ic">🧾</div><div><b>Cotizador</b><span>Abre el cotizador externo.</span></div></button>
+      <button class="actionCard purple" id="openOrders"><div class="ic">🛒</div><div><b>Pedidos</b><span>Abre el portal de pedidos externo.</span></div></button>
     </div>
-    <button id="logout" class="logout">Cerrar sesión</button>
+    <div id="adminQuickWrap" style="display:none">
+      <div class="sectionTitle">Administración</div>
+      <button class="actionCard" data-go="admin" style="width:100%;min-height:105px"><div class="ic">⚙️</div><div><b>Admin</b><span>Visitas, sincronización y gestión de promociones.</span></div></button>
+    </div>
   </section>
-  <div id="net" class="status"></div>
+
+  <section id="visits" class="screen">
+    <div class="sectionTitle" style="margin-top:3px">Registrar visita</div>
+    <div id="activeBox" class="card visitActive" style="display:none"></div>
+    <div class="card" id="visitForm">
+      <div class="field"><label>CLIENTE ASIGNADO</label><select id="clientSelect"><option value="">Selecciona cliente</option></select></div>
+      <div class="field"><label>BUSCAR CLIENTE</label><input id="clientSearch" placeholder="Código o nombre"></div>
+      <div class="field"><label>TIPO DE VISITA</label>
+        <select id="visitType">
+          <option>Visita de Seguimiento</option><option>Degustación</option><option>Entrega de Nuevos Productos</option>
+          <option>Entrega de Faltantes</option><option>Visita Potencialidad</option><option>Cobranza</option>
+          <option>Prospecto</option><option>Recolección</option>
+        </select>
+      </div>
+      <div class="field"><label>COMENTARIOS</label><textarea id="visitNotes" placeholder="Acuerdos, productos revisados, pendientes…"></textarea></div>
+      <div class="btnbar"><button id="startVisit" class="btn good">Iniciar visita</button><button id="endVisit" class="btn bad" disabled>Finalizar</button></div>
+    </div>
+    <div class="sectionTitle">Visitas de hoy</div>
+    <div id="todayVisits" class="visitList"></div>
+  </section>
+
+  <section id="promos" class="screen">
+    <div class="sectionTitle" style="margin-top:3px">Promociones vigentes</div>
+    <div class="card" style="margin-bottom:10px"><span class="pill">Solo se cargan al abrir esta sección</span><button id="refreshPromos" class="btn secondary" style="float:right;padding:7px 10px">Actualizar</button><div style="clear:both"></div></div>
+    <div id="promoList" class="promoList"><div class="empty">Abriendo promociones…</div></div>
+  </section>
+
+  <section id="admin" class="screen">
+    <div class="sectionTitle" style="margin-top:3px">Administración</div>
+    <div class="grid2">
+      <div class="card"><b style="font-size:12px">Visitas Cloud</b><div id="adminVisitStats" style="font-size:24px;font-weight:900;margin-top:7px">—</div><span style="font-size:9px;color:var(--muted)">últimos 30 días</span></div>
+      <div class="card"><b style="font-size:12px">Sincronización</b><div id="queueStats" style="font-size:24px;font-weight:900;margin-top:7px">0</div><span style="font-size:9px;color:var(--muted)">pendientes locales</span></div>
+    </div>
+    <div class="btnbar"><button id="loadAdminVisits" class="btn secondary">Cargar visitas</button><button id="syncNow" class="btn secondary">Sincronizar</button><button id="exportCsv" class="btn secondary">CSV</button></div>
+    <div id="adminVisits" class="adminList" style="margin-top:12px"></div>
+
+    <div class="sectionTitle">Nueva / editar promoción</div>
+    <div class="card">
+      <input id="promoEditId" type="hidden">
+      <div class="field"><label>TEMA / TÍTULO</label><input id="promoTitle" placeholder="Ej. Promoción Ichimasa septiembre"></div>
+      <div class="field"><label>COMENTARIOS</label><textarea id="promoComments" placeholder="Precio, mecánica, vigencia, objetivo, observaciones…"></textarea></div>
+      <div class="row">
+        <div class="field"><label>DESDE</label><input id="promoStart" type="date"></div>
+        <div class="field"><label>HASTA</label><input id="promoEnd" type="date"></div>
+      </div>
+      <div class="field"><label>IMAGEN</label><input id="promoImage" type="file" accept="image/*"></div>
+      <div id="promoPreview" class="preview"><img id="promoPreviewImg"></div>
+      <div class="btnbar"><button id="savePromo" class="btn good">Guardar promoción</button><button id="cancelPromoEdit" class="btn secondary">Limpiar</button></div>
+    </div>
+    <div class="sectionTitle">Promociones publicadas</div>
+    <div class="btnbar" style="margin-top:0"><button id="loadAdminPromos" class="btn secondary">Actualizar lista</button></div>
+    <div id="adminPromos" class="adminList" style="margin-top:10px"></div>
+  </section>
+
+  <section id="more" class="screen">
+    <div class="sectionTitle" style="margin-top:3px">Más</div>
+    <div class="card userCard"><div class="avatar">👤</div><div><b id="moreUser">—</b><span id="moreScope">—</span></div></div>
+    <div class="btnbar"><button id="moreQuote" class="btn secondary">🧾 Cotizador</button><button id="moreOrders" class="btn secondary">🛒 Pedidos</button></div>
+    <div class="btnbar"><button id="logout" class="btn bad">Cerrar sesión</button></div>
+  </section>
 </main>
+
+<nav class="bottom">
+  <button class="nav active" data-go="home"><i>⌂</i><span>Inicio</span></button>
+  <button class="nav" data-go="visits"><i>📍</i><span>Visitas</span></button>
+  <button class="nav" data-go="promos"><i>🏷️</i><span>Promos</span></button>
+  <button class="nav" data-go="more"><i>☰</i><span>Más</span></button>
+</nav>
+
+<div id="login" class="login"><div class="loginBox">
+  <div class="loginHead"><img src="assets/toyo_logo.png"><div><h2>App Visitas</h2><p>Acceso para vendedores y administración.</p></div></div>
+  <div class="field"><label>USUARIO</label><select id="loginUser"><option value="">Selecciona usuario</option></select></div>
+  <div class="field"><label>CONTRASEÑA</label><input id="loginPass" type="password" placeholder="Contraseña"></div>
+  <button id="loginBtn" class="btn" style="width:100%;margin-top:14px;height:49px">Entrar</button>
+  <div id="loginErr" class="loginErr">Usuario o contraseña incorrectos.</div>
+</div></div>
+<div id="toast" class="toast"></div>
+
 <script>
 const SELLERS={"CDMX":["David Adrian Hernández Guzmán","Javier Espinosa Olivares","Ricardo Gutierrez Bandera","Abraham Rene Valdes Gonzales","Jesus Antonio Ramirez Rivera","Sergio Servin Rivera","Eduardo Faustino Hernandez Sanchez","Khiroyuki Sakurai","Andres Fierro Ibañez","Jonathan Ramirez","Tohru Kurasawa","Tanno Nobuko"],"MTY":["Jessica Palomo","Luis Heredia","Carla Hernández","Salomé Barron"],"GDL":["Aguilar Neri Daniel","De la Cruz Ponce Julio Cesar","Garibay Ortiz Sergio Joel","Sierra de Anda Aldo","Perez Mar Alan Roberto","Reynoso Aguilar Maricela","Sandra Navarro Navarro","Aguirre Ojeda Arcenio","Velez Castellanos Antonio","Yepez Mora Oscar Alberto","Sanchez Esmeralda","Reynaga Valeria","González Guzmán Cristian Eduardo"],"AGS":["Hernandez Gonzalez Angel Miguel"],"PUE":["Victor Mendez","Yael Mojica"],"QRO":["Roberto Lopez"]};
 const CITY_LABELS={"GDL":"Guadalajara","MTY":"Monterrey","CDMX":"México","AGS":"Aguascalientes","PUE":"Puebla","QRO":"Querétaro"};
-const AUTH_KEY='app_visitas_auth_v2', PASS='Toyo2026';
-const $=s=>document.querySelector(s);
-function accounts(){const a={Admin:{role:'admin',city:'ALL',vendor:'ALL'}};Object.entries(SELLERS).forEach(([city,vs])=>vs.forEach(v=>a[v]={role:'seller',city,vendor:v}));return a}
-const ACC=accounts();
-function getAuth(){try{const x=JSON.parse(localStorage.getItem(AUTH_KEY)||sessionStorage.getItem(AUTH_KEY)||'null');return x&&x.ok?x:null}catch(e){return null}}
-function setAuth(x){
-  try{
-    if(x){
-      const raw=JSON.stringify(x);
-      localStorage.setItem(AUTH_KEY,raw);
-      sessionStorage.setItem(AUTH_KEY,raw);
-    }else{
-      localStorage.removeItem(AUTH_KEY);
-      sessionStorage.removeItem(AUTH_KEY);
-    }
-  }catch(e){}
-  draw();
+const AUTH_KEY='toyo_visitas_auth_v1', AUTH_PASS='Toyo2026';
+const ACTIVE_KEY='toyo_active_visit_v1', VISITS_KEY='toyo_visits_local_v1', QUEUE_KEY='toyo_visits_queue_v1';
+
+const SUPABASE_URL='https://cqgctmpbvlsodfnwscnx.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6ImNxZ2N0bXBidmxzb2RmbndzY254Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzQyOTIsImV4cCI6MjA4MzMxMDI5Mn0.gSOhlIgGFo5cwimH6hJ_yk5lquVsxKxDGJLAR9dA5xM';
+const VISITS_TABLE='visits', PROMO_TABLE='announcements';
+
+const QUOTE_URL='https://beris04.github.io/Cotizador/';
+const ORDERS_URL='https://beris04.github.io/Toyo-MX/';
+
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+let CLIENTS=[], CURRENT_PROMO_IMAGE='', ADMIN_VISITS_CACHE=[], ADMIN_PROMOS_CACHE=[];
+
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),2200)}
+function norm(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()}
+function slug(s){return norm(s).replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'')}
+function today(){return new Date().toISOString().slice(0,10)}
+function uuid(){return crypto?.randomUUID?.()||('id-'+Date.now()+'-'+Math.random().toString(16).slice(2))}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+function fmtTime(v){if(!v)return '—';return new Date(v).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})}
+function durationText(sec){sec=Math.max(0,Number(sec)||0);const m=Math.floor(sec/60);return m<60?`${m} min`:`${Math.floor(m/60)} h ${m%60} min`}
+
+function accounts(){
+  const a={Admin:{role:'admin',city:'ALL',vendor:'ALL'}};
+  Object.entries(SELLERS).forEach(([city,vs])=>vs.forEach(v=>a[v]={role:'seller',city,vendor:v}));
+  return a;
 }
-function fill(){const s=$('#user');const adm=document.createElement('option');adm.value='Admin';adm.textContent='Admin';s.appendChild(adm);Object.entries(SELLERS).forEach(([c,vs])=>{const g=document.createElement('optgroup');g.label=CITY_LABELS[c]||c;vs.slice().sort((a,b)=>a.localeCompare(b,'es')).forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;g.appendChild(o)});s.appendChild(g)})}
-function draw(){const a=getAuth();$('#login').classList.toggle('hide',!!a);$('#home').classList.toggle('show',!!a);if(!a)return;$('#who').textContent=a.user;$('#scope').textContent=a.role==='admin'?'Administrador':`${CITY_LABELS[a.city]||a.city} · ${a.vendor}`;$('#admin').style.display=a.role==='admin'?'':'none'}
-function login(){const u=$('#user').value,p=$('#pass').value,pr=ACC[u],ok=!!pr&&p===PASS;$('#err').classList.toggle('show',!ok);if(ok){setAuth({ok:true,user:u,role:pr.role,city:pr.city,vendor:pr.vendor});$('#pass').value=''}}
-function sellerSlug(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'')}
-$('#enter').onclick=login;$('#pass').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
-$('#logout').onclick=()=>setAuth(null);
-$('#visitas').onclick=()=>location.href='visitas.html';
-$('#admin').onclick=()=>location.href='visitas.html#/admin';
-$('#cotizar').onclick=()=>{const a=getAuth();if(!a||a.role!=='seller')return;const u=new URL('cotizador.html',location.href);u.searchParams.set('from','home');u.searchParams.set('seller',a.vendor);u.searchParams.set('city',a.city);location.href=u.href};
-function net(){$('#net').textContent=navigator.onLine?'● En línea':'● Sin conexión'}window.addEventListener('online',net);window.addEventListener('offline',net);
-fill();draw();net();
-// Retira Service Workers/cachés de versiones anteriores sin registrar uno nuevo.
-if('serviceWorker' in navigator)navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())).catch(()=>{});
-if('caches' in window)caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))).catch(()=>{});
+const ACC=accounts();
+
+function getAuth(){try{const a=JSON.parse(localStorage.getItem(AUTH_KEY)||'null');return a&&a.ok?a:null}catch{return null}}
+function setAuth(a){try{a?localStorage.setItem(AUTH_KEY,JSON.stringify(a)):localStorage.removeItem(AUTH_KEY)}catch{};syncSession()}
+function syncSession(){
+  const a=getAuth(), logged=!!a;
+  $('#login').classList.toggle('hide',logged);
+  if(!logged)return;
+  const label=a.role==='admin'?'Administrador':`${CITY_LABELS[a.city]||a.city} · ${a.vendor}`;
+  $('#userName').textContent=a.user;$('#userScope').textContent=label;$('#moreUser').textContent=a.user;$('#moreScope').textContent=label;
+  $('#hello').textContent=`Hola, ${a.role==='admin'?'Admin':a.user.split(' ')[0]}`;
+  $('#adminQuickWrap').style.display=a.role==='admin'?'':'none';
+  if(a.role==='seller') loadSellerClients();
+  renderVisitState();
+}
+function fillUsers(){
+  const s=$('#loginUser');
+  const admin=document.createElement('option');admin.value='Admin';admin.textContent='Admin';s.appendChild(admin);
+  Object.entries(SELLERS).forEach(([city,vs])=>{
+    const g=document.createElement('optgroup');g.label=CITY_LABELS[city]||city;
+    vs.slice().sort((a,b)=>a.localeCompare(b,'es')).forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;g.appendChild(o)});
+    s.appendChild(g);
+  });
+}
+function login(){
+  const u=$('#loginUser').value,p=$('#loginPass').value,pr=ACC[u];
+  const ok=!!pr&&p===AUTH_PASS;$('#loginErr').classList.toggle('show',!ok);
+  if(!ok)return;
+  setAuth({ok:true,user:u,role:pr.role,city:pr.city,vendor:pr.vendor});
+  $('#loginPass').value='';go('home');
+}
+function logout(){localStorage.removeItem(AUTH_KEY);location.reload()}
+
+function go(name){
+  const a=getAuth();if(!a)return;
+  if(name==='admin'&&a.role!=='admin')return;
+  $$('.screen').forEach(x=>x.classList.toggle('active',x.id===name));
+  $$('.nav').forEach(x=>x.classList.toggle('active',x.dataset.go===name));
+  const titles={home:['App Visitas','Toyo Foods · Equipo comercial'],visits:['Visitas','Clientes asignados y registro'],promos:['Promociones','Material comercial vigente'],admin:['Admin','Visitas y promociones'],more:['Más','Herramientas y sesión']};
+  const t=titles[name]||titles.home;$('#topTitle').textContent=t[0];$('#topSub').textContent=t[1];
+  if(name==='visits'){renderVisitState();renderToday()}
+  if(name==='promos')loadPromos();
+  if(name==='admin'){updateQueueStat();loadAdminPromos()}
+}
+
+function openExternal(url){
+  const w=window.open(url,'_blank','noopener');
+  if(!w) location.href=url;
+}
+
+async function loadSellerClients(){
+  const a=getAuth();if(!a||a.role!=='seller')return;
+  try{
+    const r=await fetch(`data/visitas/${slug(a.vendor)}.json`,{cache:'force-cache'});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    CLIENTS=await r.json();if(!Array.isArray(CLIENTS))CLIENTS=[];
+    fillClientOptions(CLIENTS);
+  }catch(e){CLIENTS=[];fillClientOptions([]);toast('No se pudo cargar clientes')}
+}
+function fillClientOptions(rows){
+  const s=$('#clientSelect'), current=s.value;s.innerHTML='<option value="">Selecciona cliente</option>';
+  rows.forEach(c=>{const o=document.createElement('option');o.value=`${c.code}|||${c.name}`;o.textContent=`${c.code} · ${c.name}`;s.appendChild(o)});
+  if([...s.options].some(o=>o.value===current))s.value=current;
+}
+function filterClients(){
+  const q=norm($('#clientSearch').value);
+  if(!q)return fillClientOptions(CLIENTS);
+  fillClientOptions(CLIENTS.filter(c=>norm(c.code+' '+c.name).includes(q)).slice(0,250));
+}
+
+function getLocalVisits(){try{return JSON.parse(localStorage.getItem(VISITS_KEY)||'[]')}catch{return []}}
+function setLocalVisits(v){localStorage.setItem(VISITS_KEY,JSON.stringify(v))}
+function getQueue(){try{return JSON.parse(localStorage.getItem(QUEUE_KEY)||'[]')}catch{return []}}
+function setQueue(v){localStorage.setItem(QUEUE_KEY,JSON.stringify(v));updateQueueStat()}
+function getActive(){try{return JSON.parse(localStorage.getItem(ACTIVE_KEY)||'null')}catch{return null}}
+function setActive(v){v?localStorage.setItem(ACTIVE_KEY,JSON.stringify(v)):localStorage.removeItem(ACTIVE_KEY)}
+function selectedClient(){
+  const v=$('#clientSelect').value;if(!v)return null;const [code,name]=v.split('|||');return {code,name};
+}
+function getPos(){
+  return new Promise((resolve,reject)=>{
+    if(!navigator.geolocation)return reject(new Error('Sin GPS'));
+    navigator.geolocation.getCurrentPosition(resolve,reject,{enableHighAccuracy:true,timeout:15000,maximumAge:15000});
+  });
+}
+async function startVisit(){
+  const a=getAuth(),c=selectedClient();if(!a||a.role!=='seller')return;if(!c)return toast('Selecciona un cliente');
+  if(getActive())return toast('Ya hay una visita activa');
+  $('#startVisit').disabled=true;
+  try{
+    const pos=await getPos(), now=new Date().toISOString();
+    setActive({city:a.city,vendor:a.vendor,client:`${c.code} · ${c.name}`,client_code:c.code,client_name:c.name,type:$('#visitType').value,notes:$('#visitNotes').value.trim(),start_ts:now,start_lat:pos.coords.latitude,start_lng:pos.coords.longitude});
+    renderVisitState();toast('Visita iniciada');
+  }catch(e){toast('Activa permiso de ubicación')}finally{$('#startVisit').disabled=false}
+}
+async function endVisit(){
+  const act=getActive();if(!act)return toast('No hay visita activa');
+  $('#endVisit').disabled=true;
+  try{
+    const pos=await getPos(),end=new Date().toISOString(),dur=Math.max(0,Math.floor((Date.now()-new Date(act.start_ts).getTime())/1000));
+    const rec={id:uuid(),day:today(),city:act.city,vendor:act.vendor,client:act.client,type:act.type,notes:act.notes,start_ts:act.start_ts,end_ts:end,duration_sec:dur,start_lat:act.start_lat,start_lng:act.start_lng,end_lat:pos.coords.latitude,end_lng:pos.coords.longitude};
+    const rows=getLocalVisits();rows.push(rec);setLocalVisits(rows);setActive(null);
+    $('#visitNotes').value='';$('#clientSearch').value='';fillClientOptions(CLIENTS);
+    try{await cloudInsertVisit(rec)}catch(e){const q=getQueue();q.push(rec);setQueue(q)}
+    renderVisitState();renderToday();toast('Visita finalizada');
+  }catch(e){toast('No se pudo obtener ubicación')}finally{$('#endVisit').disabled=false}
+}
+function renderVisitState(){
+  const act=getActive(),box=$('#activeBox');
+  $('#startVisit').disabled=!!act;$('#endVisit').disabled=!act;
+  if(!act){box.style.display='none';$('#visitForm').style.opacity='1';return}
+  box.style.display='block';box.innerHTML=`<h3>Visita activa</h3><p><b>${esc(act.client)}</b></p><p>${esc(act.type)} · inicio ${fmtTime(act.start_ts)}</p><p>${esc(act.notes||'Sin comentarios')}</p>`;
+  $('#visitForm').style.opacity='.92';
+}
+function renderToday(){
+  const a=getAuth(),rows=getLocalVisits().filter(r=>r.day===today()&&(a?.role==='admin'||r.vendor===a?.vendor)).slice().reverse();
+  $('#todayVisits').innerHTML=rows.length?rows.map(r=>`<div class="visitItem"><b>${esc(r.client)}</b><span>${esc(r.type)} · ${fmtTime(r.start_ts)}–${fmtTime(r.end_ts)} · ${durationText(r.duration_sec)}</span></div>`).join(''):'<div class="empty">Sin visitas registradas hoy.</div>';
+}
+
+function sbUrl(path){return SUPABASE_URL.replace(/\/$/,'')+path}
+async function sbFetch(path,{method='GET',body=null,headers={}}={}){
+  const opts={method,headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY,...headers}};
+  if(body!==null){opts.headers['Content-Type']='application/json';opts.body=JSON.stringify(body)}
+  const r=await fetch(sbUrl(path),opts),txt=await r.text();
+  if(!r.ok)throw new Error(txt||('HTTP '+r.status));
+  if(!txt.trim())return null;try{return JSON.parse(txt)}catch{return txt}
+}
+async function cloudInsertVisit(rec){
+  await sbFetch(`/rest/v1/${VISITS_TABLE}`,{method:'POST',headers:{Prefer:'return=minimal'},body:rec});
+}
+async function flushQueue(){
+  const q=getQueue();if(!q.length){updateQueueStat();return 0}
+  const pending=[];let sent=0;
+  for(const r of q){try{await cloudInsertVisit(r);sent++}catch(e){pending.push(r)}}
+  setQueue(pending);if(sent)toast(`Sincronizadas: ${sent}`);return sent;
+}
+function updateQueueStat(){$('#queueStats').textContent=getQueue().length}
+
+function promoPayloadBody({comments,image,start,end}){return JSON.stringify({v:1,comments,image,start,end})}
+function parsePromo(r){
+  try{const b=JSON.parse(r.body||'{}');return {...r,comments:b.comments||'',image:b.image||'',start:b.start||'',end:b.end||''}}catch{return {...r,comments:r.body||'',image:'',start:'',end:''}}
+}
+function promoIsCurrent(p){
+  const d=today();if(p.start&&d<p.start)return false;if(p.end&&d>p.end)return false;return p.active!==false;
+}
+async function fetchPromos(activeOnly=false){
+  let path=`/rest/v1/${PROMO_TABLE}?select=id,created_at,day,city,vendor,title,body,active&city=eq.PROMO&order=created_at.desc&limit=40`;
+  if(activeOnly)path+=`&active=eq.true`;
+  const rows=await sbFetch(path);return (Array.isArray(rows)?rows:[]).map(parsePromo);
+}
+async function loadPromos(){
+  const box=$('#promoList');box.innerHTML='<div class="empty">Cargando promociones…</div>';
+  try{
+    const rows=(await fetchPromos(true)).filter(promoIsCurrent);
+    if(!rows.length){box.innerHTML='<div class="empty">No hay promociones vigentes.</div>';return}
+    box.innerHTML=rows.map(p=>`<article class="promoCard">${p.image?`<img src="${p.image}" alt="">`:''}<div class="promoBody"><b>${esc(p.title)}</b><p>${esc(p.comments)}</p><div class="promoMeta">${p.start||'—'} → ${p.end||'—'}</div></div></article>`).join('');
+  }catch(e){box.innerHTML='<div class="empty">No se pudieron cargar promociones. Revisa tu conexión.</div>'}
+}
+async function imageToData(file){
+  if(!file)return CURRENT_PROMO_IMAGE||'';
+  const data=await new Promise((resolve,reject)=>{const fr=new FileReader();fr.onload=()=>resolve(fr.result);fr.onerror=reject;fr.readAsDataURL(file)});
+  const img=await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=data});
+  const max=1100,scale=Math.min(1,max/Math.max(img.width,img.height)),w=Math.max(1,Math.round(img.width*scale)),h=Math.max(1,Math.round(img.height*scale));
+  const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
+  return c.toDataURL('image/jpeg',.72);
+}
+async function previewPromoImage(){
+  const f=$('#promoImage').files[0];if(!f)return;
+  try{CURRENT_PROMO_IMAGE=await imageToData(f);$('#promoPreviewImg').src=CURRENT_PROMO_IMAGE;$('#promoPreview').style.display='block'}catch{toast('No se pudo leer imagen')}
+}
+function resetPromoForm(){
+  $('#promoEditId').value='';$('#promoTitle').value='';$('#promoComments').value='';$('#promoStart').value=today();$('#promoEnd').value='';$('#promoImage').value='';CURRENT_PROMO_IMAGE='';$('#promoPreview').style.display='none';$('#savePromo').textContent='Guardar promoción';
+}
+async function savePromo(){
+  const a=getAuth();if(!a||a.role!=='admin')return;
+  const title=$('#promoTitle').value.trim(),comments=$('#promoComments').value.trim(),start=$('#promoStart').value,end=$('#promoEnd').value;
+  if(!title)return toast('Escribe el tema');
+  $('#savePromo').disabled=true;
+  try{
+    const file=$('#promoImage').files[0];const image=file?await imageToData(file):CURRENT_PROMO_IMAGE;
+    const body=promoPayloadBody({comments,image,start,end}),id=$('#promoEditId').value;
+    if(id){
+      await sbFetch(`/rest/v1/${PROMO_TABLE}?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:{title,body,day:today(),active:true}});
+      toast('Promoción actualizada');
+    }else{
+      await sbFetch(`/rest/v1/${PROMO_TABLE}`,{method:'POST',headers:{Prefer:'return=minimal'},body:{id:uuid(),created_at:new Date().toISOString(),day:today(),active:true,city:'PROMO',vendor:'ALL',title,body}});
+      toast('Promoción publicada');
+    }
+    resetPromoForm();await loadAdminPromos();
+  }catch(e){toast('No se pudo guardar promoción')}finally{$('#savePromo').disabled=false}
+}
+async function loadAdminPromos(){
+  if(getAuth()?.role!=='admin')return;
+  const box=$('#adminPromos');box.innerHTML='<div class="empty">Cargando…</div>';
+  try{
+    ADMIN_PROMOS_CACHE=await fetchPromos(false);
+    if(!ADMIN_PROMOS_CACHE.length){box.innerHTML='<div class="empty">Sin promociones publicadas.</div>';return}
+    box.innerHTML=ADMIN_PROMOS_CACHE.map(p=>`<div class="adminRow"><div class="top"><b>${esc(p.title)}</b><span>${p.active===false?'Inactiva':'Activa'}</span></div><p>${esc(p.comments||'Sin comentarios')}</p><div class="miniBtns"><button data-edit-promo="${p.id}">Editar</button><button data-toggle-promo="${p.id}">${p.active===false?'Activar':'Desactivar'}</button><button data-delete-promo="${p.id}">Eliminar</button></div></div>`).join('');
+    $$('[data-edit-promo]').forEach(b=>b.onclick=()=>editPromo(b.dataset.editPromo));
+    $$('[data-toggle-promo]').forEach(b=>b.onclick=()=>togglePromo(b.dataset.togglePromo));
+    $$('[data-delete-promo]').forEach(b=>b.onclick=()=>deletePromo(b.dataset.deletePromo));
+  }catch(e){box.innerHTML='<div class="empty">No se pudo cargar promociones.</div>'}
+}
+function editPromo(id){
+  const p=ADMIN_PROMOS_CACHE.find(x=>x.id===id);if(!p)return;
+  $('#promoEditId').value=p.id;$('#promoTitle').value=p.title||'';$('#promoComments').value=p.comments||'';$('#promoStart').value=p.start||'';$('#promoEnd').value=p.end||'';CURRENT_PROMO_IMAGE=p.image||'';
+  if(CURRENT_PROMO_IMAGE){$('#promoPreviewImg').src=CURRENT_PROMO_IMAGE;$('#promoPreview').style.display='block'}else $('#promoPreview').style.display='none';
+  $('#savePromo').textContent='Actualizar promoción';window.scrollTo({top:0,behavior:'smooth'});
+}
+async function togglePromo(id){
+  const p=ADMIN_PROMOS_CACHE.find(x=>x.id===id);if(!p)return;
+  try{await sbFetch(`/rest/v1/${PROMO_TABLE}?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:{active:!p.active}});await loadAdminPromos()}catch{toast('No se pudo actualizar')}
+}
+async function deletePromo(id){
+  if(!confirm('¿Eliminar esta promoción?'))return;
+  try{await sbFetch(`/rest/v1/${PROMO_TABLE}?id=eq.${encodeURIComponent(id)}`,{method:'DELETE',headers:{Prefer:'return=minimal'}});await loadAdminPromos();toast('Promoción eliminada')}catch{toast('No se pudo eliminar')}
+}
+
+async function loadAdminVisits(){
+  if(getAuth()?.role!=='admin')return;
+  const since=new Date(Date.now()-29*864e5).toISOString().slice(0,10);
+  const box=$('#adminVisits');box.innerHTML='<div class="empty">Cargando visitas…</div>';
+  try{
+    const cols='id,day,city,vendor,client,type,notes,start_ts,end_ts,duration_sec';
+    const rows=await sbFetch(`/rest/v1/${VISITS_TABLE}?select=${cols}&day=gte.${since}&order=start_ts.desc&limit=1000`);
+    ADMIN_VISITS_CACHE=Array.isArray(rows)?rows:[];$('#adminVisitStats').textContent=ADMIN_VISITS_CACHE.length;
+    box.innerHTML=ADMIN_VISITS_CACHE.length?ADMIN_VISITS_CACHE.slice(0,120).map(r=>`<div class="adminRow"><div class="top"><b>${esc(r.vendor)} · ${esc(r.client)}</b><span>${esc(r.day)}</span></div><p>${esc(r.type)} · ${fmtTime(r.start_ts)}–${fmtTime(r.end_ts)} · ${durationText(r.duration_sec)}</p></div>`).join(''):'<div class="empty">Sin visitas.</div>';
+  }catch(e){box.innerHTML='<div class="empty">No se pudo cargar Cloud.</div>'}
+}
+function csv(v){return '"'+String(v??'').replaceAll('"','""')+'"'}
+function exportAdminCsv(){
+  if(!ADMIN_VISITS_CACHE.length)return toast('Primero carga visitas');
+  const h=['Fecha','Ciudad','Vendedor','Cliente','Tipo','Comentarios','Inicio','Fin','Duración min'];
+  const lines=[h.map(csv).join(',')].concat(ADMIN_VISITS_CACHE.map(r=>[r.day,r.city,r.vendor,r.client,r.type,r.notes,r.start_ts,r.end_ts,Math.round((r.duration_sec||0)/60)].map(csv).join(',')));
+  const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'}),u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=`visitas_${today()}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);
+}
+
+function updateNet(){const on=navigator.onLine;$('#net').textContent=on?'● En línea':'● Sin conexión';$('#net').style.opacity=on?'1':'.72'}
+
+fillUsers();syncSession();updateNet();renderToday();updateQueueStat();
+window.addEventListener('online',()=>{updateNet();setTimeout(flushQueue,600)});window.addEventListener('offline',updateNet);
+$('#loginBtn').onclick=login;$('#loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')login()});$('#logout').onclick=logout;
+$$('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
+$('#openQuote').onclick=$('#moreQuote').onclick=()=>openExternal(QUOTE_URL);
+$('#openOrders').onclick=$('#moreOrders').onclick=()=>openExternal(ORDERS_URL);
+$('#clientSearch').addEventListener('input',filterClients);$('#startVisit').onclick=startVisit;$('#endVisit').onclick=endVisit;
+$('#refreshPromos').onclick=loadPromos;$('#promoImage').addEventListener('change',previewPromoImage);$('#savePromo').onclick=savePromo;$('#cancelPromoEdit').onclick=resetPromoForm;$('#loadAdminPromos').onclick=loadAdminPromos;
+$('#loadAdminVisits').onclick=loadAdminVisits;$('#syncNow').onclick=flushQueue;$('#exportCsv').onclick=exportAdminCsv;
+resetPromoForm();
+if(getAuth()&&navigator.onLine)setTimeout(flushQueue,2200);
 </script>
 </body>
 </html>

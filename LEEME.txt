@@ -1,0 +1,50 @@
+TOYO FOODS · APP VISITAS MÓVIL V1
+
+OBJETIVO
+App reconstruida desde cero para ser muy ligera en Safari, Chrome y navegadores móviles.
+
+INCLUYE
+- Login persistente: el vendedor permanece conectado hasta pulsar Cerrar sesión.
+- Cada vendedor carga únicamente sus clientes asignados.
+- Registro de visitas con:
+  cliente, tipo, comentarios, hora inicial/final y GPS.
+- Visita activa persistente aunque salga del navegador.
+- Guardado local y sincronización con Supabase.
+- Admin puede consultar visitas y exportar CSV.
+- Botón externo Cotizador:
+  https://beris04.github.io/Cotizador/
+- Botón externo Pedidos:
+  https://beris04.github.io/Toyo-MX/
+- Zona de Promociones.
+- Solo Admin puede crear, editar, activar/desactivar y eliminar promociones.
+- Promoción permite: tema/título, comentarios, imagen, fecha desde y fecha hasta.
+- Las imágenes se comprimen antes de guardarse.
+
+NO INCLUYE
+- Catálogo del cotizador.
+- Base del portal de pedidos.
+- Mapas Leaflet.
+- Service Worker/PWA.
+- iframes.
+- Librerías externas.
+
+ARCHIVOS
+index.html
+assets/toyo_logo.png
+data/visitas/*.json
+
+PUBLICACIÓN EN GITHUB
+1. Reemplaza el contenido del repositorio Toyo-GDL por el contenido de este ZIP.
+2. Elimina archivos viejos que ya no aparecen aquí (cotizador.html, sw.js, manifest, data/cotizador, etc.).
+3. Commit to main.
+4. Push origin.
+5. Abre:
+   https://beris04.github.io/Toyo-GDL/
+
+NOTA SOBRE PROMOCIONES
+La app reutiliza la tabla Supabase "announcements" que ya utilizaba el proyecto.
+Las promociones se identifican internamente con city = PROMO.
+La foto se comprime en el celular y se guarda dentro del registro de la promoción.
+
+CREDENCIAL ACTUAL
+Contraseña compartida: Toyo2026
