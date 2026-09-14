@@ -1,32 +1,21 @@
-TOYO FOODS · APP VISITAS MÓVIL V2
+TOYO FOODS · APP VISITAS MÓVIL V2.1
 
-NUEVO DISEÑO
-- Dashboard diario con visitas, meta 5, faltantes y minutos en campo.
-- Barra visual de avance.
-- Botón rápido Nueva visita.
-- Último cliente visitado.
-- Interfaz móvil mejorada y más ejecutiva.
+CORRECCIONES
+- Promociones ahora se guardan primero en el dispositivo del Admin y además intentan sincronizar con Supabase.
+- Si Supabase falla, la promoción NO se pierde y sí aparece en la app del mismo dispositivo.
+- Admin puede editar, activar/desactivar y eliminar promociones.
+- Historial del vendedor: cada vendedor ve solamente SUS visitas.
+- Admin: registro consolidado de visitas de todos los vendedores.
+- Admin: filtro por vendedor y fecha.
+- Pedidos abre siempre en una pestaña nueva del navegador.
+- Cotizador sigue como enlace externo.
 
-VISITAS
-- Mapa bajo demanda: solo carga al entrar a Visitas.
-- Ubicación actual.
-- Inicio y fin de visitas del día.
-- Clientes asignados por vendedor.
-- Tipo de visita, comentarios, GPS y duración.
-- Próxima acción: seguimiento, muestra, cotización, cobranza, volver a visitar, etc.
-- Botón “No pude visitar” con motivos:
-  cliente cerrado, no estaba el encargado, reagendar, cliente no disponible.
-- Actividad del día con próxima acción.
-
-SE MANTIENE
-- Sesión persistente hasta Cerrar sesión.
-- Cotizador externo: https://beris04.github.io/Cotizador/
-- Pedidos externo: https://beris04.github.io/Toyo-MX/
-- Promociones administrables solo por Admin.
-- App ligera: sin cotizador/pedidos internos, sin iframe y sin PWA pesada.
+IMPORTANTE SOBRE PROMOCIONES
+Para que las promociones publicadas por Admin aparezcan también en OTROS dispositivos, Supabase debe permitir escritura/lectura en la tabla announcements.
+Esta versión evita que el Admin pierda el registro si Supabase falla, pero la sincronización entre teléfonos depende de Supabase.
 
 PUBLICACIÓN
-1. Reemplaza TODO el contenido actual de Toyo-GDL por este ZIP.
+1. Reemplaza el contenido actual de Toyo-GDL por este ZIP.
 2. Commit to main.
 3. Push origin.
 4. Abre https://beris04.github.io/Toyo-GDL/

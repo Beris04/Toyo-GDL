@@ -115,7 +115,7 @@ main{padding-top:12px}
 <header class="topbar">
   <div class="toprow">
     <img class="logo" src="assets/toyo_logo.png" alt="Toyo Foods">
-    <div class="brand"><b id="topTitle">App Visitas</b><span id="topSub">Toyo Foods · Visitas móvil V2</span></div>
+    <div class="brand"><b id="topTitle">App Visitas</b><span id="topSub">Toyo Foods · Visitas móvil V2.1</span></div>
     <span id="net" class="net">●</span>
   </div>
 </header>
@@ -198,6 +198,16 @@ main{padding-top:12px}
       </div>
     </div>
     <div class="sectionTitle">Actividad de hoy</div><div class="historyHead"><span id="todaySummary">0 registros</span></div><div id="todayVisits" class="visitList"></div>
+    <div class="sectionTitle">Mi historial</div>
+    <div class="card">
+      <div class="row">
+        <div class="field"><label>DESDE</label><input id="sellerHistFrom" type="date"></div>
+        <div class="field"><label>HASTA</label><input id="sellerHistTo" type="date"></div>
+      </div>
+      <div class="btnbar"><button id="loadSellerHistory" class="btn secondary">Actualizar historial</button></div>
+      <div id="sellerHistory" class="adminList" style="margin-top:10px"></div>
+    </div>
+
   </section>
 
   <section id="promos" class="screen">
@@ -211,6 +221,12 @@ main{padding-top:12px}
     <div class="grid2">
       <div class="card"><b style="font-size:12px">Visitas Cloud</b><div id="adminVisitStats" style="font-size:24px;font-weight:900;margin-top:7px">—</div><span style="font-size:9px;color:var(--muted)">últimos 30 días</span></div>
       <div class="card"><b style="font-size:12px">Sincronización</b><div id="queueStats" style="font-size:24px;font-weight:900;margin-top:7px">0</div><span style="font-size:9px;color:var(--muted)">pendientes locales</span></div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <div class="row">
+        <div class="field"><label>VENDEDOR</label><select id="adminVendorFilter"><option value="">Todos</option></select></div>
+        <div class="field"><label>FECHA</label><input id="adminDateFilter" type="date"></div>
+      </div>
     </div>
     <div class="btnbar"><button id="loadAdminVisits" class="btn secondary">Cargar visitas</button><button id="syncNow" class="btn secondary">Sincronizar</button><button id="exportCsv" class="btn secondary">CSV</button></div>
     <div id="adminVisits" class="adminList" style="margin-top:12px"></div>
@@ -261,7 +277,7 @@ main{padding-top:12px}
 const SELLERS={"CDMX":["David Adrian Hernández Guzmán","Javier Espinosa Olivares","Ricardo Gutierrez Bandera","Abraham Rene Valdes Gonzales","Jesus Antonio Ramirez Rivera","Sergio Servin Rivera","Eduardo Faustino Hernandez Sanchez","Khiroyuki Sakurai","Andres Fierro Ibañez","Jonathan Ramirez","Tohru Kurasawa","Tanno Nobuko"],"MTY":["Jessica Palomo","Luis Heredia","Carla Hernández","Salomé Barron"],"GDL":["Aguilar Neri Daniel","De la Cruz Ponce Julio Cesar","Garibay Ortiz Sergio Joel","Sierra de Anda Aldo","Perez Mar Alan Roberto","Reynoso Aguilar Maricela","Sandra Navarro Navarro","Aguirre Ojeda Arcenio","Velez Castellanos Antonio","Yepez Mora Oscar Alberto","Sanchez Esmeralda","Reynaga Valeria","González Guzmán Cristian Eduardo"],"AGS":["Hernandez Gonzalez Angel Miguel"],"PUE":["Victor Mendez","Yael Mojica"],"QRO":["Roberto Lopez"]};
 const CITY_LABELS={"GDL":"Guadalajara","MTY":"Monterrey","CDMX":"México","AGS":"Aguascalientes","PUE":"Puebla","QRO":"Querétaro"};
 const AUTH_KEY='toyo_visitas_auth_v1', AUTH_PASS='Toyo2026';
-const ACTIVE_KEY='toyo_active_visit_v1', VISITS_KEY='toyo_visits_local_v1', QUEUE_KEY='toyo_visits_queue_v1';
+const ACTIVE_KEY='toyo_active_visit_v1', VISITS_KEY='toyo_visits_local_v1', QUEUE_KEY='toyo_visits_queue_v1', PROMOS_KEY='toyo_promos_local_v1';
 
 const SUPABASE_URL='https://cqgctmpbvlsodfnwscnx.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6ImNxZ2N0bXBidmxzb2RmbndzY254Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzQyOTIsImV4cCI6MjA4MzMxMDI5Mn0.gSOhlIgGFo5cwimH6hJ_yk5lquVsxKxDGJLAR9dA5xM';
@@ -326,17 +342,18 @@ function go(name){
   if(name==='admin'&&a.role!=='admin')return;
   $$('.screen').forEach(x=>x.classList.toggle('active',x.id===name));
   $$('.nav').forEach(x=>x.classList.toggle('active',x.dataset.go===name));
-  const titles={home:['App Visitas','Toyo Foods · Visitas móvil V2'],visits:['Visitas','Clientes asignados y registro'],promos:['Promociones','Material comercial vigente'],admin:['Admin','Visitas y promociones'],more:['Más','Herramientas y sesión']};
+  const titles={home:['App Visitas','Toyo Foods · Visitas móvil V2.1'],visits:['Visitas','Clientes asignados y registro'],promos:['Promociones','Material comercial vigente'],admin:['Admin','Visitas y promociones'],more:['Más','Herramientas y sesión']};
   const t=titles[name]||titles.home;$('#topTitle').textContent=t[0];$('#topSub').textContent=t[1];
-  if(name==='visits'){renderVisitState();renderToday();setTimeout(ensureVisitMap,60)}
+  if(name==='visits'){renderVisitState();renderToday();setTimeout(ensureVisitMap,60);if(getAuth()?.role==='seller')setTimeout(loadSellerHistory,100)}
   if(name==='promos')loadPromos();
   if(name==='admin'){updateQueueStat();loadAdminPromos()}
   if(name==='home')updateDashboard();
 }
 
 function openExternal(url){
-  const w=window.open(url,'_blank','noopener');
-  if(!w) location.href=url;
+  const a=document.createElement('a');
+  a.href=url;a.target='_blank';a.rel='noopener noreferrer';
+  document.body.appendChild(a);a.click();a.remove();
 }
 
 
@@ -524,6 +541,15 @@ function renderToday(){
   $('#todayVisits').innerHTML=rows.length?rows.map(r=>`<div class="visitItem"><b>${r.missed?'⚠️ ':''}${esc(r.client)}</b><span>${esc(r.type)} · ${r.missed?esc(r.notes):`${fmtTime(r.start_ts)}–${fmtTime(r.end_ts)} · ${durationText(r.duration_sec)}`}</span>${r.next_action?`<span>Próxima acción: ${esc(r.next_action)}</span>`:''}</div>`).join(''):'<div class="empty">Sin actividad registrada hoy.</div>';
 }
 
+
+function getLocalPromos(){try{return JSON.parse(localStorage.getItem(PROMOS_KEY)||'[]')}catch{return []}}
+function setLocalPromos(rows){localStorage.setItem(PROMOS_KEY,JSON.stringify(rows||[]))}
+function mergePromos(localRows, cloudRows){
+  const m=new Map();
+  [...(cloudRows||[]),...(localRows||[])].forEach(p=>{if(p&&p.id)m.set(String(p.id),p)});
+  return [...m.values()].sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
+}
+
 function sbUrl(path){return SUPABASE_URL.replace(/\/$/,'')+path}
 async function sbFetch(path,{method='GET',body=null,headers={}}={}){
   const opts={method,headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY,...headers}};
@@ -551,9 +577,18 @@ function promoIsCurrent(p){
   const d=today();if(p.start&&d<p.start)return false;if(p.end&&d>p.end)return false;return p.active!==false;
 }
 async function fetchPromos(activeOnly=false){
-  let path=`/rest/v1/${PROMO_TABLE}?select=id,created_at,day,city,vendor,title,body,active&city=eq.PROMO&order=created_at.desc&limit=40`;
-  if(activeOnly)path+=`&active=eq.true`;
-  const rows=await sbFetch(path);return (Array.isArray(rows)?rows:[]).map(parsePromo);
+  const local=getLocalPromos();
+  let cloud=[];
+  try{
+    let path=`/rest/v1/${PROMO_TABLE}?select=id,created_at,day,city,vendor,title,body,active&city=eq.PROMO&order=created_at.desc&limit=80`;
+    if(activeOnly)path+=`&active=eq.true`;
+    const rows=await sbFetch(path);
+    cloud=(Array.isArray(rows)?rows:[]).map(parsePromo);
+  }catch(e){
+    cloud=[];
+  }
+  const merged=mergePromos(local,cloud);
+  return activeOnly?merged.filter(p=>p.active!==false):merged;
 }
 async function loadPromos(){
   const box=$('#promoList');box.innerHTML='<div class="empty">Cargando promociones…</div>';
@@ -584,17 +619,36 @@ async function savePromo(){
   if(!title)return toast('Escribe el tema');
   $('#savePromo').disabled=true;
   try{
-    const file=$('#promoImage').files[0];const image=file?await imageToData(file):CURRENT_PROMO_IMAGE;
-    const body=promoPayloadBody({comments,image,start,end}),id=$('#promoEditId').value;
-    if(id){
-      await sbFetch(`/rest/v1/${PROMO_TABLE}?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:{title,body,day:today(),active:true}});
-      toast('Promoción actualizada');
-    }else{
-      await sbFetch(`/rest/v1/${PROMO_TABLE}`,{method:'POST',headers:{Prefer:'return=minimal'},body:{id:uuid(),created_at:new Date().toISOString(),day:today(),active:true,city:'PROMO',vendor:'ALL',title,body}});
-      toast('Promoción publicada');
-    }
-    resetPromoForm();await loadAdminPromos();
-  }catch(e){toast('No se pudo guardar promoción')}finally{$('#savePromo').disabled=false}
+    const file=$('#promoImage').files[0];
+    const image=file?await imageToData(file):CURRENT_PROMO_IMAGE;
+    const body=promoPayloadBody({comments,image,start,end});
+    const editId=$('#promoEditId').value;
+    const now=new Date().toISOString();
+    const id=editId||uuid();
+    const promo={id,created_at:now,day:today(),active:true,city:'PROMO',vendor:'ALL',title,body,comments,image,start,end};
+
+    let locals=getLocalPromos();
+    const idx=locals.findIndex(x=>String(x.id)===String(id));
+    if(idx>=0) locals[idx]=promo; else locals.unshift(promo);
+    setLocalPromos(locals);
+
+    // Intento de sincronización Cloud, pero la app funciona aunque Supabase rechace la escritura.
+    try{
+      if(editId){
+        await sbFetch(`/rest/v1/${PROMO_TABLE}?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:{title,body,day:today(),active:true,city:'PROMO',vendor:'ALL'}});
+      }else{
+        await sbFetch(`/rest/v1/${PROMO_TABLE}`,{method:'POST',headers:{Prefer:'return=minimal'},body:{id,created_at:now,day:today(),active:true,city:'PROMO',vendor:'ALL',title,body}});
+      }
+    }catch(e){ /* guardado local ya realizado */ }
+
+    resetPromoForm();
+    await loadAdminPromos();
+    toast('Promoción guardada');
+  }catch(e){
+    toast('No se pudo procesar la imagen');
+  }finally{
+    $('#savePromo').disabled=false;
+  }
 }
 async function loadAdminPromos(){
   if(getAuth()?.role!=='admin')return;
@@ -615,24 +669,78 @@ function editPromo(id){
   $('#savePromo').textContent='Actualizar promoción';window.scrollTo({top:0,behavior:'smooth'});
 }
 async function togglePromo(id){
-  const p=ADMIN_PROMOS_CACHE.find(x=>x.id===id);if(!p)return;
-  try{await sbFetch(`/rest/v1/${PROMO_TABLE}?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:{active:!p.active}});await loadAdminPromos()}catch{toast('No se pudo actualizar')}
+  const p=ADMIN_PROMOS_CACHE.find(x=>String(x.id)===String(id));if(!p)return;
+  const locals=getLocalPromos();const i=locals.findIndex(x=>String(x.id)===String(id));
+  if(i>=0){locals[i].active=!p.active;setLocalPromos(locals)}
+  try{await sbFetch(`/rest/v1/${PROMO_TABLE}?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:{active:!p.active}})}catch(e){}
+  await loadAdminPromos();
 }
 async function deletePromo(id){
   if(!confirm('¿Eliminar esta promoción?'))return;
-  try{await sbFetch(`/rest/v1/${PROMO_TABLE}?id=eq.${encodeURIComponent(id)}`,{method:'DELETE',headers:{Prefer:'return=minimal'}});await loadAdminPromos();toast('Promoción eliminada')}catch{toast('No se pudo eliminar')}
+  setLocalPromos(getLocalPromos().filter(x=>String(x.id)!==String(id)));
+  try{await sbFetch(`/rest/v1/${PROMO_TABLE}?id=eq.${encodeURIComponent(id)}`,{method:'DELETE',headers:{Prefer:'return=minimal'}})}catch(e){}
+  await loadAdminPromos();toast('Promoción eliminada');
+}
+
+
+function localSellerVisits(vendor,from,to){
+  return getLocalVisits().filter(r=>{
+    if(String(r.vendor)!==String(vendor))return false;
+    if(from&&String(r.day)<from)return false;
+    if(to&&String(r.day)>to)return false;
+    return true;
+  });
+}
+async function loadSellerHistory(){
+  const a=getAuth();if(!a||a.role!=='seller')return;
+  const from=$('#sellerHistFrom').value,to=$('#sellerHistTo').value;
+  let rows=localSellerVisits(a.vendor,from,to);
+  try{
+    let path=`/rest/v1/${VISITS_TABLE}?select=id,day,city,vendor,client,type,notes,next_action,start_ts,end_ts,duration_sec&vendor=eq.${encodeURIComponent(a.vendor)}&order=start_ts.desc&limit=500`;
+    if(from)path+=`&day=gte.${from}`;
+    if(to)path+=`&day=lte.${to}`;
+    const cloud=await sbFetch(path);
+    const all=[...(Array.isArray(cloud)?cloud:[]),...rows];
+    const m=new Map();all.forEach(r=>m.set(String(r.id||[r.day,r.vendor,r.client,r.start_ts].join('|')),r));
+    rows=[...m.values()];
+  }catch(e){}
+  rows.sort((x,y)=>String(y.start_ts||'').localeCompare(String(x.start_ts||'')));
+  const box=$('#sellerHistory');
+  box.innerHTML=rows.length?rows.map(r=>`<div class="adminRow"><div class="top"><b>${esc(r.client)}</b><span>${esc(r.day)}</span></div><p>${esc(r.type)} · ${fmtTime(r.start_ts)}–${fmtTime(r.end_ts)} · ${durationText(r.duration_sec)}</p>${r.next_action?`<p>Próxima acción: ${esc(r.next_action)}</p>`:''}${r.notes?`<p>${esc(r.notes)}</p>`:''}</div>`).join(''):'<div class="empty">Sin visitas en el periodo.</div>';
+}
+function fillAdminVendorFilter(){
+  const s=$('#adminVendorFilter'); if(!s)return;
+  const vals=[...new Set(Object.values(SELLERS).flat())].sort((a,b)=>a.localeCompare(b,'es'));
+  s.innerHTML='<option value="">Todos</option>'+vals.map(v=>`<option>${esc(v)}</option>`).join('');
 }
 
 async function loadAdminVisits(){
   if(getAuth()?.role!=='admin')return;
-  const since=new Date(Date.now()-29*864e5).toISOString().slice(0,10);
+  const selectedVendor=$('#adminVendorFilter')?.value||'';
+  const selectedDate=$('#adminDateFilter')?.value||'';
   const box=$('#adminVisits');box.innerHTML='<div class="empty">Cargando visitas…</div>';
+
+  let rows=[...getLocalVisits()];
   try{
-    const cols='id,day,city,vendor,client,type,notes,start_ts,end_ts,duration_sec';
-    const rows=await sbFetch(`/rest/v1/${VISITS_TABLE}?select=${cols}&day=gte.${since}&order=start_ts.desc&limit=1000`);
-    ADMIN_VISITS_CACHE=Array.isArray(rows)?rows:[];$('#adminVisitStats').textContent=ADMIN_VISITS_CACHE.length;
-    box.innerHTML=ADMIN_VISITS_CACHE.length?ADMIN_VISITS_CACHE.slice(0,120).map(r=>`<div class="adminRow"><div class="top"><b>${esc(r.vendor)} · ${esc(r.client)}</b><span>${esc(r.day)}</span></div><p>${esc(r.type)} · ${fmtTime(r.start_ts)}–${fmtTime(r.end_ts)} · ${durationText(r.duration_sec)}</p></div>`).join(''):'<div class="empty">Sin visitas.</div>';
-  }catch(e){box.innerHTML='<div class="empty">No se pudo cargar Cloud.</div>'}
+    const cols='id,day,city,vendor,client,type,notes,next_action,start_ts,end_ts,duration_sec';
+    let path=`/rest/v1/${VISITS_TABLE}?select=${cols}&order=start_ts.desc&limit=2000`;
+    if(selectedVendor)path+=`&vendor=eq.${encodeURIComponent(selectedVendor)}`;
+    if(selectedDate)path+=`&day=eq.${selectedDate}`;
+    const cloud=await sbFetch(path);
+    if(Array.isArray(cloud)) rows=[...cloud,...rows];
+  }catch(e){}
+
+  const m=new Map();
+  rows.forEach(r=>m.set(String(r.id||[r.day,r.vendor,r.client,r.start_ts].join('|')),r));
+  rows=[...m.values()].filter(r=>{
+    if(selectedVendor&&String(r.vendor)!==selectedVendor)return false;
+    if(selectedDate&&String(r.day)!==selectedDate)return false;
+    return true;
+  }).sort((x,y)=>String(y.start_ts||'').localeCompare(String(x.start_ts||'')));
+
+  ADMIN_VISITS_CACHE=rows;
+  $('#adminVisitStats').textContent=rows.length;
+  box.innerHTML=rows.length?rows.map(r=>`<div class="adminRow"><div class="top"><b>${esc(r.vendor)} · ${esc(r.client)}</b><span>${esc(r.day)}</span></div><p>${esc(r.type)} · ${fmtTime(r.start_ts)}–${fmtTime(r.end_ts)} · ${durationText(r.duration_sec)}</p>${r.next_action?`<p>Próxima acción: ${esc(r.next_action)}</p>`:''}${r.notes?`<p>${esc(r.notes)}</p>`:''}</div>`).join(''):'<div class="empty">Sin visitas para el filtro seleccionado.</div>';
 }
 function csv(v){return '"'+String(v??'').replaceAll('"','""')+'"'}
 function exportAdminCsv(){
@@ -644,7 +752,10 @@ function exportAdminCsv(){
 
 function updateNet(){const on=navigator.onLine;$('#net').textContent=on?'● En línea':'● Sin conexión';$('#net').style.opacity=on?'1':'.72'}
 
-fillUsers();syncSession();updateNet();renderToday();updateQueueStat();updateDashboard();
+fillUsers();syncSession();updateNet();renderToday();updateQueueStat();updateDashboard();fillAdminVendorFilter();
+const d=new Date(), d30=new Date(Date.now()-29*864e5);
+if($('#sellerHistFrom'))$('#sellerHistFrom').value=d30.toISOString().slice(0,10);
+if($('#sellerHistTo'))$('#sellerHistTo').value=d.toISOString().slice(0,10);
 window.addEventListener('online',()=>{updateNet();setTimeout(flushQueue,600)});window.addEventListener('offline',updateNet);
 $('#loginBtn').onclick=login;$('#loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')login()});$('#logout').onclick=logout;
 $$('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
@@ -657,7 +768,7 @@ $('#cantVisit').onclick=toggleCantVisit;
 $$('[data-reason]').forEach(b=>b.onclick=()=>chooseReason(b.dataset.reason));
 $('#saveCantVisit').onclick=saveCantVisit;
 $('#refreshPromos').onclick=loadPromos;$('#promoImage').addEventListener('change',previewPromoImage);$('#savePromo').onclick=savePromo;$('#cancelPromoEdit').onclick=resetPromoForm;$('#loadAdminPromos').onclick=loadAdminPromos;
-$('#loadAdminVisits').onclick=loadAdminVisits;$('#syncNow').onclick=flushQueue;$('#exportCsv').onclick=exportAdminCsv;
+$('#loadAdminVisits').onclick=loadAdminVisits;$('#syncNow').onclick=flushQueue;$('#exportCsv').onclick=exportAdminCsv;$('#loadSellerHistory').onclick=loadSellerHistory;
 resetPromoForm();
 if(getAuth()&&navigator.onLine)setTimeout(flushQueue,2200);
 </script>
