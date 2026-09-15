@@ -36,3 +36,16 @@ PUBLICACIÓN
 3. Push origin.
 4. Abre:
    https://beris04.github.io/Toyo-GDL/
+
+
+=== SUPABASE ACTUALIZADO ===
+Proyecto: https://cqgctmpbvlsodfnwscnx.supabase.co
+La app usa la Publishable Key configurada dentro de index.html.
+
+1. En Supabase abre SQL Editor.
+2. Ejecuta el archivo SUPABASE_SETUP.sql completo con role postgres.
+3. Sube TODO este paquete a GitHub Pages conservando carpetas assets/ y data/.
+4. En la app entra como Admin > Estado de Cloud > Diagnóstico completo.
+5. Debe mostrar Lectura Cloud OK y Escritura Cloud OK.
+
+IMPORTANTE: la publishable key puede estar en una app web pública. No uses service_role ni sb_secret_ en GitHub.
