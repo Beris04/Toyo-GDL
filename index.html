@@ -328,8 +328,8 @@ const CITY_LABELS={"GDL":"Guadalajara","MTY":"Monterrey","CDMX":"México","AGS":
 const AUTH_KEY='toyo_visitas_auth_v1', AUTH_PASS='Toyo2026';
 const ACTIVE_KEY='toyo_active_visit_v1', VISITS_KEY='toyo_visits_local_v1', QUEUE_KEY='toyo_visits_queue_v1', PROMOS_KEY='toyo_promos_local_v1', PROMO_QUEUE_KEY='toyo_promos_queue_v1';
 
-const SUPABASE_URL='https://cqgctmpbvlsodfnwscnx.supabase.co';
-const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6ImNxZ2N0bXBidmxzb2RmbndzY254Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzQyOTIsImV4cCI6MjA4MzMxMDI5Mn0.gSOhlIgGFo5cwimH6hJ_yk5lquVsxKxDGJLAR9dA5xM';
+const SUPABASE_URL='https://rnggpjnxfllrcvhorwth.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable_A2_bhYfE5lQtKcETceMEfg_ZwENhbwQ';
 const VISITS_TABLE='visits', PROMO_TABLE='announcements';
 
 const QUOTE_URL='https://beris04.github.io/Cotizador/';
@@ -754,7 +754,7 @@ async function cloudTestAll(){
 
 function sbUrl(path){return SUPABASE_URL.replace(/\/$/,'')+path}
 async function sbFetch(path,{method='GET',body=null,headers={}}={}){
-  const opts={method,headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY,...headers}};
+  const opts={method,headers:{apikey:SUPABASE_ANON_KEY,...headers}};
   if(body!==null){opts.headers['Content-Type']='application/json';opts.body=JSON.stringify(body)}
   const r=await fetch(sbUrl(path),opts),txt=await r.text();
   if(!r.ok)throw new Error(txt||('HTTP '+r.status));
