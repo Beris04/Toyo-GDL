@@ -1,26 +1,38 @@
-TOYO FOODS · APP VISITAS MÓVIL V3
+TOYO FOODS · APP VISITAS MÓVIL V3.2 ESTABLE
 
-Se respetó el mismo diseño visual de la V2.
+OBJETIVO
+Dejar la app usable para operación inmediata aunque Cloud tenga una falla temporal.
 
-NUEVO
-- Prospectos como módulo independiente.
-- Historial Cloud por vendedor: este mes, mes anterior, mes elegido y rango de fechas.
-- Admin con filtros por vendedor, ciudad, mes y rango.
-- Resumen por vendedor: visitas, prospectos, no visitados y duración promedio.
-- Clientes sin visita reciente: 15 / 30 / 45+ días.
-- Próxima acción + fecha de seguimiento.
-- Pendientes de hoy en Inicio.
-- Cumplimiento mensual.
-- Estado de prospecto, incluyendo Convertido a cliente.
-- Indicador de sincronización.
-- Visitas fallidas separadas de efectivas.
-- Pedidos y Cotizador continúan externos.
+MEJORAS
+- Diagnóstico Supabase dentro de Admin.
+- Botones:
+  Probar lectura / Probar escritura / Diagnóstico completo.
+- Muestra el error real y una interpretación:
+  API key, RLS, tabla, columnas, validación/check, red/CORS.
+- Visitas y prospectos siguen guardándose localmente si Cloud falla.
+- Promociones también:
+  se guardan localmente y quedan en cola de sincronización.
+- Botón Sincronizar reintenta visitas + promociones.
+- Reintento automático al recuperar Internet.
+- Indicador:
+  Todo sincronizado / N pendientes.
+- Se conserva interfaz, dashboard, mapa, prospectos, historial, promociones y enlaces externos.
 
-IMPORTANTE
-Los datos nuevos se guardan dentro del campo notes en JSON para no exigir cambios en la estructura actual de Supabase.
+PRUEBA URGENTE
+1. Sube esta V3.2 a Toyo-GDL.
+2. Entra como Admin.
+3. Admin > Estado de Cloud > Diagnóstico completo.
+4. Si dice:
+   - Lectura OK + Escritura OK: Supabase está listo.
+   - Lectura OK / Escritura falló: normalmente RLS/permisos o validaciones.
+   - Lectura falló: revisar URL, anon key, RLS o tabla visits.
+5. Haz una visita de prueba.
+6. Si queda “pendiente”, pulsa Sincronizar.
+7. Publica una promoción y prueba desde otro celular.
 
 PUBLICACIÓN
-1. Reemplaza todo el contenido actual de Toyo-GDL con este ZIP.
+1. Reemplaza TODO el contenido de Toyo-GDL con este ZIP.
 2. Commit to main.
 3. Push origin.
-4. Abre https://beris04.github.io/Toyo-GDL/
+4. Abre:
+   https://beris04.github.io/Toyo-GDL/

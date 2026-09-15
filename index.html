@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b4ea2">
-<title>Toyo Foods · Visitas V3</title>
+<title>Toyo Foods · Visitas V3.2</title>
 <style>
 :root{
   --blue:#0b4ea2;--blue2:#062f69;--cyan:#17a2ff;--ink:#10243e;--muted:#6f7f95;--bg:#eef3f8;
@@ -115,7 +115,7 @@ main{padding-top:12px}
 <header class="topbar">
   <div class="toprow">
     <img class="logo" src="assets/toyo_logo.png" alt="Toyo Foods">
-    <div class="brand"><b id="topTitle">App Visitas</b><span id="topSub">Toyo Foods · Visitas móvil V3</span></div>
+    <div class="brand"><b id="topTitle">App Visitas</b><span id="topSub">Toyo Foods · Visitas móvil V3.2</span></div>
     <span id="net" class="net">●</span>
   </div>
 </header>
@@ -159,6 +159,17 @@ main{padding-top:12px}
     </div>
     <div id="adminQuickWrap" style="display:none">
       <div class="sectionTitle">Administración</div>
+    <div class="sectionTitle">Estado de Cloud</div>
+    <div class="card">
+      <div class="historyHead"><div><b style="font-size:12px">Supabase</b><span id="cloudDiagState" style="display:block;margin-top:3px">Sin probar</span></div><span id="cloudDiagDot" class="pill">●</span></div>
+      <div class="btnbar">
+        <button id="testCloudRead" class="btn secondary">Probar lectura</button>
+        <button id="testCloudWrite" class="btn secondary">Probar escritura</button>
+        <button id="testCloudAll" class="btn secondary">Diagnóstico completo</button>
+      </div>
+      <div id="cloudDiagDetail" class="empty" style="margin-top:10px;text-align:left;white-space:pre-wrap">Aquí aparecerá el resultado real de Supabase.</div>
+    </div>
+    
       <button class="actionCard" data-go="admin" style="width:100%;min-height:105px"><div class="ic">⚙️</div><div><b>Admin</b><span>Visitas, sincronización y gestión de promociones.</span></div></button>
     </div>
   </section>
@@ -315,7 +326,7 @@ main{padding-top:12px}
 const SELLERS={"CDMX":["David Adrian Hernández Guzmán","Javier Espinosa Olivares","Ricardo Gutierrez Bandera","Abraham Rene Valdes Gonzales","Jesus Antonio Ramirez Rivera","Sergio Servin Rivera","Eduardo Faustino Hernandez Sanchez","Khiroyuki Sakurai","Andres Fierro Ibañez","Jonathan Ramirez","Tohru Kurasawa","Tanno Nobuko"],"MTY":["Jessica Palomo","Luis Heredia","Carla Hernández","Salomé Barron"],"GDL":["Aguilar Neri Daniel","De la Cruz Ponce Julio Cesar","Garibay Ortiz Sergio Joel","Sierra de Anda Aldo","Perez Mar Alan Roberto","Reynoso Aguilar Maricela","Sandra Navarro Navarro","Aguirre Ojeda Arcenio","Velez Castellanos Antonio","Yepez Mora Oscar Alberto","Sanchez Esmeralda","Reynaga Valeria","González Guzmán Cristian Eduardo"],"AGS":["Hernandez Gonzalez Angel Miguel"],"PUE":["Victor Mendez","Yael Mojica"],"QRO":["Roberto Lopez"]};
 const CITY_LABELS={"GDL":"Guadalajara","MTY":"Monterrey","CDMX":"México","AGS":"Aguascalientes","PUE":"Puebla","QRO":"Querétaro"};
 const AUTH_KEY='toyo_visitas_auth_v1', AUTH_PASS='Toyo2026';
-const ACTIVE_KEY='toyo_active_visit_v1', VISITS_KEY='toyo_visits_local_v1', QUEUE_KEY='toyo_visits_queue_v1', PROMOS_KEY='toyo_promos_local_v1';
+const ACTIVE_KEY='toyo_active_visit_v1', VISITS_KEY='toyo_visits_local_v1', QUEUE_KEY='toyo_visits_queue_v1', PROMOS_KEY='toyo_promos_local_v1', PROMO_QUEUE_KEY='toyo_promos_queue_v1';
 
 const SUPABASE_URL='https://cqgctmpbvlsodfnwscnx.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6ImNxZ2N0bXBidmxzb2RmbndzY254Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MzQyOTIsImV4cCI6MjA4MzMxMDI5Mn0.gSOhlIgGFo5cwimH6hJ_yk5lquVsxKxDGJLAR9dA5xM';
@@ -380,12 +391,12 @@ function go(name){
   if(name==='admin'&&a.role!=='admin')return;
   $$('.screen').forEach(x=>x.classList.toggle('active',x.id===name));
   $$('.nav').forEach(x=>x.classList.toggle('active',x.dataset.go===name));
-  const titles={home:['App Visitas','Toyo Foods · Visitas móvil V3'],visits:['Visitas','Clientes asignados y registro'],promos:['Promociones','Material comercial vigente'],admin:['Admin','Visitas y promociones'],more:['Más','Herramientas y sesión']};
+  const titles={home:['App Visitas','Toyo Foods · Visitas móvil V3.2'],visits:['Visitas','Clientes asignados y registro'],promos:['Promociones','Material comercial vigente'],admin:['Admin','Visitas y promociones'],more:['Más','Herramientas y sesión']};
   const t=titles[name]||titles.home;$('#topTitle').textContent=t[0];$('#topSub').textContent=t[1];
   if(name==='visits'){renderVisitState();renderToday();setTimeout(ensureVisitMap,60);if(getAuth()?.role==='seller')setTimeout(loadSellerHistory,100)}
   if(name==='promos')loadPromos();
   if(name==='prospects')loadMyProspects();
-  if(name==='admin'){updateQueueStat();loadAdminPromos()}
+  if(name==='admin'){updateQueueStat();loadAdminPromos();setTimeout(()=>cloudTestRead(true),250)}
   if(name==='home')updateDashboard();
 }
 
@@ -560,6 +571,18 @@ function setSellerHistoryMonth(value){
 function getLocalVisits(){try{return JSON.parse(localStorage.getItem(VISITS_KEY)||'[]')}catch{return []}}
 function setLocalVisits(v){localStorage.setItem(VISITS_KEY,JSON.stringify(v))}
 function getQueue(){try{return JSON.parse(localStorage.getItem(QUEUE_KEY)||'[]')}catch{return []}}
+
+function getPromoQueue(){try{return JSON.parse(localStorage.getItem(PROMO_QUEUE_KEY)||'[]')}catch{return []}}
+function setPromoQueue(v){localStorage.setItem(PROMO_QUEUE_KEY,JSON.stringify(v||[]));updateQueueStat()}
+function queuePromoRevision(p){
+  const q=getPromoQueue();
+  const id=String(p.promo_id||p.id||uuid());
+  const next={...p,promo_id:id,id};
+  const i=q.findIndex(x=>String(x.promo_id||x.id)===id);
+  if(i>=0)q[i]=next;else q.push(next);
+  setPromoQueue(q);
+}
+
 function setQueue(v){localStorage.setItem(QUEUE_KEY,JSON.stringify(v));updateQueueStat()}
 function getActive(){try{return JSON.parse(localStorage.getItem(ACTIVE_KEY)||'null')}catch{return null}}
 function setActive(v){v?localStorage.setItem(ACTIVE_KEY,JSON.stringify(v)):localStorage.removeItem(ACTIVE_KEY)}
@@ -669,6 +692,66 @@ function mergePromos(localRows, cloudRows){
   return [...m.values()].sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
 }
 
+
+function cloudDiagSet(kind,msg,detail=''){
+  const st=$('#cloudDiagState'),dot=$('#cloudDiagDot'),box=$('#cloudDiagDetail');
+  if(st)st.textContent=msg;
+  if(dot){
+    dot.textContent=kind==='ok'?'✓ Conectado':kind==='bad'?'✕ Error':'● Probando';
+    dot.style.color=kind==='ok'?'#137a50':kind==='bad'?'#b42318':'#8a6400';
+  }
+  if(box)box.textContent=detail||msg;
+}
+function humanCloudError(e){
+  const raw=String(e?.message||e||'Error desconocido');
+  if(/401|JWT|apikey|API key|invalid token/i.test(raw))return 'API key / JWT inválido o rechazado.';
+  if(/403|permission|policy|row-level|RLS/i.test(raw))return 'RLS o permisos están bloqueando la operación.';
+  if(/404|relation .* does not exist|table/i.test(raw))return 'La tabla o endpoint no existe.';
+  if(/Failed to fetch|NetworkError|Load failed|CORS/i.test(raw))return 'No hubo respuesta de red/CORS hacia Supabase.';
+  if(/check constraint|violates check/i.test(raw))return 'La tabla rechazó uno de los valores por una validación/check.';
+  if(/column .* does not exist/i.test(raw))return 'La estructura de columnas no coincide con la app.';
+  return raw;
+}
+async function cloudTestRead(show=true){
+  if(show)cloudDiagSet('wait','Probando lectura…','Consultando tabla visits…');
+  try{
+    const r=await sbFetch(`/rest/v1/${VISITS_TABLE}?select=id,day,vendor,client&limit=1`);
+    const detail=`LECTURA OK\nProyecto: ${SUPABASE_URL}\nTabla: ${VISITS_TABLE}\nRespuesta: ${Array.isArray(r)?r.length:0} registro(s)`;
+    if(show)cloudDiagSet('ok','Lectura Cloud OK',detail);
+    return {ok:true,detail};
+  }catch(e){
+    const detail=`LECTURA FALLÓ\n${humanCloudError(e)}\n\nDetalle técnico:\n${String(e?.message||e)}`;
+    if(show)cloudDiagSet('bad','Lectura Cloud falló',detail);
+    return {ok:false,detail,error:e};
+  }
+}
+async function cloudTestWrite(show=true){
+  if(show)cloudDiagSet('wait','Probando escritura…','Creando y eliminando un registro de diagnóstico…');
+  const id=uuid(),now=new Date().toISOString();
+  const body={id,day:today(),city:'GDL',vendor:'Admin',client:'DIAG::Cloud',type:'Visita de Seguimiento',notes:'Diagnóstico automático V3.2',start_ts:now,end_ts:now,duration_sec:0,start_lat:null,start_lng:null,end_lat:null,end_lng:null};
+  try{
+    await sbFetch(`/rest/v1/${VISITS_TABLE}`,{method:'POST',headers:{Prefer:'return=minimal'},body});
+    let cleanup='Limpieza OK';
+    try{await sbFetch(`/rest/v1/${VISITS_TABLE}?id=eq.${encodeURIComponent(id)}`,{method:'DELETE',headers:{Prefer:'return=minimal'}})}catch(e){cleanup='Escritura OK; no se pudo borrar el registro de prueba.'}
+    const detail=`ESCRITURA OK\nProyecto: ${SUPABASE_URL}\nTabla: ${VISITS_TABLE}\n${cleanup}`;
+    if(show)cloudDiagSet('ok','Escritura Cloud OK',detail);
+    return {ok:true,detail};
+  }catch(e){
+    const detail=`ESCRITURA FALLÓ\n${humanCloudError(e)}\n\nDetalle técnico:\n${String(e?.message||e)}`;
+    if(show)cloudDiagSet('bad','Escritura Cloud falló',detail);
+    return {ok:false,detail,error:e};
+  }
+}
+async function cloudTestAll(){
+  cloudDiagSet('wait','Diagnóstico en curso…','1/2 Probando lectura…');
+  const r=await cloudTestRead(false);
+  if(!r.ok){cloudDiagSet('bad','Cloud no disponible',r.detail);return}
+  cloudDiagSet('wait','Lectura OK; probando escritura…','2/2 Probando escritura…');
+  const w=await cloudTestWrite(false);
+  if(!w.ok){cloudDiagSet('bad','Cloud lectura OK / escritura falló',`${r.detail}\n\n${w.detail}`);return}
+  cloudDiagSet('ok','Supabase conectado',`${r.detail}\n\n${w.detail}`);
+}
+
 function sbUrl(path){return SUPABASE_URL.replace(/\/$/,'')+path}
 async function sbFetch(path,{method='GET',body=null,headers={}}={}){
   const opts={method,headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY,...headers}};
@@ -686,70 +769,68 @@ async function cloudInsertVisit(rec){
   await sbFetch(`/rest/v1/${VISITS_TABLE}`,{method:'POST',headers:{Prefer:'return=minimal'},body});
 }
 async function flushQueue(){
-  const q=getQueue();if(!q.length){updateQueueStat();return 0}
-  const pending=[];let sent=0;
+  const q=getQueue();const pending=[];let sent=0;
   for(const r of q){try{await cloudInsertVisit(r);sent++}catch(e){pending.push(r)}}
-  setQueue(pending);if(sent)toast(`Sincronizadas: ${sent}`);return sent;
+  setQueue(pending);
+
+  const pq=getPromoQueue();const pPending=[];let pSent=0;
+  for(const p of pq){
+    try{await cloudPromoRevision(p);pSent++}
+    catch(e){pPending.push(p)}
+  }
+  setPromoQueue(pPending);
+
+  const total=sent+pSent;
+  if(total)toast(`Sincronizados: ${total}`);
+  updateQueueStat();
+  return total;
 }
 function updateQueueStat(){
-  const n=getQueue().length;
+  const v=getQueue().length,pq=getPromoQueue().length,n=v+pq;
   $('#queueStats').textContent=n;
-  const s=$('#syncLabel'); if(s)s.textContent=n?`${n} pendiente${n===1?'':'s'}`:'Todo sincronizado';
+  const s=$('#syncLabel'); if(s)s.textContent=n?`${n} pendiente${n===1?'':'s'} (${v} visitas, ${pq} promos)`:'Todo sincronizado';
   const p=$('#sellerSyncStatus'); if(p)p.textContent=n?`${n} pendiente${n===1?'':'s'}`:'✓ Sincronizado';
 }
 
 
 function promoEventBody(p){
   return JSON.stringify({
-    v:2,
-    promo_id:p.promo_id,
-    title:p.title||'',
-    comments:p.comments||'',
-    image:p.image||'',
-    start:p.start||'',
-    end:p.end||'',
-    active:p.active!==false,
+    v:4,promo_marker:true,promo_id:String(p.promo_id||p.id||''),
+    title:p.title||'',comments:p.comments||'',image:p.image||'',
+    start:p.start||'',end:p.end||'',active:p.active!==false,
     updated_at:p.updated_at||new Date().toISOString()
   });
 }
 function parsePromoEvent(r){
   try{
+    if(!String(r.client||'').startsWith('PROMO::'))return null;
     const b=JSON.parse(r.notes||'{}');
-    if(!b || b.v!==2 || !b.promo_id) return null;
+    if(!b||b.promo_marker!==true||!b.promo_id)return null;
     return {
-      id:String(b.promo_id),
-      promo_id:String(b.promo_id),
-      title:b.title||r.client||'Promoción',
-      comments:b.comments||'',
-      image:b.image||'',
-      start:b.start||'',
-      end:b.end||'',
-      active:b.active!==false,
-      created_at:b.updated_at||r.start_ts||r.day||'',
+      id:String(b.promo_id),promo_id:String(b.promo_id),
+      title:b.title||String(r.client||'').split('::').slice(2).join('::')||'Promoción',
+      comments:b.comments||'',image:b.image||'',start:b.start||'',end:b.end||'',
+      active:b.active!==false,created_at:b.updated_at||r.start_ts||r.day||'',
       updated_at:b.updated_at||r.start_ts||''
     };
-  }catch(e){ return null; }
+  }catch(e){return null}
 }
 async function cloudPromoRevision(p){
   const now=new Date().toISOString();
+  const promoId=String(p.promo_id||p.id||uuid());
+  const title=String(p.title||'Promoción').slice(0,120);
   const rec={
     id:uuid(),
     day:today(),
-    city:'PROMO',
-    vendor:'ADMIN',
-    client:p.title||'Promoción',
-    type:'PROMOTION',
-    notes:promoEventBody({...p,updated_at:now}),
-    start_ts:now,
-    end_ts:now,
-    duration_sec:0,
+    city:'GDL',
+    vendor:'Admin',
+    client:`PROMO::${promoId}::${title}`,
+    type:'Visita de Seguimiento',
+    notes:promoEventBody({...p,promo_id:promoId,updated_at:now}),
+    start_ts:now,end_ts:now,duration_sec:0,
     start_lat:null,start_lng:null,end_lat:null,end_lng:null
   };
-  await sbFetch(`/rest/v1/${VISITS_TABLE}`,{
-    method:'POST',
-    headers:{Prefer:'return=minimal'},
-    body:rec
-  });
+  await cloudInsertVisit(rec);
 }
 
 function promoPayloadBody({comments,image,start,end}){return JSON.stringify({v:1,comments,image,start,end})}
@@ -764,12 +845,12 @@ async function fetchPromos(activeOnly=false){
   let shared=[];
   try{
     const cols='id,day,city,vendor,client,type,notes,start_ts';
-    const rows=await sbFetch(`/rest/v1/${VISITS_TABLE}?select=${cols}&city=eq.PROMO&type=eq.PROMOTION&order=start_ts.desc&limit=250`);
+    const rows=await sbFetch(`/rest/v1/${VISITS_TABLE}?select=${cols}&vendor=eq.Admin&order=start_ts.desc&limit=500`);
     const parsed=(Array.isArray(rows)?rows:[]).map(parsePromoEvent).filter(Boolean);
     const latest=new Map();
     parsed.forEach(p=>{
       const prev=latest.get(p.promo_id);
-      if(!prev || String(p.updated_at||'')>String(prev.updated_at||'')) latest.set(p.promo_id,p);
+      if(!prev||String(p.updated_at||'')>String(prev.updated_at||''))latest.set(p.promo_id,p);
     });
     shared=[...latest.values()];
   }catch(e){
@@ -784,15 +865,21 @@ async function loadPromos(){
     const rows=(await fetchPromos(true)).filter(promoIsCurrent);
     if(!rows.length){box.innerHTML='<div class="empty">No hay promociones vigentes publicadas.</div>';return}
     box.innerHTML=rows.map(p=>`<article class="promoCard">${p.image?`<img src="${p.image}" alt="">`:''}<div class="promoBody"><b>${esc(p.title)}</b><p>${esc(p.comments)}</p><div class="promoMeta">${p.start||'—'} → ${p.end||'—'}</div></div></article>`).join('');
-  }catch(e){box.innerHTML='<div class="empty">No se pudieron cargar promociones. Revisa tu conexión.</div>'}
+  }catch(e){box.innerHTML='<div class="empty">No se pudieron cargar promociones desde Cloud. La app sigue funcionando; intenta Actualizar más tarde.</div>'}
 }
 async function imageToData(file){
   if(!file)return CURRENT_PROMO_IMAGE||'';
-  const data=await new Promise((resolve,reject)=>{const fr=new FileReader();fr.onload=()=>resolve(fr.result);fr.onerror=reject;fr.readAsDataURL(file)});
-  const img=await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=data});
-  const max=1100,scale=Math.min(1,max/Math.max(img.width,img.height)),w=Math.max(1,Math.round(img.width*scale)),h=Math.max(1,Math.round(img.height*scale));
-  const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
-  return c.toDataURL('image/jpeg',.72);
+  const data=await new Promise((resolve,reject)=>{
+    const fr=new FileReader();fr.onload=()=>resolve(fr.result);fr.onerror=reject;fr.readAsDataURL(file)
+  });
+  const img=await new Promise((resolve,reject)=>{
+    const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=data
+  });
+  const max=640,scale=Math.min(1,max/Math.max(img.width,img.height));
+  const w=Math.max(1,Math.round(img.width*scale)),h=Math.max(1,Math.round(img.height*scale));
+  const c=document.createElement('canvas');c.width=w;c.height=h;
+  const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(img,0,0,w,h);
+  return c.toDataURL('image/jpeg',.55);
 }
 async function previewPromoImage(){
   const f=$('#promoImage').files[0];if(!f)return;
@@ -811,27 +898,29 @@ async function savePromo(){
     const image=file?await imageToData(file):CURRENT_PROMO_IMAGE;
     const promoId=$('#promoEditId').value||uuid();
     const now=new Date().toISOString();
-    const promo={
-      id:promoId,promo_id:promoId,title,comments,image,start,end,
-      active:true,created_at:now,updated_at:now
-    };
+    const promo={id:promoId,promo_id:promoId,title,comments,image,start,end,active:true,created_at:now,updated_at:now};
 
-    // Respaldo local del dispositivo Admin.
     let locals=getLocalPromos();
     const idx=locals.findIndex(x=>String(x.id)===String(promoId));
-    if(idx>=0) locals[idx]=promo; else locals.unshift(promo);
+    if(idx>=0)locals[idx]=promo;else locals.unshift(promo);
     setLocalPromos(locals);
 
-    // Publicación compartida usando la misma tabla Cloud que ya funciona para visitas.
-    await cloudPromoRevision(promo);
+    try{
+      await cloudPromoRevision(promo);
+      setPromoQueue(getPromoQueue().filter(x=>String(x.promo_id||x.id)!==String(promoId)));
+      toast('Promoción publicada para vendedores');
+    }catch(e){
+      queuePromoRevision(promo);
+      toast('Guardada. Quedó pendiente de sincronizar');
+    }
 
     resetPromoForm();
     await loadAdminPromos();
-    toast('Promoción publicada para vendedores');
   }catch(e){
-    toast('No se pudo publicar. Revisa conexión o Cloud.');
+    console.error('PROMO PROCESS ERROR',e);
+    toast('No se pudo procesar la promoción');
   }finally{
-    $('#savePromo').disabled=false;
+    $('#savePromo').disabled=false;updateQueueStat();
   }
 }
 async function loadAdminPromos(){
@@ -855,30 +944,21 @@ function editPromo(id){
 async function togglePromo(id){
   const p=ADMIN_PROMOS_CACHE.find(x=>String(x.id)===String(id));if(!p)return;
   const updated={...p,promo_id:String(id),active:!p.active,updated_at:new Date().toISOString()};
-  let locals=getLocalPromos();
-  const i=locals.findIndex(x=>String(x.id)===String(id));
-  if(i>=0) locals[i]=updated; else locals.unshift(updated);
+  let locals=getLocalPromos(),i=locals.findIndex(x=>String(x.id)===String(id));
+  if(i>=0)locals[i]=updated;else locals.unshift(updated);
   setLocalPromos(locals);
   try{
     await cloudPromoRevision(updated);
-    await loadAdminPromos();
     toast(updated.active?'Promoción activada':'Promoción desactivada');
-  }catch(e){
-    await loadAdminPromos();
-    toast('Cambio guardado localmente; falta sincronizar Cloud');
-  }
+  }catch(e){toast('Cambio local; Cloud no respondió')}
+  await loadAdminPromos();
 }
 async function deletePromo(id){
   if(!confirm('¿Eliminar esta promoción?'))return;
   const p=ADMIN_PROMOS_CACHE.find(x=>String(x.id)===String(id));if(!p)return;
-  const tomb={...p,promo_id:String(id),active:false,title:p.title||'Promoción eliminada',updated_at:new Date().toISOString()};
+  const tomb={...p,promo_id:String(id),active:false,updated_at:new Date().toISOString()};
   setLocalPromos(getLocalPromos().filter(x=>String(x.id)!==String(id)));
-  try{
-    await cloudPromoRevision(tomb);
-    toast('Promoción eliminada');
-  }catch(e){
-    toast('Eliminada localmente; falta sincronizar Cloud');
-  }
+  try{await cloudPromoRevision(tomb);toast('Promoción eliminada')}catch(e){toast('Eliminada localmente; Cloud no respondió')}
   await loadAdminPromos();
 }
 
@@ -990,6 +1070,7 @@ $('#cantVisit').onclick=toggleCantVisit;
 $$('[data-reason]').forEach(b=>b.onclick=()=>chooseReason(b.dataset.reason));
 $('#saveCantVisit').onclick=saveCantVisit;
 $('#refreshPromos').onclick=loadPromos;$('#promoImage').addEventListener('change',previewPromoImage);$('#savePromo').onclick=savePromo;$('#cancelPromoEdit').onclick=resetPromoForm;$('#loadAdminPromos').onclick=loadAdminPromos;
+$('#testCloudRead').onclick=()=>cloudTestRead(true);$('#testCloudWrite').onclick=()=>cloudTestWrite(true);$('#testCloudAll').onclick=cloudTestAll;
 $('#loadAdminVisits').onclick=loadAdminVisits;$('#syncNow').onclick=flushQueue;$('#exportCsv').onclick=exportAdminCsv;
 $('#saveProspect').onclick=saveProspect;$('#refreshProspects').onclick=loadMyProspects;
 $('#moreHistory').onclick=()=>go('visits');
