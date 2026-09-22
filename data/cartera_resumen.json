@@ -1,0 +1,206 @@
+{
+  "AGENTE CLAVE  GDL": {
+    "city": "GDL",
+    "total": 318
+  },
+  "GDL - QIN": {
+    "city": "GDL",
+    "total": 3
+  },
+  "GDL - VERDE VALLE": {
+    "city": "GDL",
+    "total": 2
+  },
+  "GDL1 - OSCAR YEPEZ": {
+    "city": "GDL",
+    "total": 138
+  },
+  "GDL13 - SANDRA NAVARRO": {
+    "city": "GDL",
+    "total": 111
+  },
+  "GDL14- ARCENIO AGUIRRE": {
+    "city": "GDL",
+    "total": 55
+  },
+  "GDL15 - ALDO SIERRA": {
+    "city": "GDL",
+    "total": 44
+  },
+  "GDL3 - MARICELA REYNOSO": {
+    "city": "GDL",
+    "total": 89
+  },
+  "GDL4 - JULIO DE LA CRUZ": {
+    "city": "GDL",
+    "total": 126
+  },
+  "GDL5 - ALAN PEREZ": {
+    "city": "GDL",
+    "total": 174
+  },
+  "GDL6 - DANIEL  AGUILAR": {
+    "city": "GDL",
+    "total": 116
+  },
+  "GDL9 - ANTONIO V.": {
+    "city": "GDL",
+    "total": 120
+  },
+  "OFICINA GDL": {
+    "city": "GDL",
+    "total": 4729
+  },
+  "RUTA AMECA GDL": {
+    "city": "GDL",
+    "total": 59
+  },
+  "RUTA ARANDAS GDL": {
+    "city": "GDL",
+    "total": 31
+  },
+  "RUTA ATOTONILCO GDL": {
+    "city": "GDL",
+    "total": 55
+  },
+  "RUTA AUTLAN GDL": {
+    "city": "GDL",
+    "total": 14
+  },
+  "RUTA CHAPALA GDL": {
+    "city": "GDL",
+    "total": 83
+  },
+  "RUTA JALOSTOTITLAN GDL": {
+    "city": "GDL",
+    "total": 27
+  },
+  "RUTA LOS ALTOS GDL": {
+    "city": "GDL",
+    "total": 74
+  },
+  "RUTA SAHUAYO GDL": {
+    "city": "GDL",
+    "total": 31
+  },
+  "RUTA TAPALPA GDL": {
+    "city": "GDL",
+    "total": 19
+  },
+  "RUTA TEPA GDL": {
+    "city": "GDL",
+    "total": 1
+  },
+  "RUTA TEQUILA GDL": {
+    "city": "GDL",
+    "total": 61
+  },
+  "AGENTE CLAVE CDMX": {
+    "city": "CDMX",
+    "total": 23
+  },
+  "AGENTE CLAVE JAPONES CDMX": {
+    "city": "CDMX",
+    "total": 258
+  },
+  "CD MEXICO MAYOREO": {
+    "city": "CDMX",
+    "total": 19
+  },
+  "CD MEXICO MENUDEO": {
+    "city": "CDMX",
+    "total": 10
+  },
+  "CDMX ABRAHAM": {
+    "city": "CDMX",
+    "total": 92
+  },
+  "CDMX ADRIAN": {
+    "city": "CDMX",
+    "total": 111
+  },
+  "CDMX ANDRES": {
+    "city": "CDMX",
+    "total": 104
+  },
+  "CDMX DAVID": {
+    "city": "CDMX",
+    "total": 82
+  },
+  "CDMX EDUARDO": {
+    "city": "CDMX",
+    "total": 253
+  },
+  "CDMX JAVIER": {
+    "city": "CDMX",
+    "total": 274
+  },
+  "CDMX JESUS": {
+    "city": "CDMX",
+    "total": 237
+  },
+  "CDMX JONATHAN": {
+    "city": "CDMX",
+    "total": 93
+  },
+  "CDMX OFICINA AGENTE CLAVE": {
+    "city": "CDMX",
+    "total": 50
+  },
+  "CDMX RICARDO": {
+    "city": "CDMX",
+    "total": 119
+  },
+  "CDMX SAKURAI HIROYUKI": {
+    "city": "CDMX",
+    "total": 3
+  },
+  "CDMX SERGIO": {
+    "city": "CDMX",
+    "total": 172
+  },
+  "CDMX VARIABLES": {
+    "city": "CDMX",
+    "total": 3
+  },
+  "CDMX  OFICINA": {
+    "city": "CDMX",
+    "total": 5988
+  },
+  "QRO 01 ROBERTO LOPEZ": {
+    "city": "QRO",
+    "total": 118
+  },
+  "PUE 02 YAEL MOJICA": {
+    "city": "PUE",
+    "total": 36
+  },
+  "LEO 01 NOE CERVANTES": {
+    "city": "LEON",
+    "total": 76
+  },
+  "CLN 01 - MANUEL  ACQUART": {
+    "city": "CLN",
+    "total": 81
+  },
+  "CLN 02 - FRANCISCO VALDEZ": {
+    "city": "CLN",
+    "total": 48
+  },
+  "MTY 01 - JESICA PALOMO": {
+    "city": "MTY",
+    "total": 120
+  },
+  "MTY 02 - LUIS HEREDIA": {
+    "city": "MTY",
+    "total": 102
+  },
+  "MTY 05 - CARLA HERNANDEZ": {
+    "city": "MTY",
+    "total": 58
+  },
+  "MTY 06 - SALOME BARRON": {
+    "city": "MTY",
+    "total": 43
+  }
+}

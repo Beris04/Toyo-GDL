@@ -106,6 +106,13 @@ main{padding-top:12px}
 .mapLegend{display:flex;gap:10px;flex-wrap:wrap;padding:8px 12px;border-top:1px solid var(--line);font-size:9px;color:var(--muted)}
 .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}
 .dot.blue{background:#0b4ea2}.dot.green{background:#179c63}.dot.red{background:#d92d20}
+
+.portfolioCard{margin-top:10px;background:linear-gradient(180deg,#ffffff,#f8fbff);border:1px solid #d8e5f3}
+.portfolioMain{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.portfolioPct{font-size:31px;font-weight:950;line-height:1;color:#0b4ea2}
+.portfolioCount{font-size:11px;color:var(--muted);font-weight:800;text-align:right}
+.portfolioNote{font-size:9px;color:var(--muted);margin-top:8px}
+
 @media(max-width:520px){.kpiGrid{grid-template-columns:repeat(2,1fr)}.quickStrip{grid-template-columns:1fr}}
 
 @media(max-width:390px){.grid2,.promoList,.row,.reasonGrid{grid-template-columns:1fr}}
@@ -138,6 +145,14 @@ main{padding-top:12px}
       <div class="quickStrip">
         <button id="quickNewVisit" class="quickVisit"><b>＋ Nueva visita</b><span>Ir directo al registro de cliente</span></button>
         <div class="lastClient"><b>ÚLTIMO CLIENTE</b><span id="lastClient">Sin visitas hoy</span></div>
+      </div>
+      <div class="card portfolioCard">
+        <div class="portfolioMain">
+          <div><b style="font-size:12px">Cobertura de cartera · mes actual</b><div id="portfolioPct" class="portfolioPct">0%</div></div>
+          <div id="portfolioCount" class="portfolioCount">0 de 0 clientes visitados</div>
+        </div>
+        <div class="progressTrack"><div id="portfolioFill" class="progressFill"></div></div>
+        <div id="portfolioNote" class="portfolioNote">Se cuentan clientes únicos de tu cartera visitados al menos una vez durante el mes.</div>
       </div>
       <div class="sectionTitle">Pendientes de hoy</div>
       <div id="todayFollowups" class="visitList"><div class="empty">Sin pendientes para hoy.</div></div>
@@ -323,8 +338,9 @@ main{padding-top:12px}
 <div id="toast" class="toast"></div>
 
 <script>
-const SELLERS={"CDMX":["David Adrian Hernández Guzmán","Javier Espinosa Olivares","Ricardo Gutierrez Bandera","Abraham Rene Valdes Gonzales","Jesus Antonio Ramirez Rivera","Sergio Servin Rivera","Eduardo Faustino Hernandez Sanchez","Khiroyuki Sakurai","Andres Fierro Ibañez","Jonathan Ramirez","Tohru Kurasawa","Tanno Nobuko"],"MTY":["Jessica Palomo","Luis Heredia","Carla Hernández","Salomé Barron"],"GDL":["Aguilar Neri Daniel","De la Cruz Ponce Julio Cesar","Garibay Ortiz Sergio Joel","Sierra de Anda Aldo","Perez Mar Alan Roberto","Reynoso Aguilar Maricela","Sandra Navarro Navarro","Aguirre Ojeda Arcenio","Velez Castellanos Antonio","Yepez Mora Oscar Alberto","Sanchez Esmeralda","Reynaga Valeria","González Guzmán Cristian Eduardo"],"AGS":["Hernandez Gonzalez Angel Miguel"],"PUE":["Victor Mendez","Yael Mojica"],"QRO":["Roberto Lopez"]};
-const CITY_LABELS={"GDL":"Guadalajara","MTY":"Monterrey","CDMX":"México","AGS":"Aguascalientes","PUE":"Puebla","QRO":"Querétaro"};
+const SELLERS={"GDL":["AGENTE CLAVE  GDL","GDL - QIN","GDL - VERDE VALLE","GDL1 - OSCAR YEPEZ","GDL13 - SANDRA NAVARRO","GDL14- ARCENIO AGUIRRE","GDL15 - ALDO SIERRA","GDL3 - MARICELA REYNOSO","GDL4 - JULIO DE LA CRUZ","GDL5 - ALAN PEREZ","GDL6 - DANIEL  AGUILAR","GDL9 - ANTONIO V.","OFICINA GDL","RUTA AMECA GDL","RUTA ARANDAS GDL","RUTA ATOTONILCO GDL","RUTA AUTLAN GDL","RUTA CHAPALA GDL","RUTA JALOSTOTITLAN GDL","RUTA LOS ALTOS GDL","RUTA SAHUAYO GDL","RUTA TAPALPA GDL","RUTA TEPA GDL","RUTA TEQUILA GDL"],"CDMX":["AGENTE CLAVE CDMX","AGENTE CLAVE JAPONES CDMX","CD MEXICO MAYOREO","CD MEXICO MENUDEO","CDMX ABRAHAM","CDMX ADRIAN","CDMX ANDRES","CDMX DAVID","CDMX EDUARDO","CDMX JAVIER","CDMX JESUS","CDMX JONATHAN","CDMX OFICINA AGENTE CLAVE","CDMX RICARDO","CDMX SAKURAI HIROYUKI","CDMX SERGIO","CDMX VARIABLES","CDMX  OFICINA"],"QRO":["QRO 01 ROBERTO LOPEZ"],"PUE":["PUE 02 YAEL MOJICA"],"LEON":["LEO 01 NOE CERVANTES"],"CLN":["CLN 01 - MANUEL  ACQUART","CLN 02 - FRANCISCO VALDEZ"],"MTY":["MTY 01 - JESICA PALOMO","MTY 02 - LUIS HEREDIA","MTY 05 - CARLA HERNANDEZ","MTY 06 - SALOME BARRON"]};
+const CITY_LABELS={"GDL":"Guadalajara","CDMX":"México","QRO":"Querétaro","PUE":"Puebla","LEON":"León","CLN":"Culiacán","MTY":"Monterrey"};
+const PORTFOLIO_TOTALS={"AGENTE CLAVE  GDL":318,"GDL - QIN":3,"GDL - VERDE VALLE":2,"GDL1 - OSCAR YEPEZ":138,"GDL13 - SANDRA NAVARRO":111,"GDL14- ARCENIO AGUIRRE":55,"GDL15 - ALDO SIERRA":44,"GDL3 - MARICELA REYNOSO":89,"GDL4 - JULIO DE LA CRUZ":126,"GDL5 - ALAN PEREZ":174,"GDL6 - DANIEL  AGUILAR":116,"GDL9 - ANTONIO V.":120,"OFICINA GDL":4729,"RUTA AMECA GDL":59,"RUTA ARANDAS GDL":31,"RUTA ATOTONILCO GDL":55,"RUTA AUTLAN GDL":14,"RUTA CHAPALA GDL":83,"RUTA JALOSTOTITLAN GDL":27,"RUTA LOS ALTOS GDL":74,"RUTA SAHUAYO GDL":31,"RUTA TAPALPA GDL":19,"RUTA TEPA GDL":1,"RUTA TEQUILA GDL":61,"AGENTE CLAVE CDMX":23,"AGENTE CLAVE JAPONES CDMX":258,"CD MEXICO MAYOREO":19,"CD MEXICO MENUDEO":10,"CDMX ABRAHAM":92,"CDMX ADRIAN":111,"CDMX ANDRES":104,"CDMX DAVID":82,"CDMX EDUARDO":253,"CDMX JAVIER":274,"CDMX JESUS":237,"CDMX JONATHAN":93,"CDMX OFICINA AGENTE CLAVE":50,"CDMX RICARDO":119,"CDMX SAKURAI HIROYUKI":3,"CDMX SERGIO":172,"CDMX VARIABLES":3,"CDMX  OFICINA":5988,"QRO 01 ROBERTO LOPEZ":118,"PUE 02 YAEL MOJICA":36,"LEO 01 NOE CERVANTES":76,"CLN 01 - MANUEL  ACQUART":81,"CLN 02 - FRANCISCO VALDEZ":48,"MTY 01 - JESICA PALOMO":120,"MTY 02 - LUIS HEREDIA":102,"MTY 05 - CARLA HERNANDEZ":58,"MTY 06 - SALOME BARRON":43};
 const AUTH_KEY='toyo_visitas_auth_v1', AUTH_PASS='Toyo2026';
 const ACTIVE_KEY='toyo_active_visit_v1', VISITS_KEY='toyo_visits_local_v1', QUEUE_KEY='toyo_visits_queue_v1', PROMOS_KEY='toyo_promos_local_v1', PROMO_QUEUE_KEY='toyo_promos_queue_v1';
 
@@ -342,6 +358,37 @@ let MAP=null, MAP_READY=false, MAP_LOADING_PROMISE=null, MAP_CURRENT=null, MAP_L
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),2200)}
 function norm(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()}
 function slug(s){return norm(s).replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'')}
+function clientKey(s){
+  s=String(s||'').trim();
+  if(s.includes(' · '))s=s.split(' · ').slice(1).join(' · ');
+  return norm(s).replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();
+}
+function renderPortfolioCoverage(visited,total,source='Cloud'){
+  visited=Math.max(0,Number(visited)||0);total=Math.max(0,Number(total)||0);
+  const pct=total?Math.min(100,Math.round((visited/total)*100)):0;
+  if($('#portfolioPct'))$('#portfolioPct').textContent=pct+'%';
+  if($('#portfolioCount'))$('#portfolioCount').textContent=`${visited} de ${total} clientes visitados`;
+  if($('#portfolioFill'))$('#portfolioFill').style.width=pct+'%';
+  if($('#portfolioNote'))$('#portfolioNote').textContent=`Clientes únicos visitados en el mes · fuente ${source}`;
+}
+async function refreshPortfolioCoverage(){
+  const a=getAuth();if(!a||a.role!=='seller'||!CLIENTS.length)return;
+  const total=CLIENTS.length, month=new Date().toISOString().slice(0,7), from=month+'-01';
+  const [y,m]=month.split('-').map(Number), to=`${month}-${String(new Date(y,m,0).getDate()).padStart(2,'0')}`;
+  let rows=[],source='local';
+  try{
+    const cols='day,vendor,client,type,notes';
+    const cloud=await sbFetch(`/rest/v1/${VISITS_TABLE}?select=${cols}&vendor=eq.${encodeURIComponent(a.vendor)}&day=gte.${from}&day=lte.${to}&limit=5000`);
+    rows=Array.isArray(cloud)?cloud:[];source='Cloud';
+  }catch(e){
+    rows=getLocalVisits().filter(r=>r.vendor===a.vendor&&String(r.day||'').startsWith(month));
+  }
+  const portfolioKeys=new Set(CLIENTS.map(c=>clientKey(c.name)).filter(Boolean));
+  const visited=new Set();
+  rows.forEach(r=>{const meta=visitMeta(r);if(meta.prospect||meta.missed)return;const k=clientKey(r.client);if(portfolioKeys.has(k))visited.add(k)});
+  renderPortfolioCoverage(visited.size,total,source);
+}
+
 function today(){return new Date().toISOString().slice(0,10)}
 function uuid(){return crypto?.randomUUID?.()||('id-'+Date.now()+'-'+Math.random().toString(16).slice(2))}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
@@ -397,7 +444,7 @@ function go(name){
   if(name==='promos')loadPromos();
   if(name==='prospects')loadMyProspects();
   if(name==='admin'){updateQueueStat();loadAdminPromos();setTimeout(()=>cloudTestRead(true),250)}
-  if(name==='home')updateDashboard();
+  if(name==='home'){updateDashboard();if(getAuth()?.role==='seller')refreshPortfolioCoverage();}
 }
 
 function openExternal(url){
@@ -516,11 +563,13 @@ async function loadSellerClients(){
     if(!r.ok)throw new Error('HTTP '+r.status);
     CLIENTS=await r.json();if(!Array.isArray(CLIENTS))CLIENTS=[];
     fillClientOptions(CLIENTS);
+    renderPortfolioCoverage(0,CLIENTS.length,'cargando');
+    refreshPortfolioCoverage();
   }catch(e){CLIENTS=[];fillClientOptions([]);toast('No se pudo cargar clientes')}
 }
 function fillClientOptions(rows){
   const s=$('#clientSelect'), current=s.value;s.innerHTML='<option value="">Selecciona cliente</option>';
-  rows.forEach(c=>{const o=document.createElement('option');o.value=`${c.code}|||${c.name}`;o.textContent=`${c.code} · ${c.name}`;s.appendChild(o)});
+  rows.forEach(c=>{const o=document.createElement('option');o.value=`${c.code}|||${c.name}`;o.textContent=c.name;s.appendChild(o)});
   if([...s.options].some(o=>o.value===current))s.value=current;
 }
 function filterClients(){
@@ -601,7 +650,7 @@ async function startVisit(){
   $('#startVisit').disabled=true;
   try{
     const pos=await getPos(), now=new Date().toISOString();
-    setActive({city:a.city,vendor:a.vendor,client:`${c.code} · ${c.name}`,client_code:c.code,client_name:c.name,type:$('#visitType').value,notes:$('#visitNotes').value.trim(),start_ts:now,start_lat:pos.coords.latitude,start_lng:pos.coords.longitude});
+    setActive({city:a.city,vendor:a.vendor,client:c.name,client_code:c.code,client_name:c.name,type:$('#visitType').value,notes:$('#visitNotes').value.trim(),start_ts:now,start_lat:pos.coords.latitude,start_lng:pos.coords.longitude});
     renderVisitState();renderVisitMapMarkers();toast('Visita iniciada');
   }catch(e){toast('Activa permiso de ubicación')}finally{$('#startVisit').disabled=false}
 }
@@ -615,7 +664,7 @@ async function endVisit(){
     const rows=getLocalVisits();rows.push(rec);setLocalVisits(rows);setActive(null);
     $('#visitNotes').value='';$('#nextAction').value='';$('#followupDate').value='';$('#clientSearch').value='';fillClientOptions(CLIENTS);
     try{await cloudInsertVisit(rec)}catch(e){const q=getQueue();q.push(rec);setQueue(q)}
-    renderVisitState();renderToday();renderVisitMapMarkers();updateDashboard();toast('Visita finalizada');
+    renderVisitState();renderToday();renderVisitMapMarkers();updateDashboard();refreshPortfolioCoverage();toast('Visita finalizada');
   }catch(e){toast('No se pudo obtener ubicación')}finally{$('#endVisit').disabled=false}
 }
 
@@ -633,11 +682,11 @@ async function saveCantVisit(){
   try{const p=await getPos();lat=p.coords.latitude;lng=p.coords.longitude}catch(e){}
   const now=new Date().toISOString();
   const nextAction=$('#nextAction').value||'Volver a visitar',followup=$('#followupDate').value;
-  const rec={id:uuid(),day:today(),city:a.city,vendor:a.vendor,client:`${c.code} · ${c.name}`,type:'No pude visitar',notes:packNotes(CANT_VISIT_REASON,{missed:true,next_action:nextAction,followup_date:followup}),next_action:nextAction,followup_date:followup,missed:true,start_ts:now,end_ts:now,duration_sec:0,start_lat:lat,start_lng:lng,end_lat:lat,end_lng:lng};
+  const rec={id:uuid(),day:today(),city:a.city,vendor:a.vendor,client:c.name,type:'No pude visitar',notes:packNotes(CANT_VISIT_REASON,{missed:true,next_action:nextAction,followup_date:followup}),next_action:nextAction,followup_date:followup,missed:true,start_ts:now,end_ts:now,duration_sec:0,start_lat:lat,start_lng:lng,end_lat:lat,end_lng:lng};
   const rows=getLocalVisits();rows.push(rec);setLocalVisits(rows);
   try{await cloudInsertVisit(rec)}catch(e){const q=getQueue();q.push(rec);setQueue(q)}
   $('#cantVisitBox').style.display='none';CANT_VISIT_REASON='';$$('[data-reason]').forEach(b=>b.classList.remove('active'));
-  renderToday();updateDashboard();toast('Intento registrado');
+  renderToday();updateDashboard();refreshPortfolioCoverage();toast('Intento registrado');
 }
 
 
@@ -1017,12 +1066,12 @@ function renderAdminSellerSummary(rows){
   const map=new Map();
   rows.forEach(r=>{
     if(!r.vendor||r.vendor==='ADMIN')return;
-    if(!map.has(r.vendor))map.set(r.vendor,{visits:0,prospects:0,missed:0,dur:0});
+    if(!map.has(r.vendor))map.set(r.vendor,{visits:0,prospects:0,missed:0,dur:0,clients:new Set()});
     const x=map.get(r.vendor),m=visitMeta(r);
-    if(m.prospect)x.prospects++; else if(m.missed)x.missed++; else{x.visits++;x.dur+=Number(r.duration_sec)||0}
+    if(m.prospect)x.prospects++; else if(m.missed)x.missed++; else{x.visits++;x.dur+=Number(r.duration_sec)||0;x.clients.add(clientKey(r.client))}
   });
   const box=$('#adminSellerSummary');
-  box.innerHTML=[...map.entries()].sort((a,b)=>b[1].visits-a[1].visits).map(([v,x])=>`<div class="adminRow"><div class="top"><b>${esc(v)}</b><span>${x.visits} visitas</span></div><p>Prospectos ${x.prospects} · No visitados ${x.missed} · Duración prom. ${x.visits?Math.round((x.dur/x.visits)/60):0} min</p></div>`).join('')||'<div class="empty">Sin información.</div>';
+  box.innerHTML=[...map.entries()].sort((a,b)=>b[1].visits-a[1].visits).map(([v,x])=>`<div class="adminRow"><div class="top"><b>${esc(v)}</b><span>${x.visits} visitas</span></div><p>Prospectos ${x.prospects} · No visitados ${x.missed} · Duración prom. ${x.visits?Math.round((x.dur/x.visits)/60):0} min</p><p><b>Cobertura cartera:</b> ${PORTFOLIO_TOTALS[v]?Math.min(100,Math.round((x.clients.size/PORTFOLIO_TOTALS[v])*100)):0}% · ${x.clients.size}/${PORTFOLIO_TOTALS[v]||0} clientes</p></div>`).join('')||'<div class="empty">Sin información.</div>';
 }
 async function loadAgingClients(days){
   const box=$('#agingClients');box.innerHTML='<div class="empty">Analizando clientes…</div>';
