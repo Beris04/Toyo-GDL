@@ -8,7 +8,6 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Toyo Visitas">
-<link rel="manifest" href="manifest.webmanifest">
 <title>Toyo Foods · Visitas V3.4</title>
 <style>
 :root{
@@ -352,7 +351,7 @@ const ACTIVE_KEY='toyo_active_visit_v1', VISITS_KEY='toyo_visits_local_v1', QUEU
 const SUPABASE_URL='https://cqgctmpbvlsodfnwscnx.supabase.co';
 const SUPABASE_ANON_KEY='sb_publishable_YrwnpHjOzCaCfYonPQu73Q_CZ2F7IBc';
 const VISITS_TABLE='visits', PROMO_TABLE='announcements';
-const APP_VERSION='3.4.0';
+const APP_VERSION='3.5.0';
 
 const QUOTE_URL='https://beris04.github.io/Cotizador/';
 const ORDERS_URL='https://beris04.github.io/Toyo-MX/';
@@ -801,7 +800,7 @@ async function cloudTestRead(show=true){
 async function cloudTestWrite(show=true){
   if(show)cloudDiagSet('wait','Probando escritura…','Creando y eliminando un registro de diagnóstico…');
   const id=uuid(),now=new Date().toISOString();
-  const body={id,day:today(),city:'GDL',vendor:'Admin',client:'DIAG::Cloud',type:'Visita de Seguimiento',notes:'Diagnóstico automático V3.2',start_ts:now,end_ts:now,duration_sec:0,start_lat:null,start_lng:null,end_lat:null,end_lng:null};
+  const body={id,day:today(),city:'GDL',vendor:'Admin',client:'DIAG::Cloud',type:'Visita de Seguimiento',notes:'Diagnóstico automático V3.5',start_ts:now,end_ts:now,duration_sec:0,start_lat:null,start_lng:null,end_lat:null,end_lng:null};
   try{
     await sbFetch(`/rest/v1/${VISITS_TABLE}`,{method:'POST',headers:{Prefer:'return=minimal'},body});
     let cleanup='Limpieza OK';
@@ -1164,14 +1163,12 @@ $$('[data-aging]').forEach(b=>b.onclick=()=>loadAgingClients(b.dataset.aging));$
 resetPromoForm();
 if(getAuth()&&navigator.onLine)setTimeout(flushQueue,2200);
 
-// V3.4 · estabilidad móvil: la app puede abrir aunque Cloud esté lento o temporalmente caído.
+// V3.5 · estabilidad móvil sin Service Worker.
+// Evita que una versión vieja quede atrapada en caché del teléfono.
 window.addEventListener('error',e=>console.error('APP ERROR',e.error||e.message));
 window.addEventListener('unhandledrejection',e=>console.error('APP PROMISE ERROR',e.reason));
 if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('./sw.js?v='+encodeURIComponent(APP_VERSION))
-      .catch(e=>console.warn('Service Worker',e));
-  });
+  navigator.serviceWorker.getRegistrations().then(regs=>regs.forEach(r=>r.unregister())).catch(()=>{});
 }
 
 </script>
