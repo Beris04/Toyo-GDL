@@ -1,0 +1,18 @@
+V3.4 - 2026-10-05
+
+CAMBIOS DE VENDEDORES
+- Agregado: GDL8 - HUGO A.
+- Cartera de Hugo: 58 clientes tomados de Libro1.xlsx.
+- Eliminado del acceso: GDL3 - MARICELA REYNOSO.
+- Se eliminó el archivo local de cartera de Maricela.
+- Los registros históricos ya existentes en Supabase NO se eliminan.
+
+ESTABILIDAD MÓVIL
+- Timeout de Supabase: 12 segundos para evitar que Cloud deje esperando la app.
+- La cartera se guarda como respaldo en localStorage después de una carga correcta.
+- Se agregó Service Worker para caché del app shell y archivos consultados.
+- Se agregó manifest.webmanifest para mejor funcionamiento en celular/PWA.
+- El HTML se intenta obtener primero desde GitHub y usa caché solo si la red falla.
+
+SUPABASE
+- No se requieren cambios de columnas o tablas por esta actualización.

@@ -1,0 +1,17 @@
+{
+  "name": "Toyo Foods · App Visitas",
+  "short_name": "Toyo Visitas",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#eef3f8",
+  "theme_color": "#0b4ea2",
+  "icons": [
+    {
+      "src": "assets/toyo_logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

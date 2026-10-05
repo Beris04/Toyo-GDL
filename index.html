@@ -4,7 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b4ea2">
-<title>Toyo Foods · Visitas V3.2</title>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Toyo Visitas">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Toyo Foods · Visitas V3.4</title>
 <style>
 :root{
   --blue:#0b4ea2;--blue2:#062f69;--cyan:#17a2ff;--ink:#10243e;--muted:#6f7f95;--bg:#eef3f8;
@@ -122,7 +127,7 @@ main{padding-top:12px}
 <header class="topbar">
   <div class="toprow">
     <img class="logo" src="assets/toyo_logo.png" alt="Toyo Foods">
-    <div class="brand"><b id="topTitle">App Visitas</b><span id="topSub">Toyo Foods · Visitas móvil V3.2</span></div>
+    <div class="brand"><b id="topTitle">App Visitas</b><span id="topSub">Toyo Foods · Visitas móvil V3.4</span></div>
     <span id="net" class="net">●</span>
   </div>
 </header>
@@ -338,15 +343,16 @@ main{padding-top:12px}
 <div id="toast" class="toast"></div>
 
 <script>
-const SELLERS={"GDL":["AGENTE CLAVE  GDL","GDL - QIN","GDL - VERDE VALLE","GDL1 - OSCAR YEPEZ","GDL13 - SANDRA NAVARRO","GDL14- ARCENIO AGUIRRE","GDL15 - ALDO SIERRA","GDL3 - MARICELA REYNOSO","GDL4 - JULIO DE LA CRUZ","GDL5 - ALAN PEREZ","GDL6 - DANIEL  AGUILAR","GDL9 - ANTONIO V.","OFICINA GDL","RUTA AMECA GDL","RUTA ARANDAS GDL","RUTA ATOTONILCO GDL","RUTA AUTLAN GDL","RUTA CHAPALA GDL","RUTA JALOSTOTITLAN GDL","RUTA LOS ALTOS GDL","RUTA SAHUAYO GDL","RUTA TAPALPA GDL","RUTA TEPA GDL","RUTA TEQUILA GDL"],"CDMX":["AGENTE CLAVE CDMX","AGENTE CLAVE JAPONES CDMX","CD MEXICO MAYOREO","CD MEXICO MENUDEO","CDMX ABRAHAM","CDMX ADRIAN","CDMX ANDRES","CDMX DAVID","CDMX EDUARDO","CDMX JAVIER","CDMX JESUS","CDMX JONATHAN","CDMX OFICINA AGENTE CLAVE","CDMX RICARDO","CDMX SAKURAI HIROYUKI","CDMX SERGIO","CDMX VARIABLES","CDMX  OFICINA"],"QRO":["QRO 01 ROBERTO LOPEZ"],"PUE":["PUE 02 YAEL MOJICA"],"LEON":["LEO 01 NOE CERVANTES"],"CLN":["CLN 01 - MANUEL  ACQUART","CLN 02 - FRANCISCO VALDEZ"],"MTY":["MTY 01 - JESICA PALOMO","MTY 02 - LUIS HEREDIA","MTY 05 - CARLA HERNANDEZ","MTY 06 - SALOME BARRON"]};
+const SELLERS={"GDL":["AGENTE CLAVE  GDL","GDL - QIN","GDL - VERDE VALLE","GDL1 - OSCAR YEPEZ","GDL13 - SANDRA NAVARRO","GDL14- ARCENIO AGUIRRE","GDL15 - ALDO SIERRA","GDL4 - JULIO DE LA CRUZ","GDL5 - ALAN PEREZ","GDL6 - DANIEL  AGUILAR","GDL8 - HUGO A.","GDL9 - ANTONIO V.","OFICINA GDL","RUTA AMECA GDL","RUTA ARANDAS GDL","RUTA ATOTONILCO GDL","RUTA AUTLAN GDL","RUTA CHAPALA GDL","RUTA JALOSTOTITLAN GDL","RUTA LOS ALTOS GDL","RUTA SAHUAYO GDL","RUTA TAPALPA GDL","RUTA TEPA GDL","RUTA TEQUILA GDL"],"CDMX":["AGENTE CLAVE CDMX","AGENTE CLAVE JAPONES CDMX","CD MEXICO MAYOREO","CD MEXICO MENUDEO","CDMX ABRAHAM","CDMX ADRIAN","CDMX ANDRES","CDMX DAVID","CDMX EDUARDO","CDMX JAVIER","CDMX JESUS","CDMX JONATHAN","CDMX OFICINA AGENTE CLAVE","CDMX RICARDO","CDMX SAKURAI HIROYUKI","CDMX SERGIO","CDMX VARIABLES","CDMX  OFICINA"],"QRO":["QRO 01 ROBERTO LOPEZ"],"PUE":["PUE 02 YAEL MOJICA"],"LEON":["LEO 01 NOE CERVANTES"],"CLN":["CLN 01 - MANUEL  ACQUART","CLN 02 - FRANCISCO VALDEZ"],"MTY":["MTY 01 - JESICA PALOMO","MTY 02 - LUIS HEREDIA","MTY 05 - CARLA HERNANDEZ","MTY 06 - SALOME BARRON"]};
 const CITY_LABELS={"GDL":"Guadalajara","CDMX":"México","QRO":"Querétaro","PUE":"Puebla","LEON":"León","CLN":"Culiacán","MTY":"Monterrey"};
-const PORTFOLIO_TOTALS={"AGENTE CLAVE  GDL":318,"GDL - QIN":3,"GDL - VERDE VALLE":2,"GDL1 - OSCAR YEPEZ":138,"GDL13 - SANDRA NAVARRO":111,"GDL14- ARCENIO AGUIRRE":55,"GDL15 - ALDO SIERRA":44,"GDL3 - MARICELA REYNOSO":89,"GDL4 - JULIO DE LA CRUZ":126,"GDL5 - ALAN PEREZ":174,"GDL6 - DANIEL  AGUILAR":116,"GDL9 - ANTONIO V.":120,"OFICINA GDL":4729,"RUTA AMECA GDL":59,"RUTA ARANDAS GDL":31,"RUTA ATOTONILCO GDL":55,"RUTA AUTLAN GDL":14,"RUTA CHAPALA GDL":83,"RUTA JALOSTOTITLAN GDL":27,"RUTA LOS ALTOS GDL":74,"RUTA SAHUAYO GDL":31,"RUTA TAPALPA GDL":19,"RUTA TEPA GDL":1,"RUTA TEQUILA GDL":61,"AGENTE CLAVE CDMX":23,"AGENTE CLAVE JAPONES CDMX":258,"CD MEXICO MAYOREO":19,"CD MEXICO MENUDEO":10,"CDMX ABRAHAM":92,"CDMX ADRIAN":111,"CDMX ANDRES":104,"CDMX DAVID":82,"CDMX EDUARDO":253,"CDMX JAVIER":274,"CDMX JESUS":237,"CDMX JONATHAN":93,"CDMX OFICINA AGENTE CLAVE":50,"CDMX RICARDO":119,"CDMX SAKURAI HIROYUKI":3,"CDMX SERGIO":172,"CDMX VARIABLES":3,"CDMX  OFICINA":5988,"QRO 01 ROBERTO LOPEZ":118,"PUE 02 YAEL MOJICA":36,"LEO 01 NOE CERVANTES":76,"CLN 01 - MANUEL  ACQUART":81,"CLN 02 - FRANCISCO VALDEZ":48,"MTY 01 - JESICA PALOMO":120,"MTY 02 - LUIS HEREDIA":102,"MTY 05 - CARLA HERNANDEZ":58,"MTY 06 - SALOME BARRON":43};
+const PORTFOLIO_TOTALS={"AGENTE CLAVE  GDL":318,"GDL - QIN":3,"GDL - VERDE VALLE":2,"GDL1 - OSCAR YEPEZ":138,"GDL13 - SANDRA NAVARRO":111,"GDL14- ARCENIO AGUIRRE":55,"GDL15 - ALDO SIERRA":44,"GDL4 - JULIO DE LA CRUZ":126,"GDL5 - ALAN PEREZ":174,"GDL6 - DANIEL  AGUILAR":116,"GDL8 - HUGO A.":58,"GDL9 - ANTONIO V.":120,"OFICINA GDL":4729,"RUTA AMECA GDL":59,"RUTA ARANDAS GDL":31,"RUTA ATOTONILCO GDL":55,"RUTA AUTLAN GDL":14,"RUTA CHAPALA GDL":83,"RUTA JALOSTOTITLAN GDL":27,"RUTA LOS ALTOS GDL":74,"RUTA SAHUAYO GDL":31,"RUTA TAPALPA GDL":19,"RUTA TEPA GDL":1,"RUTA TEQUILA GDL":61,"AGENTE CLAVE CDMX":23,"AGENTE CLAVE JAPONES CDMX":258,"CD MEXICO MAYOREO":19,"CD MEXICO MENUDEO":10,"CDMX ABRAHAM":92,"CDMX ADRIAN":111,"CDMX ANDRES":104,"CDMX DAVID":82,"CDMX EDUARDO":253,"CDMX JAVIER":274,"CDMX JESUS":237,"CDMX JONATHAN":93,"CDMX OFICINA AGENTE CLAVE":50,"CDMX RICARDO":119,"CDMX SAKURAI HIROYUKI":3,"CDMX SERGIO":172,"CDMX VARIABLES":3,"CDMX  OFICINA":5988,"QRO 01 ROBERTO LOPEZ":118,"PUE 02 YAEL MOJICA":36,"LEO 01 NOE CERVANTES":76,"CLN 01 - MANUEL  ACQUART":81,"CLN 02 - FRANCISCO VALDEZ":48,"MTY 01 - JESICA PALOMO":120,"MTY 02 - LUIS HEREDIA":102,"MTY 05 - CARLA HERNANDEZ":58,"MTY 06 - SALOME BARRON":43};
 const AUTH_KEY='toyo_visitas_auth_v1', AUTH_PASS='Toyo2026';
 const ACTIVE_KEY='toyo_active_visit_v1', VISITS_KEY='toyo_visits_local_v1', QUEUE_KEY='toyo_visits_queue_v1', PROMOS_KEY='toyo_promos_local_v1', PROMO_QUEUE_KEY='toyo_promos_queue_v1';
 
 const SUPABASE_URL='https://cqgctmpbvlsodfnwscnx.supabase.co';
 const SUPABASE_ANON_KEY='sb_publishable_YrwnpHjOzCaCfYonPQu73Q_CZ2F7IBc';
 const VISITS_TABLE='visits', PROMO_TABLE='announcements';
+const APP_VERSION='3.4.0';
 
 const QUOTE_URL='https://beris04.github.io/Cotizador/';
 const ORDERS_URL='https://beris04.github.io/Toyo-MX/';
@@ -438,7 +444,7 @@ function go(name){
   if(name==='admin'&&a.role!=='admin')return;
   $$('.screen').forEach(x=>x.classList.toggle('active',x.id===name));
   $$('.nav').forEach(x=>x.classList.toggle('active',x.dataset.go===name));
-  const titles={home:['App Visitas','Toyo Foods · Visitas móvil V3.2'],visits:['Visitas','Clientes asignados y registro'],promos:['Promociones','Material comercial vigente'],admin:['Admin','Visitas y promociones'],more:['Más','Herramientas y sesión']};
+  const titles={home:['App Visitas','Toyo Foods · Visitas móvil V3.4'],visits:['Visitas','Clientes asignados y registro'],promos:['Promociones','Material comercial vigente'],admin:['Admin','Visitas y promociones'],more:['Más','Herramientas y sesión']};
   const t=titles[name]||titles.home;$('#topTitle').textContent=t[0];$('#topSub').textContent=t[1];
   if(name==='visits'){renderVisitState();renderToday();setTimeout(ensureVisitMap,60);if(getAuth()?.role==='seller')setTimeout(loadSellerHistory,100)}
   if(name==='promos')loadPromos();
@@ -558,14 +564,32 @@ function renderVisitMapMarkers(){
 
 async function loadSellerClients(){
   const a=getAuth();if(!a||a.role!=='seller')return;
+  const cacheKey='toyo_clients_'+slug(a.vendor);
   try{
-    const r=await fetch(`data/visitas/${slug(a.vendor)}.json`,{cache:'force-cache'});
+    const ctrl=new AbortController();
+    const timer=setTimeout(()=>ctrl.abort(),10000);
+    const r=await fetch(`data/visitas/${slug(a.vendor)}.json?v=${encodeURIComponent(APP_VERSION)}`,{
+      cache:'no-cache',
+      signal:ctrl.signal
+    });
+    clearTimeout(timer);
     if(!r.ok)throw new Error('HTTP '+r.status);
     CLIENTS=await r.json();if(!Array.isArray(CLIENTS))CLIENTS=[];
+    try{localStorage.setItem(cacheKey,JSON.stringify(CLIENTS))}catch(e){}
     fillClientOptions(CLIENTS);
     renderPortfolioCoverage(0,CLIENTS.length,'cargando');
     refreshPortfolioCoverage();
-  }catch(e){CLIENTS=[];fillClientOptions([]);toast('No se pudo cargar clientes')}
+  }catch(e){
+    try{CLIENTS=JSON.parse(localStorage.getItem(cacheKey)||'[]')}catch(_){CLIENTS=[]}
+    fillClientOptions(CLIENTS);
+    if(CLIENTS.length){
+      renderPortfolioCoverage(0,CLIENTS.length,'respaldo local');
+      refreshPortfolioCoverage();
+      toast('Usando cartera guardada en el celular');
+    }else{
+      toast('No se pudo cargar cartera. Revisa internet y actualiza.');
+    }
+  }
 }
 function fillClientOptions(rows){
   const s=$('#clientSelect'), current=s.value;s.innerHTML='<option value="">Selecciona cliente</option>';
@@ -802,12 +826,22 @@ async function cloudTestAll(){
 }
 
 function sbUrl(path){return SUPABASE_URL.replace(/\/$/,'')+path}
-async function sbFetch(path,{method='GET',body=null,headers={}}={}){
-  const opts={method,headers:{apikey:SUPABASE_ANON_KEY,...headers}};
+async function sbFetch(path,{method='GET',body=null,headers={},timeout=12000}={}){
+  const ctrl=new AbortController();
+  const timer=setTimeout(()=>ctrl.abort(),timeout);
+  const opts={method,signal:ctrl.signal,headers:{apikey:SUPABASE_ANON_KEY,...headers}};
   if(body!==null){opts.headers['Content-Type']='application/json';opts.body=JSON.stringify(body)}
-  const r=await fetch(sbUrl(path),opts),txt=await r.text();
-  if(!r.ok)throw new Error(txt||('HTTP '+r.status));
-  if(!txt.trim())return null;try{return JSON.parse(txt)}catch{return txt}
+  try{
+    const r=await fetch(sbUrl(path),opts),txt=await r.text();
+    if(!r.ok)throw new Error(txt||('HTTP '+r.status));
+    if(!txt.trim())return null;
+    try{return JSON.parse(txt)}catch{return txt}
+  }catch(e){
+    if(e?.name==='AbortError')throw new Error('Tiempo de espera agotado al conectar con Supabase');
+    throw e;
+  }finally{
+    clearTimeout(timer);
+  }
 }
 async function cloudInsertVisit(rec){
   const body={
@@ -1129,6 +1163,17 @@ $('#sellerHistMonth').addEventListener('change',e=>setSellerHistoryMonth(e.targe
 $$('[data-aging]').forEach(b=>b.onclick=()=>loadAgingClients(b.dataset.aging));$('#loadSellerHistory').onclick=loadSellerHistory;
 resetPromoForm();
 if(getAuth()&&navigator.onLine)setTimeout(flushQueue,2200);
+
+// V3.4 · estabilidad móvil: la app puede abrir aunque Cloud esté lento o temporalmente caído.
+window.addEventListener('error',e=>console.error('APP ERROR',e.error||e.message));
+window.addEventListener('unhandledrejection',e=>console.error('APP PROMISE ERROR',e.reason));
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./sw.js?v='+encodeURIComponent(APP_VERSION))
+      .catch(e=>console.warn('Service Worker',e));
+  });
+}
+
 </script>
 </body>
 </html>
