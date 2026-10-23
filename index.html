@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Toyo Visitas V4.0 · versión de un solo archivo para GitHub Pages -->
+<!-- Toyo Visitas V4.1 · versión de un solo archivo para GitHub Pages -->
 <html lang="es">
 <head>
 <meta charset="utf-8">
@@ -122,7 +122,7 @@ main{padding-top:12px}
 
 @media(max-width:390px){.grid2,.promoList,.row,.reasonGrid{grid-template-columns:1fr}}
 
-/* V4.0 · UI limpia tipo portal Toyo */
+/* V4.1 · UI limpia tipo portal Toyo */
 body{background:#f6f8fb;color:#10284b}
 .topbar{background:#fff;color:#10284b;border-top:3px solid #185db6;border-bottom:1px solid #dce5f0;box-shadow:none}
 .brand span{color:#718198;opacity:1}.net{background:#f3f7fd;border:1px solid #d8e3f1;color:#1d4f91}
@@ -508,7 +508,7 @@ const ACTIVE_KEY='toyo_active_visit_v1', VISITS_KEY='toyo_visits_local_v1', QUEU
 const SUPABASE_URL='https://cqgctmpbvlsodfnwscnx.supabase.co';
 const SUPABASE_ANON_KEY='sb_publishable_YrwnpHjOzCaCfYonPQu73Q_CZ2F7IBc';
 const VISITS_TABLE='visits', PROMO_TABLE='announcements';
-const APP_VERSION='4.0.0';
+const APP_VERSION='4.1.0';
 
 const QUOTE_URL='https://beris04.github.io/Cotizador/';
 const ORDERS_URL='https://beris04.github.io/Toyo-MX/';
@@ -758,6 +758,10 @@ async function loadSellerClients(){
   }catch(e){CLIENTS=[];fillClientOptions([]);toast('No se pudo cargar la cartera')}
 }
 function fillClientOptions(rows){
+  rows=Array.isArray(rows)?rows.slice():[];
+  if(!rows.some(c=>norm((c?.name||c?.nombre||c?.client||c?.code||c?.codigo||''))==='sucursal')){
+    rows.unshift({code:'SUCURSAL',name:'Sucursal'});
+  }
   const s=$('#clientSelect'), current=s.value;s.innerHTML='<option value="">Selecciona cliente</option>';
   rows.forEach(c=>{const o=document.createElement('option');o.value=`${c.code}|||${c.name}`;o.textContent=c.name;s.appendChild(o)});
   if([...s.options].some(o=>o.value===current))s.value=current;
