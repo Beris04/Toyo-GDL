@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Toyo Visitas V4.1 · versión de un solo archivo para GitHub Pages -->
+<!-- Toyo Visitas V4.2 · versión de un solo archivo para GitHub Pages -->
 <html lang="es">
 <head>
 <meta charset="utf-8">
@@ -122,7 +122,7 @@ main{padding-top:12px}
 
 @media(max-width:390px){.grid2,.promoList,.row,.reasonGrid{grid-template-columns:1fr}}
 
-/* V4.1 · UI limpia tipo portal Toyo */
+/* V4.2 · UI limpia tipo portal Toyo */
 body{background:#f6f8fb;color:#10284b}
 .topbar{background:#fff;color:#10284b;border-top:3px solid #185db6;border-bottom:1px solid #dce5f0;box-shadow:none}
 .brand span{color:#718198;opacity:1}.net{background:#f3f7fd;border:1px solid #d8e3f1;color:#1d4f91}
@@ -155,7 +155,8 @@ main{max-width:980px;padding-top:18px}.card,.actionCard,.kpi,.lastClient{box-sha
 
     <div id="sellerDashboard">
       <div class="kpiGrid">
-        <div class="kpi"><div id="kpiVisits" class="num">0</div><div class="lab">VISITAS HOY</div></div>
+        <div class="kpi"><div id="kpiVisits" class="num">0</div><div class="lab">VISITAS HOY</div>
+        <div class="kpi"><div id="kpiSucursal" class="num">0</div><div class="lab">VISITAS A SUCURSAL</div></div></div>
         <div class="kpi good"><div id="kpiGoal" class="num">0/5</div><div class="lab">META DIARIA</div></div>
         <div class="kpi warn"><div id="kpiPending" class="num">5</div><div class="lab">FALTAN</div></div>
         <div class="kpi"><div id="kpiMinutes" class="num">0</div><div class="lab">MIN. EN CAMPO</div></div>
@@ -184,6 +185,18 @@ main{max-width:980px;padding-top:18px}.card,.actionCard,.kpi,.lastClient{box-sha
         <div class="card"><b style="font-size:11px">Prospectos</b><div id="monthlyProspects" style="font-size:24px;font-weight:950;margin-top:7px">0</div><span style="font-size:9px;color:var(--muted)">registrados este mes</span></div>
       </div>
     </div>
+    <div class="sectionTitle">Visitas a sucursal</div>
+    <div class="card">
+      <div class="historyHead">
+        <div>
+          <b style="font-size:12px">Actividad en sucursal</b>
+          <span style="display:block;margin-top:3px">No afecta la cobertura de cartera</span>
+        </div>
+        <span id="branchVisitsSummary" class="pill">0 visitas</span>
+      </div>
+      <div id="branchVisitsList" class="visitList"><div class="empty">Sin visitas a sucursal este mes.</div></div>
+    </div>
+
 
     <div class="sectionTitle">Tu sesión</div>
     <div class="card userCard"><div class="avatar">👤</div><div style="flex:1"><b id="userName">—</b><span id="userScope">—</span></div><span id="sellerSyncStatus" class="pill">✓ Sincronizado</span></div>
@@ -508,7 +521,7 @@ const ACTIVE_KEY='toyo_active_visit_v1', VISITS_KEY='toyo_visits_local_v1', QUEU
 const SUPABASE_URL='https://cqgctmpbvlsodfnwscnx.supabase.co';
 const SUPABASE_ANON_KEY='sb_publishable_YrwnpHjOzCaCfYonPQu73Q_CZ2F7IBc';
 const VISITS_TABLE='visits', PROMO_TABLE='announcements';
-const APP_VERSION='4.1.0';
+const APP_VERSION='4.2.0';
 
 const QUOTE_URL='https://beris04.github.io/Cotizador/';
 const ORDERS_URL='https://beris04.github.io/Toyo-MX/';
@@ -532,6 +545,11 @@ let MAP=null, MAP_READY=false, MAP_LOADING_PROMISE=null, MAP_CURRENT=null, MAP_L
 
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),2200)}
 function norm(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()}
+
+function isSucursalVisit(r){
+  const c=norm(r?.client||'');
+  return c==='sucursal'||c.startsWith('sucursal ·')||c.includes('· sucursal')||c.includes('sucursal');
+}
 function slug(s){return norm(s).replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'')}
 function clientKey(s){
   s=String(s||'').trim();
@@ -556,7 +574,7 @@ async function refreshPortfolioCoverage(){
     let path=`/rest/v1/${VISITS_TABLE}?select=${cols}&day=gte.${from}&day=lte.${to}&limit=5000`;
     if(a.city&&a.city!=='ALL')path+=`&city=eq.${encodeURIComponent(a.city)}`;
     const cloud=await sbFetch(path);
-    rows=(Array.isArray(cloud)?cloud:[]).filter(r=>vendorMatchesSeller(r.vendor,a.vendor));source='Cloud';
+    rows=(Array.isArray(cloud)?cloud:[]).filter(r=>!isSucursalVisit(r)&&vendorMatchesSeller(r.vendor,a.vendor));source='Cloud';
   }catch(e){
     rows=getLocalVisits().filter(r=>vendorMatchesSeller(r.vendor,a.vendor)&&String(r.day||'').startsWith(month));
   }
@@ -1346,7 +1364,7 @@ function renderAdminSellerSummary(rows){
     if(m.prospect)x.prospects++; else if(m.missed)x.missed++; else{x.visits++;x.dur+=Number(r.duration_sec)||0;x.clients.add(clientKey(r.client))}
   });
   const box=$('#adminSellerSummary');
-  box.innerHTML=[...map.entries()].sort((a,b)=>b[1].visits-a[1].visits).map(([v,x])=>`<div class="adminRow"><div class="top"><b>${esc(v)}</b><span>${x.visits} visitas</span></div><p>Prospectos ${x.prospects} · No visitados ${x.missed} · Duración prom. ${x.visits?Math.round((x.dur/x.visits)/60):0} min</p><p><b>Cobertura cartera:</b> ${PORTFOLIO_TOTALS[v]?Math.min(100,Math.round((x.clients.size/PORTFOLIO_TOTALS[v])*100)):0}% · ${x.clients.size}/${PORTFOLIO_TOTALS[v]||0} clientes</p></div>`).join('')||'<div class="empty">Sin información.</div>';
+  box.innerHTML=[...map.entries()].sort((a,b)=>b[1].visits-a[1].visits).map(([v,x])=>`<div class="adminRow"><div class="top"><b>${esc(v)}</b><span>${x.visits} visitas</span></div><p>Sucursal ${x.branches} · Prospectos ${x.prospects} · No visitados ${x.missed} · Duración prom. ${x.visits?Math.round((x.dur/x.visits)/60):0} min</p><p><b>Cobertura cartera:</b> ${PORTFOLIO_TOTALS[v]?Math.min(100,Math.round((x.clients.size/PORTFOLIO_TOTALS[v])*100)):0}% · ${x.clients.size}/${PORTFOLIO_TOTALS[v]||0} clientes</p></div>`).join('')||'<div class="empty">Sin información.</div>';
 }
 async function loadAgingClients(days){
   const box=$('#agingClients');box.innerHTML='<div class="empty">Analizando clientes…</div>';
